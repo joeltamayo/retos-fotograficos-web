@@ -12,6 +12,7 @@ const ROUTES = [
 	{ pattern: '/retos/:id', modulePath: './pages/retoDetalle.js' },
 	{ pattern: '/galeria', modulePath: './pages/galeria.js' },
 	{ pattern: '/ranking', modulePath: './pages/ranking.js' },
+	{ pattern: '/perfil/me', modulePath: './pages/perfil.js', requiresAuth: true },
 	{ pattern: '/perfil/:usuario', modulePath: './pages/perfil.js' },
 	{ pattern: '/login', modulePath: './pages/login.js' },
 	{ pattern: '/admin', modulePath: './admin/admin.js', requiresAuth: true, requiresAdmin: true },

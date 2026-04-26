@@ -436,6 +436,66 @@ function renderLayout(contenedor, perfil, esPerfilPropio, ordenActivo) {
 }
 
 /**
+ * Muestra skeleton de carga para el perfil completo (header + fotos).
+ */
+function renderProfileHeaderSkeleton(contenedor) {
+	if (!(contenedor instanceof HTMLElement)) {
+		return;
+	}
+
+	contenedor.innerHTML = `
+		<section class="perfil-page page-enter">
+			<a class="perfil-breadcrumb" href="#/home">
+				<span>←</span>
+				<span>Perfil de Usuario</span>
+			</a>
+
+			<section class="perfil-card" aria-label="Perfil de usuario">
+				<header class="perfil-header">
+					<div class="skeleton" style="width:92px;height:92px;border-radius:9999px;flex-shrink:0"></div>
+					<div>
+						<div class="skeleton" style="height:22px;width:180px;margin-bottom:8px"></div>
+						<div class="skeleton" style="height:15px;width:120px;margin-bottom:12px"></div>
+						<div class="skeleton" style="height:16px;width:280px;margin-bottom:10px"></div>
+						<div class="skeleton" style="height:14px;width:200px"></div>
+					</div>
+				</header>
+
+				<div class="perfil-divider"></div>
+
+				<section class="perfil-stats" aria-label="Estadísticas del perfil">
+					${Array.from({ length: 4 }, () => `<article class="perfil-stat">
+						<div class="skeleton" style="height:32px;width:40px;margin:0 auto 8px"></div>
+						<div class="skeleton" style="height:14px;width:80px;margin:0 auto"></div>
+					</article>`).join('')}
+				</section>
+
+				<div class="perfil-divider"></div>
+
+				<section aria-label="Insignias">
+					<h2 class="perfil-badges-title"><i class="bi bi-award"></i>Insignias</h2>
+					<div class="perfil-badges-placeholders">
+						${Array.from({ length: 3 }, () => '<div class="skeleton" style="width:18px;height:18px;border-radius:9999px"></div>').join('')}
+					</div>
+				</section>
+			</section>
+
+			<div class="perfil-tabs" role="tablist" aria-label="Cambiar orden de fotos">
+				${Array.from({ length: 2 }, () => `<button class="perfil-tab-btn" disabled>
+					<div class="skeleton" style="height:15px;width:100px"></div>
+				</button>`).join('')}
+			</div>
+
+			<section class="perfil-grid-wrap">
+				<div class="perfil-skeleton-grid">
+					${Array.from({ length: 6 }, () => skeletonCard('300px')).join('')}
+				</div>
+			</section>
+		</section>
+	`;
+}
+
+/**
  * Muestra skeleton de carga en el grid.
  */
 function renderFotosSkeleton(contenedor) {
@@ -575,6 +635,8 @@ async function render(contenedor, params = {}) {
 		mostrarErrorPagina(contenedor, '404', 'Perfil no encontrado.');
 		return;
 	}
+
+	renderProfileHeaderSkeleton(contenedor);
 
 	try {
 		const perfil = await api.get(`/usuarios/${encodeURIComponent(usuarioObjetivo)}`);

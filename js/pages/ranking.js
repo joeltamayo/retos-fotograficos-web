@@ -640,7 +640,9 @@ function renderLayout(contenedor, periodo) {
 function renderSkeleton(contenedor) {
 	contenedor.innerHTML = `
 		<div class="ranking-skeleton-podium">
-			${Array.from({ length: 3 }, () => skeletonCard('430px')).join('')}
+			<div class="skeleton" style="height:500px;flex:1 1 32%"></div>
+			<div class="skeleton" style="height:580px;flex:1 1 35%"></div>
+			<div class="skeleton" style="height:450px;flex:1 1 32%"></div>
 		</div>
 
 		<div class="ranking-skeleton-details">
