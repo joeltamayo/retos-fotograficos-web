@@ -466,3 +466,98 @@
 	right: 16px;
 	font-size: 18px;
 }
+
+/* ========================================================================== */
+/* MOBILE EXTRA (<576PX)                                                      */
+/* ========================================================================== */
+
+@media (max-width: 575.98px) {
+	#photochallenge-navbar .container-fluid {
+		padding-inline: 12px !important;
+	}
+
+	#photochallenge-navbar .navbar-toggler {
+		min-width: 44px;
+		min-height: 44px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	#photochallenge-navbar .navbar-collapse {
+		background: #FFFFFF;
+		border-top: 1px solid var(--color-border);
+		margin-top: 8px;
+		padding-top: 8px;
+	}
+
+	#photochallenge-navbar .navbar-nav .nav-link {
+		width: 100%;
+		justify-content: flex-start;
+	}
+
+	#photochallenge-navbar [data-accion] {
+		width: 44px !important;
+		height: 44px !important;
+	}
+
+	.navbar-icon-btn {
+		width: 44px;
+		height: 44px;
+	}
+
+	.modal-foto-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.modal-foto-grid > :first-child {
+		order: 1;
+	}
+
+	.modal-foto-grid > :last-child {
+		order: 2;
+	}
+
+	.pc-modal-layout {
+		flex-direction: column !important;
+	}
+
+	.pc-modal-left,
+	.pc-modal-right {
+		flex: 0 0 100% !important;
+		max-width: 100% !important;
+	}
+
+	.pc-modal-left {
+		order: 1;
+	}
+
+	.pc-modal-right {
+		order: 2;
+	}
+
+	.admin-tabs {
+		flex-wrap: nowrap;
+		overflow-x: auto;
+	}
+
+	.admin-tab {
+		flex: 0 0 auto;
+		min-height: 44px;
+		display: inline-flex;
+		align-items: center;
+	}
+
+	.btn-gradient,
+	.btn-dark-custom,
+	.btn-outline-custom {
+		min-height: 44px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.input-custom {
+		min-height: 44px;
+	}
+}

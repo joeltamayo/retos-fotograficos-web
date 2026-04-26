@@ -1672,3 +1672,80 @@
         width: 100%;
     }
 }
+
+/* ========================================
+   MOBILE ESTRICTO (<576px)
+   ======================================== */
+
+@media (max-width: 575.98px) {
+    .login-page {
+        padding: 12px;
+        align-items: stretch;
+    }
+
+    .login-card {
+        flex-direction: column;
+        border-radius: var(--radius-lg);
+    }
+
+    .login-left,
+    .login-right {
+        padding: 24px 18px;
+    }
+
+    .retos-grid,
+    .fotos-recientes-grid,
+    .galeria-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .podio-wrapper {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .podio-item {
+        width: 100%;
+    }
+
+    .podio-2,
+    .podio-3 {
+        margin-top: 0;
+    }
+
+    .podio-3 {
+        max-width: none;
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .perfil-stats-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .admin-tabs {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+    }
+
+    .admin-tab {
+        flex: 0 0 auto;
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .login-btn,
+    .login-signup-btn,
+    .perfil-badge-edit,
+    .admin-btn-primary,
+    .admin-btn-cancel,
+    .admin-btn-save,
+    .admin-pag-btn {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
