@@ -7,6 +7,7 @@ const BASE_URL = 'http://localhost:3000/api';
  * Hash de ruta usado para enviar al usuario al login cuando su sesión expira.
  */
 const LOGIN_HASH = '#/login';
+const FORCE_LOGOUT_EVENT = 'photochallenge:auth-force-logout';
 
 /**
  * Construye una URL absoluta combinando BASE_URL con un endpoint relativo.
@@ -57,21 +58,20 @@ async function refreshAccessToken() {
 }
 
 /**
- * Cierra sesión usando el módulo auth y redirige al login del SPA.
- * El import dinámico evita dependencias circulares entre auth.js y api.js.
+ * Fuerza cierre de sesión sin importar auth.js para evitar dependencias circulares.
+ * Limpia cookie de sesión en backend (best effort), notifica al módulo auth y redirige.
  */
 async function logoutAndRedirectToLogin() {
 	try {
-		const authModule = await import('./auth.js');
-		const auth = authModule?.default;
-
-		if (auth && typeof auth.logout === 'function') {
-			await auth.logout();
-		}
+		await fetch(buildUrl('/auth/logout'), {
+			method: 'POST',
+			credentials: 'include',
+		});
 	} catch {
-		// Si auth.js aún no está implementado o falla, mantenemos la redirección.
+		// Si falla red/backend, aún forzamos limpieza local y redirección.
 	}
 
+	window.dispatchEvent(new Event(FORCE_LOGOUT_EVENT));
 	window.location.hash = LOGIN_HASH;
 }
 

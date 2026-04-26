@@ -1,10 +1,21 @@
 import api, { BASE_URL } from './api.js';
 
+const FORCE_LOGOUT_EVENT = 'photochallenge:auth-force-logout';
+
 /**
  * Estado de sesión en memoria del navegador.
  * No se persiste en localStorage para evitar almacenar datos sensibles en cliente.
  */
 let _usuario = null;
+
+/**
+ * Limpia sesión local en memoria.
+ */
+function limpiarSesionLocal() {
+	_usuario = null;
+}
+
+window.addEventListener(FORCE_LOGOUT_EVENT, limpiarSesionLocal);
 
 /**
  * Construye una URL absoluta para endpoints de autenticación.
@@ -65,7 +76,7 @@ async function logout() {
 	} catch {
 		// Aunque falle la red, limpiamos estado local para dejar al cliente en modo anónimo.
 	} finally {
-		_usuario = null;
+		limpiarSesionLocal();
 		window.location.hash = '#/home';
 	}
 }
@@ -83,7 +94,7 @@ async function verificarSesion() {
 		});
 
 		if (!refreshResponse.ok) {
-			_usuario = null;
+			limpiarSesionLocal();
 			return null;
 		}
 
@@ -91,7 +102,7 @@ async function verificarSesion() {
 		_usuario = normalizeUsuario(perfilActual);
 		return _usuario;
 	} catch {
-		_usuario = null;
+		limpiarSesionLocal();
 		return null;
 	}
 }
