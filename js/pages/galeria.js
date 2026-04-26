@@ -2,7 +2,7 @@ import api from '../api.js';
 import { cardFoto } from '../components/cardFoto.js';
 import { abrirModalFoto } from '../components/modalFoto.js';
 import { renderPaginacion } from '../components/paginacion.js';
-import { formatearFechaCorta, skeletonCard } from '../utils.js';
+import { formatearFechaCorta, manejarErrorDePagina, skeletonCard } from '../utils.js';
 
 const STYLE_ID = 'galeria-page-styles';
 const LIMITE_FOTOS = 9;
@@ -314,25 +314,33 @@ async function render(contenedor, params = {}) {
 		updateHashState(newOrden, 1);
 	});
 
-	const response = await api.get('/galeria', {
-		orden: state.orden,
-		pagina: state.pagina,
-		limite: LIMITE_FOTOS,
-	});
+	try {
+		const response = await api.get('/galeria', {
+			orden: state.orden,
+			pagina: state.pagina,
+			limite: LIMITE_FOTOS,
+		});
 
-	const fotosRaw = Array.isArray(response?.fotos) ? response.fotos : [];
-	const fotos = state.orden === 'mejores'
-		? fotosRaw.map((foto, index) => ({ ...foto, posicion: index < 3 ? index + 1 : undefined }))
-		: fotosRaw;
+		const fotosRaw = Array.isArray(response?.fotos) ? response.fotos : [];
+		const fotos = state.orden === 'mejores'
+			? fotosRaw.map((foto, index) => ({ ...foto, posicion: index < 3 ? index + 1 : undefined }))
+			: fotosRaw;
 
-	renderFotosGrid(refs.grid, fotos);
+		renderFotosGrid(refs.grid, fotos);
 
-	const total = Math.max(0, toSafeInt(response?.total, fotos.length));
-	const totalPaginas = Math.max(1, Math.ceil(total / LIMITE_FOTOS));
+		const total = Math.max(0, toSafeInt(response?.total, fotos.length));
+		const totalPaginas = Math.max(1, Math.ceil(total / LIMITE_FOTOS));
 
-	renderPaginacion(refs.pagination, state.pagina, totalPaginas, (nuevaPagina) => {
-		updateHashState(state.orden, nuevaPagina);
-	});
+		renderPaginacion(refs.pagination, state.pagina, totalPaginas, (nuevaPagina) => {
+			updateHashState(state.orden, nuevaPagina);
+		});
+	} catch (error) {
+		manejarErrorDePagina(contenedor, error, {
+			notFoundMessage: 'No encontramos la galeria solicitada.',
+			forbiddenMessage: 'No tienes permisos para acceder a esta galeria.',
+			fallbackMessage: 'No se pudo cargar la galeria.',
+		});
+	}
 }
 
 export { render };

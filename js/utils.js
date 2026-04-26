@@ -57,8 +57,13 @@ const TOAST_VARIANTES = {
 const ERRORES_PAGINA = {
 	'404': {
 		icono: 'bi-search',
-		titulo: 'Pagina no encontrada',
+		titulo: 'No encontrado',
 		mensaje: 'No encontramos el recurso que estas buscando.',
+	},
+	'acceso-denegado': {
+		icono: 'bi-shield-lock',
+		titulo: 'Acceso denegado',
+		mensaje: 'No tienes permisos para acceder a esta seccion.',
 	},
 	'sin-conexion': {
 		icono: 'bi-wifi-off',
@@ -377,27 +382,70 @@ function mostrarErrorPagina(contenedor, tipo, mensaje) {
 	const texto = escaparHtml(mensaje || config.mensaje);
 
 	nodo.innerHTML = `
-		<section class="d-flex flex-column justify-content-center align-items-center text-center p-4" style="min-height:60vh">
-			<i class="bi ${config.icono}" style="font-size:3rem;color:var(--color-text-muted)"></i>
-			<h2 class="mt-3 mb-2" style="font-size:1.5rem;color:var(--color-text)">${titulo}</h2>
-			<p class="mb-4" style="max-width:560px;color:var(--color-text-secondary)">${texto}</p>
-			<button type="button" class="btn-dark-custom" data-accion="volver">Volver</button>
-		</section>
+		<div class="text-center py-5 page-enter">
+			<i class="bi ${config.icono} d-block mb-3" style="font-size:4rem;color:var(--color-text-muted)"></i>
+			<h3 class="mb-2">${titulo}</h3>
+			<p class="text-muted mb-4">${texto}</p>
+			<button type="button" class="btn btn-outline-dark" onclick="history.back()">&larr; Volver</button>
+		</div>
 	`;
+}
 
-	const botonVolver = nodo.querySelector('[data-accion="volver"]');
-	if (!botonVolver) {
+/**
+ * Detecta errores de red cuando fetch falla antes de tener status HTTP.
+ */
+function esErrorDeRed(error) {
+	if (!error || error?.status) {
+		return false;
+	}
+
+	if (error instanceof TypeError) {
+		return true;
+	}
+
+	const texto = String(error?.message || error?.error || '').toLowerCase();
+	return texto.includes('failed to fetch') || texto.includes('network');
+}
+
+/**
+ * Aplica un manejo consistente de errores API para vistas de pagina.
+ */
+function manejarErrorDePagina(contenedor, error, opciones = {}) {
+	const status = Number(error?.status);
+	const {
+		notFoundMessage = 'No encontrado',
+		forbiddenMessage = 'No tienes permisos para acceder a esta seccion.',
+		networkMessage = 'No fue posible conectar con el servidor. Revisa tu conexion e intenta de nuevo.',
+		fallbackMessage = 'Ocurrio un error en el servidor.',
+		redirectOn401 = true,
+	} = opciones;
+
+	if (status === 404) {
+		mostrarErrorPagina(contenedor, '404', notFoundMessage);
 		return;
 	}
 
-	botonVolver.addEventListener('click', () => {
-		if (window.history.length > 1) {
-			window.history.back();
+	if (status === 401) {
+		if (redirectOn401) {
+			window.location.hash = '#/login';
 			return;
 		}
 
-		window.location.hash = '#/home';
-	});
+		mostrarErrorPagina(contenedor, 'acceso-denegado', forbiddenMessage);
+		return;
+	}
+
+	if (status === 403) {
+		mostrarErrorPagina(contenedor, 'acceso-denegado', forbiddenMessage);
+		return;
+	}
+
+	if (esErrorDeRed(error)) {
+		mostrarErrorPagina(contenedor, 'sin-conexion', networkMessage);
+		return;
+	}
+
+	mostrarToast(error?.error || error?.message || fallbackMessage, 'danger');
 }
 
 export {
@@ -414,6 +462,7 @@ export {
 	skeletonCard,
 	renderEstrellas,
 	mostrarErrorPagina,
+	manejarErrorDePagina,
 };
 
 export default {
@@ -430,4 +479,5 @@ export default {
 	skeletonCard,
 	renderEstrellas,
 	mostrarErrorPagina,
+	manejarErrorDePagina,
 };

@@ -2,7 +2,7 @@ import api from '../api.js';
 import auth from '../auth.js';
 import { gridRetos } from '../components/cardReto.js';
 import { gridFotos } from '../components/cardFoto.js';
-import { skeletonCard } from '../utils.js';
+import { manejarErrorDePagina, skeletonCard } from '../utils.js';
 
 const STYLE_ID = 'home-page-styles';
 
@@ -303,14 +303,18 @@ async function render(contenedor, params = {}) {
 		participacionesPromise,
 	]);
 
-	if (homeSectionsResult.status === 'fulfilled') {
-		const [retosActivos, fotosRecientes] = homeSectionsResult.value;
-		gridRetos(Array.isArray(retosActivos) ? retosActivos.slice(0, 3) : [], refs.retos);
-		gridFotos(Array.isArray(fotosRecientes) ? fotosRecientes.slice(0, 8) : [], refs.fotos);
-	} else {
-		showSectionError(refs.retos, 'No se pudieron cargar los retos activos.');
-		showSectionError(refs.fotos, 'No se pudieron cargar las fotos recientes.');
+	if (homeSectionsResult.status === 'rejected') {
+		manejarErrorDePagina(contenedor, homeSectionsResult.reason, {
+			notFoundMessage: 'No encontramos la portada solicitada.',
+			forbiddenMessage: 'No tienes permisos para acceder a esta seccion.',
+			fallbackMessage: 'No se pudieron cargar los datos principales de inicio.',
+		});
+		return;
 	}
+
+	const [retosActivos, fotosRecientes] = homeSectionsResult.value;
+	gridRetos(Array.isArray(retosActivos) ? retosActivos.slice(0, 3) : [], refs.retos);
+	gridFotos(Array.isArray(fotosRecientes) ? fotosRecientes.slice(0, 8) : [], refs.fotos);
 
 	if (refs.participaciones) {
 		if (participacionesResult.status === 'fulfilled') {
@@ -323,7 +327,18 @@ async function render(contenedor, params = {}) {
 				gridFotos(fotosParticipacion, refs.participaciones, { mostrarReto: true });
 			}
 		} else {
-			showSectionError(refs.participaciones, 'No se pudieron cargar tus participaciones.');
+			const status = Number(participacionesResult.reason?.status);
+			if (status === 401) {
+				window.location.hash = '#/login';
+				return;
+			}
+
+			if (status === 403) {
+				showSectionError(refs.participaciones, 'Acceso denegado a tus participaciones.');
+				return;
+			}
+
+			showSectionError(refs.participaciones, participacionesResult.reason?.error || 'No se pudieron cargar tus participaciones.');
 		}
 	}
 }

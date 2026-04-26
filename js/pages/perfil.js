@@ -3,7 +3,7 @@ import auth from '../auth.js';
 import { cardFoto } from '../components/cardFoto.js';
 import { abrirModalFoto } from '../components/modalFoto.js';
 import { abrirModalEditarPerfil } from '../components/modalEditarPerfil.js';
-import { mostrarErrorPagina, skeletonCard } from '../utils.js';
+import { manejarErrorDePagina, mostrarErrorPagina, skeletonCard } from '../utils.js';
 
 const STYLE_ID = 'perfil-page-styles';
 const ORDEN_RECIENTES = 'recientes';
@@ -570,7 +570,12 @@ async function loadFotos(state, refs) {
 		state.fotosPorOrden[state.ordenActivo] = fotos;
 		renderFotosGrid(refs.fotosWrap, fotos);
 	} catch (error) {
-		refs.fotosWrap.innerHTML = `<p class="perfil-error">${escapeHtml(error?.error || 'No se pudieron cargar las fotografías.')}</p>`;
+		manejarErrorDePagina(refs.fotosWrap, error, {
+			notFoundMessage: 'No encontramos fotografias para este perfil.',
+			forbiddenMessage: 'No tienes permisos para ver estas fotografias.',
+			fallbackMessage: 'No se pudieron cargar las fotografias.',
+			redirectOn401: false,
+		});
 	}
 }
 
@@ -660,12 +665,11 @@ async function render(contenedor, params = {}) {
 
 		await loadFotos(state, refs);
 	} catch (error) {
-		if (error?.status === 404) {
-			mostrarErrorPagina(contenedor, '404', 'Perfil no encontrado.');
-			return;
-		}
-
-		mostrarErrorPagina(contenedor, 'error', error?.error || 'No se pudo cargar el perfil.');
+		manejarErrorDePagina(contenedor, error, {
+			notFoundMessage: 'Perfil no encontrado.',
+			forbiddenMessage: 'No tienes permisos para ver este perfil.',
+			fallbackMessage: 'No se pudo cargar el perfil.',
+		});
 	}
 }
 

@@ -1,5 +1,5 @@
 import api from '../api.js';
-import { skeletonCard } from '../utils.js';
+import { manejarErrorDePagina, skeletonCard } from '../utils.js';
 
 const STYLE_ID = 'ranking-page-styles';
 
@@ -931,7 +931,11 @@ async function loadRanking(contenedor, periodo) {
 		const ranking = await fetchRankingData(periodo);
 		renderRankingContent(contenedor, ranking);
 	} catch (error) {
-		contenedor.innerHTML = `<p class="ranking-error">${escapeHtml(error?.error || 'No se pudo cargar el ranking en este momento.')}</p>`;
+		manejarErrorDePagina(contenedor, error, {
+			notFoundMessage: 'No encontramos ranking para este periodo.',
+			forbiddenMessage: 'No tienes permisos para acceder al ranking.',
+			fallbackMessage: 'No se pudo cargar el ranking en este momento.',
+		});
 	}
 }
 

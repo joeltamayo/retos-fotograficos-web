@@ -2,7 +2,7 @@ import api from '../api.js';
 import auth from '../auth.js';
 import { gridRetos } from '../components/cardReto.js';
 import { renderPaginacion } from '../components/paginacion.js';
-import { mostrarToast, skeletonCard } from '../utils.js';
+import { manejarErrorDePagina, mostrarToast, skeletonCard } from '../utils.js';
 
 const STYLE_ID = 'retos-page-styles';
 const LIMITE_ACTIVOS = 6;
@@ -302,7 +302,11 @@ function renderFinalizadosSection(state) {
 			state.finalizados.paginaActual = nuevaPagina;
 			renderFinalizadosSection(state);
 		} catch (error) {
-			showError(state.refs.finalizados, error?.error || 'No se pudieron cargar los retos finalizados.');
+			manejarErrorDePagina(state.refs.finalizados, error, {
+				notFoundMessage: 'No encontramos los retos finalizados solicitados.',
+				forbiddenMessage: 'No tienes permisos para ver los retos finalizados.',
+				fallbackMessage: 'No se pudieron cargar los retos finalizados.',
+			});
 		} finally {
 			state.finalizados.loading = false;
 		}
@@ -347,34 +351,43 @@ async function render(contenedor, params = {}) {
 
 	const [activosResult, finalizadosResult] = await Promise.allSettled([activosPromise, finalizadosPromise]);
 
-	if (activosResult.status === 'fulfilled') {
-		const activos = Array.isArray(activosResult.value?.retos) ? activosResult.value.retos.slice(0, LIMITE_ACTIVOS) : [];
-
-		if (activos.length === 0) {
-			showEmpty(refs.activos, 'No hay retos activos en este momento.');
-		} else {
-			gridRetos(activos, refs.activos);
-		}
-	} else {
-		showError(refs.activos, activosResult.reason?.error || 'No se pudieron cargar los retos activos.');
+	if (activosResult.status === 'rejected') {
+		manejarErrorDePagina(contenedor, activosResult.reason, {
+			notFoundMessage: 'No encontramos la lista de retos activos.',
+			forbiddenMessage: 'No tienes permisos para consultar los retos activos.',
+			fallbackMessage: 'No se pudieron cargar los retos activos.',
+		});
+		return;
 	}
 
-	if (finalizadosResult.status === 'fulfilled') {
-		const state = {
-			refs,
-			finalizados: {
-				items: Array.isArray(finalizadosResult.value?.retos) ? finalizadosResult.value.retos : [],
-				total: toSafeNumber(finalizadosResult.value?.total, 0),
-				paginaActual: 1,
-				loading: false,
-			},
-		};
+	const activos = Array.isArray(activosResult.value?.retos) ? activosResult.value.retos.slice(0, LIMITE_ACTIVOS) : [];
 
-		renderFinalizadosSection(state);
+	if (activos.length === 0) {
+		showEmpty(refs.activos, 'No hay retos activos en este momento.');
 	} else {
-		showError(refs.finalizados, finalizadosResult.reason?.error || 'No se pudieron cargar los retos finalizados.');
-		refs.paginacion.innerHTML = '';
+		gridRetos(activos, refs.activos);
 	}
+
+	if (finalizadosResult.status === 'rejected') {
+		manejarErrorDePagina(contenedor, finalizadosResult.reason, {
+			notFoundMessage: 'No encontramos la lista de retos finalizados.',
+			forbiddenMessage: 'No tienes permisos para consultar los retos finalizados.',
+			fallbackMessage: 'No se pudieron cargar los retos finalizados.',
+		});
+		return;
+	}
+
+	const state = {
+		refs,
+		finalizados: {
+			items: Array.isArray(finalizadosResult.value?.retos) ? finalizadosResult.value.retos : [],
+			total: toSafeNumber(finalizadosResult.value?.total, 0),
+			paginaActual: 1,
+			loading: false,
+		},
+	};
+
+	renderFinalizadosSection(state);
 }
 
 export { render };

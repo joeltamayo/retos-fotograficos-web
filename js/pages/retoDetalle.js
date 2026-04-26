@@ -6,6 +6,7 @@ import { abrirModalSubirFoto } from '../components/modalSubirFoto.js';
 import { renderPaginacion } from '../components/paginacion.js';
 import {
 	formatearFechaCorta,
+	manejarErrorDePagina,
 	mostrarErrorPagina,
 	mostrarToast,
 	skeletonCard,
@@ -420,7 +421,24 @@ function resolveCtaAction(reto, participating) {
 				await api.post(`/retos/${encodeURIComponent(reto.id)}/participar`, {});
 				mostrarToast('Te uniste al reto correctamente.', 'success');
 			} catch (error) {
-				mostrarToast(error?.error || 'No se pudo completar la participación.', 'warning');
+				const status = Number(error?.status);
+
+				if (status === 401) {
+					window.location.hash = '#/login';
+					return;
+				}
+
+				if (status === 403) {
+					mostrarToast('Acceso denegado para participar en este reto.', 'warning');
+					return;
+				}
+
+				if (!status && (error instanceof TypeError || String(error?.message || '').toLowerCase().includes('fetch'))) {
+					mostrarToast('Sin conexión. Revisa tu internet e intenta de nuevo.', 'warning');
+					return;
+				}
+
+				mostrarToast(error?.error || error?.message || 'No se pudo completar la participación.', 'warning');
 			}
 		},
 	};
@@ -568,7 +586,11 @@ function renderAllFotosSection(refs, state) {
 			state.detalle = response;
 			renderAllFotosSection(refs, state);
 		} catch (error) {
-			mostrarToast(error?.error || 'No se pudieron cargar más fotografías.', 'warning');
+			manejarErrorDePagina(refs.fotos, error, {
+				notFoundMessage: 'No encontramos mas fotografias para este reto.',
+				forbiddenMessage: 'No tienes permisos para ver estas fotografias.',
+				fallbackMessage: 'No se pudieron cargar mas fotografias.',
+			});
 		} finally {
 			state.loadingFotos = false;
 		}
@@ -613,12 +635,11 @@ async function render(contenedor, params = {}) {
 
 		renderAllFotosSection(refs, state);
 	} catch (error) {
-		if (error?.status === 404) {
-			mostrarErrorPagina(contenedor, '404', 'Reto no encontrado');
-			return;
-		}
-
-		mostrarErrorPagina(contenedor, 'error', error?.error || 'No se pudo cargar el detalle del reto.');
+		manejarErrorDePagina(contenedor, error, {
+			notFoundMessage: 'Reto no encontrado',
+			forbiddenMessage: 'No tienes permisos para ver este reto.',
+			fallbackMessage: 'No se pudo cargar el detalle del reto.',
+		});
 	}
 }
 
