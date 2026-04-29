@@ -3,19 +3,16 @@ import { abrirModalFoto } from '../components/modalFoto.js';
 import { renderPaginacion } from '../components/paginacion.js';
 import { mostrarToast, skeletonCard } from '../utils.js';
 
-const STYLE_ID = 'admin-fotos-styles';
 const DELETE_MODAL_ID = 'admin-foto-delete-modal';
 const LIMITE = 10;
 
 const ESTADO_META = {
-	revision: { label: 'Pendiente', badgeBg: 'var(--color-warning-bg)', badgeColor: '#B45309', cardColor: '#F59E0B', dot: true },
-	aprobada: { label: 'Aprobada', badgeBg: 'var(--color-success-bg)', badgeColor: 'var(--color-success)', cardColor: 'var(--color-success)' },
-	desaprobada: { label: 'Rechazada', badgeBg: 'var(--color-danger-bg)', badgeColor: 'var(--color-danger)', cardColor: 'var(--color-danger)' },
+	revision: { label: 'Pendiente', badgeClass: 'admin-fotos-badge--revision', dot: true },
+	aprobada: { label: 'Aprobada', badgeClass: 'admin-fotos-badge--aprobada' },
+	desaprobada: { label: 'Rechazada', badgeClass: 'admin-fotos-badge--desaprobada' },
 };
 
-/**
- * Escapa texto para render seguro.
- */
+// Escapa texto para render seguro.
 function escapeHtml(value) {
 	return String(value ?? '')
 		.replaceAll('&', '&amp;')
@@ -25,17 +22,13 @@ function escapeHtml(value) {
 		.replaceAll("'", '&#39;');
 }
 
-/**
- * Convierte a entero positivo.
- */
+//Convierte a entero positivo.
 function toInt(value, fallback = 0) {
 	const parsed = Number(value);
 	return Number.isFinite(parsed) ? Math.max(0, Math.round(parsed)) : fallback;
 }
 
-/**
- * Formatea fecha y hora corta.
- */
+//Formatea fecha y hora corta.
 function formatDateTime(iso) {
 	if (!iso) {
 		return '—';
@@ -56,402 +49,16 @@ function formatDateTime(iso) {
 	}).format(date).replaceAll('.', '');
 }
 
-/**
- * Obtiene el meta visual por estado.
- */
+// Obtiene el meta visual por estado.
 function getEstadoMeta(estadoRaw) {
 	const estado = String(estadoRaw ?? '').trim().toLowerCase();
 	return ESTADO_META[estado] || {
 		label: estado || '—',
-		badgeBg: 'var(--color-neutral-bg)',
-		badgeColor: 'var(--color-neutral)',
-		cardColor: 'var(--color-neutral)',
+		badgeClass: 'admin-fotos-badge--default',
 	};
 }
 
-/**
- * Inyecta estilos una sola vez.
- */
-function ensureStyles() {
-	if (document.getElementById(STYLE_ID)) {
-		return;
-	}
-
-	const style = document.createElement('style');
-	style.id = STYLE_ID;
-	style.textContent = `
-		.admin-fotos {
-			display: grid;
-			gap: 24px;
-		}
-
-		.admin-fotos-summary {
-			display: grid;
-			grid-template-columns: repeat(4, minmax(0, 1fr));
-			gap: 16px;
-		}
-
-		.admin-fotos-summary-card,
-		.admin-fotos-filter,
-		.admin-fotos-table-card {
-			background: var(--color-surface);
-			border-radius: 14px;
-			box-shadow: var(--shadow-card);
-		}
-
-		.admin-fotos-summary-card {
-			position: relative;
-			padding: 18px;
-			min-height: 138px;
-			overflow: hidden;
-		}
-
-		.admin-fotos-summary-icon {
-			position: absolute;
-			top: 16px;
-			right: 16px;
-			font-size: 18px;
-			line-height: 1;
-		}
-
-		.admin-fotos-summary-title {
-			margin: 0;
-			font-size: 14px;
-			font-weight: 500;
-			color: var(--color-text);
-		}
-
-		.admin-fotos-summary-value {
-			margin-top: 34px;
-			font-size: 34px;
-			font-weight: 700;
-			line-height: 1;
-			color: var(--color-text);
-		}
-
-		.admin-fotos-summary-meta {
-			margin-top: 6px;
-			font-size: 14px;
-			color: var(--color-text-secondary);
-		}
-
-		.admin-fotos-filter {
-			padding: 14px;
-			display: grid;
-			grid-template-columns: minmax(0, 1fr) 220px;
-			gap: 12px;
-			align-items: center;
-		}
-
-		.admin-fotos-search,
-		.admin-fotos-select {
-			width: 100%;
-			border: 1px solid var(--color-border);
-			background: #F9FAFB;
-			border-radius: 10px;
-			padding: 11px 14px;
-			font-size: 14px;
-			color: var(--color-text);
-		}
-
-		.admin-fotos-search::placeholder {
-			color: var(--color-text-muted);
-		}
-
-		.admin-fotos-table-card {
-			padding: 18px;
-		}
-
-		.admin-fotos-table-title {
-			margin: 0 0 14px;
-			font-size: 18px;
-			font-weight: 600;
-			color: var(--color-text);
-		}
-
-		.admin-fotos-table-wrap {
-			overflow-x: auto;
-		}
-
-		.admin-fotos-table {
-			width: 100%;
-			min-width: 1300px;
-			border-collapse: collapse;
-		}
-
-		.admin-fotos-table th {
-			padding: 12px 10px;
-			text-align: left;
-			font-size: 14px;
-			font-weight: 600;
-			color: #374151;
-			border-bottom: 1px solid var(--color-border);
-			white-space: nowrap;
-		}
-
-		.admin-fotos-table td {
-			padding: 14px 10px;
-			border-bottom: 1px solid #F3F4F6;
-			vertical-align: middle;
-			font-size: 14px;
-			color: var(--color-text);
-		}
-
-		.admin-fotos-thumb {
-			width: 48px;
-			height: 48px;
-			border-radius: 6px;
-			object-fit: cover;
-			background: #E5E7EB;
-		}
-
-		.admin-fotos-thumb-placeholder {
-			width: 48px;
-			height: 48px;
-			border-radius: 6px;
-			background: #E5E7EB;
-			display: inline-flex;
-			align-items: center;
-			justify-content: center;
-			color: #9CA3AF;
-		}
-
-		.admin-fotos-title {
-			margin: 0;
-			font-size: 15px;
-			font-weight: 600;
-			color: var(--color-text);
-		}
-
-		.admin-fotos-desc {
-			margin: 4px 0 0;
-			font-size: 14px;
-			color: var(--color-text-secondary);
-			line-height: 1.35;
-			display: -webkit-box;
-			-webkit-line-clamp: 2;
-			-webkit-box-orient: vertical;
-			overflow: hidden;
-		}
-
-		.admin-fotos-user {
-			display: inline-flex;
-			align-items: center;
-			gap: 10px;
-		}
-
-		.admin-fotos-user-avatar {
-			width: 28px;
-			height: 28px;
-			border-radius: 50%;
-			object-fit: cover;
-			background: #E5E7EB;
-			flex: 0 0 auto;
-		}
-
-		.admin-fotos-user-avatar-placeholder {
-			width: 28px;
-			height: 28px;
-			border-radius: 50%;
-			background: #E5E7EB;
-			display: inline-flex;
-			align-items: center;
-			justify-content: center;
-			font-size: 12px;
-			color: #9CA3AF;
-		}
-
-		.admin-fotos-user-name {
-			font-size: 14px;
-			color: var(--color-text-secondary);
-			white-space: nowrap;
-		}
-
-		.admin-fotos-badge {
-			display: inline-flex;
-			align-items: center;
-			justify-content: center;
-			padding: 4px 10px;
-			border-radius: 9999px;
-			font-size: 12px;
-			font-weight: 500;
-			white-space: nowrap;
-		}
-
-		.admin-fotos-badge--pending::before {
-			content: '';
-			width: 7px;
-			height: 7px;
-			border-radius: 9999px;
-			background: currentColor;
-			display: inline-block;
-			margin-right: 6px;
-			animation: adminFotoPulse 1.2s ease-in-out infinite;
-		}
-
-		@keyframes adminFotoPulse {
-			0%, 100% { opacity: 0.45; transform: scale(0.9); }
-			50% { opacity: 1; transform: scale(1); }
-		}
-
-		.admin-fotos-actions {
-			display: inline-flex;
-			align-items: center;
-			gap: 8px;
-			flex-wrap: wrap;
-		}
-
-		.admin-fotos-action-btn {
-			width: 32px;
-			height: 32px;
-			border-radius: 8px;
-			border: 1px solid #E5E7EB;
-			background: #FFFFFF;
-			color: var(--color-text);
-			display: inline-flex;
-			align-items: center;
-			justify-content: center;
-			padding: 0;
-		}
-
-		.admin-fotos-action-btn--danger {
-			color: var(--color-danger);
-		}
-
-		.admin-fotos-action-btn--success {
-			color: var(--color-success);
-		}
-
-		.admin-fotos-action-btn--warning {
-			color: var(--color-warning);
-		}
-
-		.admin-fotos-score {
-			display: inline-flex;
-			align-items: center;
-			justify-content: center;
-			padding: 4px 10px;
-			border-radius: 9999px;
-			background: #F3F4F6;
-			font-weight: 600;
-			color: #111827;
-		}
-
-		.admin-fotos-empty,
-		.admin-fotos-error {
-			margin: 0;
-			padding: 16px;
-			border-radius: 10px;
-			font-size: 14px;
-		}
-
-		.admin-fotos-empty {
-			background: #F8FAFC;
-			color: var(--color-text-secondary);
-		}
-
-		.admin-fotos-error {
-			background: var(--color-danger-bg);
-			color: #991B1B;
-		}
-
-		.admin-fotos-pagination {
-			margin-top: 16px;
-		}
-
-		.admin-fotos-skeleton-grid {
-			display: grid;
-			grid-template-columns: repeat(4, minmax(0, 1fr));
-			gap: 16px;
-		}
-
-		.admin-fotos-skeleton-table {
-			display: grid;
-			gap: 12px;
-		}
-
-		#${DELETE_MODAL_ID} .modal-content {
-			border: 0;
-			border-radius: 20px;
-			box-shadow: var(--shadow-modal);
-			overflow: hidden;
-		}
-
-		.admin-modal-title {
-			margin: 0;
-			font-size: 20px;
-			font-weight: 700;
-			color: var(--color-text);
-		}
-
-		.admin-modal-subtitle {
-			margin: 6px 0 0;
-			font-size: 14px;
-			color: var(--color-text-secondary);
-		}
-
-		.admin-modal-confirm {
-			font-size: 14px;
-			color: #374151;
-		}
-
-		.admin-modal-actions {
-			display: flex;
-			justify-content: flex-end;
-			gap: 10px;
-			margin-top: 16px;
-		}
-
-		.admin-modal-btn {
-			border-radius: 10px;
-			padding: 10px 16px;
-			font-size: 14px;
-			font-weight: 600;
-			display: inline-flex;
-			align-items: center;
-			justify-content: center;
-			gap: 8px;
-		}
-
-		.admin-modal-btn--dark {
-			background: #111827;
-			color: #FFFFFF;
-			border: 0;
-		}
-
-		.admin-modal-btn--outline {
-			background: #FFFFFF;
-			color: #111827;
-			border: 1px solid #E5E7EB;
-		}
-
-		@media (max-width: 1199.98px) {
-			.admin-fotos-summary,
-			.admin-fotos-skeleton-grid {
-				grid-template-columns: repeat(2, minmax(0, 1fr));
-			}
-		}
-
-		@media (max-width: 991.98px) {
-			.admin-fotos-filter {
-				grid-template-columns: 1fr;
-			}
-		}
-
-		@media (max-width: 767.98px) {
-			.admin-fotos-summary,
-			.admin-fotos-skeleton-grid {
-				grid-template-columns: 1fr;
-			}
-		}
-	`;
-
-	document.head.appendChild(style);
-}
-
-/**
- * Devuelve estado persistido en el contenedor.
- */
+// Devuelve estado persistido en el contenedor.
 function getState(contenedor) {
 	return contenedor.__adminFotosState || {
 		query: '',
@@ -475,7 +82,7 @@ function setState(contenedor, state) {
 function renderEstadoBadge(estadoRaw) {
 	const meta = getEstadoMeta(estadoRaw);
 	const pendingClass = String(estadoRaw ?? '').toLowerCase() === 'revision' ? ' admin-fotos-badge--pending' : '';
-	return `<span class="admin-fotos-badge${pendingClass}" style="background:${meta.badgeBg};color:${meta.badgeColor}">${escapeHtml(meta.label)}</span>`;
+	return `<span class="admin-fotos-badge ${meta.badgeClass}${pendingClass}">${escapeHtml(meta.label)}</span>`;
 }
 
 /**
@@ -483,17 +90,17 @@ function renderEstadoBadge(estadoRaw) {
  */
 function renderSummaryCards(resumen = {}) {
 	const cards = [
-		{ label: 'Total Fotos', meta: 'En la plataforma', value: toInt(resumen.total), icon: 'bi-eye', color: 'var(--color-info)' },
-		{ label: 'Pendientes', meta: 'Por moderar', value: toInt(resumen.en_revision), icon: 'bi-clock', color: 'var(--color-warning)' },
-		{ label: 'Aprobadas', meta: 'Publicadas', value: toInt(resumen.aprobadas), icon: 'bi-check-lg', color: 'var(--color-success)' },
-		{ label: 'Rechazadas', meta: 'No publicadas', value: toInt(resumen.desaprobadas), icon: 'bi-x-lg', color: 'var(--color-danger)' },
+		{ label: 'Total Fotos', meta: 'En la plataforma', value: toInt(resumen.total), icon: 'bi-eye', iconClass: 'admin-fotos-summary-icon--info' },
+		{ label: 'Pendientes', meta: 'Por moderar', value: toInt(resumen.en_revision), icon: 'bi-clock', iconClass: 'admin-fotos-summary-icon--warning' },
+		{ label: 'Aprobadas', meta: 'Publicadas', value: toInt(resumen.aprobadas), icon: 'bi-check-lg', iconClass: 'admin-fotos-summary-icon--success' },
+		{ label: 'Rechazadas', meta: 'No publicadas', value: toInt(resumen.desaprobadas), icon: 'bi-x-lg', iconClass: 'admin-fotos-summary-icon--danger' },
 	];
 
 	return `
 		<div class="admin-fotos-summary">
 			${cards.map((card) => `
 				<article class="admin-fotos-summary-card">
-					<i class="bi ${card.icon} admin-fotos-summary-icon" style="color:${card.color}"></i>
+					<i class="bi ${card.icon} admin-fotos-summary-icon ${card.iconClass}"></i>
 					<p class="admin-fotos-summary-title">${escapeHtml(card.label)}</p>
 					<div class="admin-fotos-summary-value">${card.value}</div>
 					<div class="admin-fotos-summary-meta">${escapeHtml(card.meta)}</div>
@@ -512,14 +119,14 @@ function renderSkeleton(contenedor) {
 			${Array.from({ length: 4 }, () => skeletonCard('138px')).join('')}
 		</div>
 
-		<div class="admin-fotos-filter mt-1">
+		<div class="admin-fotos-filter admin-mt-1">
 			${skeletonCard('44px')}
 			${skeletonCard('44px')}
 		</div>
 
-		<div class="admin-fotos-table-card mt-1">
+		<div class="admin-fotos-table-card admin-mt-1">
 			${skeletonCard('40px')}
-			<div class="admin-fotos-skeleton-table mt-3">
+			<div class="admin-fotos-skeleton-table admin-mt-3">
 				${Array.from({ length: 5 }, () => skeletonCard('74px')).join('')}
 			</div>
 		</div>
@@ -695,14 +302,14 @@ function ensureDeleteModal() {
 			<div class="modal fade" id="${DELETE_MODAL_ID}" tabindex="-1" aria-hidden="true">
 				<div class="modal-dialog modal-dialog-centered">
 					<div class="modal-content">
-						<div class="modal-header border-0 pb-0 px-4 px-md-5 pt-4 pt-md-5">
+						<div class="admin-modal-header">
 							<div>
 								<h3 class="admin-modal-title">Eliminar Fotografía</h3>
 								<p class="admin-modal-subtitle">Esta acción eliminará la fotografía y su información relacionada.</p>
 							</div>
-							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+							<button type="button" class="admin-modal-close" data-bs-dismiss="modal" aria-label="Cerrar">&times;</button>
 						</div>
-						<div class="modal-body px-4 px-md-5 pb-4 pb-md-5 pt-3">
+						<div class="admin-modal-body">
 							<p class="admin-modal-confirm" id="admin-foto-delete-message"></p>
 							<div class="admin-modal-actions">
 								<button type="button" class="admin-modal-btn admin-modal-btn--outline" data-bs-dismiss="modal">Cancelar</button>
@@ -827,7 +434,7 @@ async function loadAndRender(state, refs) {
 
 		renderTable(tableArea, visibleFotos, {
 			onView: async (id) => {
-				await abrirModalFoto(id);
+				await abrirModalFoto(id, { useAdminEndpoint: true });
 			},
 			onModerate: async (id, estado) => {
 				try {
@@ -878,8 +485,6 @@ async function render(contenedor) {
 	if (!(contenedor instanceof HTMLElement)) {
 		return;
 	}
-
-	ensureStyles();
 
 	const state = getState(contenedor);
 	contenedor.innerHTML = '<div class="admin-fotos"><div id="admin-fotos-root"></div></div>';

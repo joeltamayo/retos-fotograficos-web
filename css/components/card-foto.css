@@ -1,0 +1,202 @@
+﻿/*
+  Card Foto
+
+  - Estilos para la tarjeta de foto usada en grids y galerías.
+  - Prefijo de clases: `cf-` o clases descriptivas ya presentes.
+*/
+
+
+/* Card base 
+  - Contiene imagen, badges de posición, overlay de calificación y contenido inferior 
+    (usuario, título, reto, stats) 
+*/
+.cf-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  cursor: pointer;
+}
+
+/* Wrapper de la imagen: mantiene proporción cuadrada y maneja el overflow. */
+.cf-img-wrapper {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: var(--color-neutral-bg);
+}
+
+/* Imagen de la tarjeta: cubre todo el wrapper, mantiene proporción y tiene efecto hover. */
+.cf-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+/* Placeholder de imagen: se muestra cuando no hay foto disponible. */
+.cf-img-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+}
+
+/* Hover de imagen: efecto sutil de zoom para destacar la foto al pasar el mouse. */
+.cf-card:hover .cf-img {
+  transform: scale(1.03);
+}
+
+/* Badge de posiciones #1 #2 #3 */
+.cf-badge-pos {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: var(--color-warning);
+  color: #FFFFFF;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  z-index: 2;
+  line-height: 1.4;
+}
+
+/* Overlay con desglose de calificacion */
+.cf-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent 0%, rgba(0, 0, 0, 0.72) 100%);
+  padding: 24px 10px 10px;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 2;
+}
+
+.cf-card:hover .cf-overlay {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Pills de criterios: creatividad, composición y tema. */
+.cf-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 700;
+  color: #FFFFFF;
+  line-height: 1;
+}
+
+/* Cards detalles */
+
+.cf-pill--creatividad {
+  background: var(--color-creatividad);
+}
+
+.cf-pill--composicion {
+  background: var(--color-composicion);
+}
+
+.cf-pill--tema {
+  background: var(--color-tema);
+}
+
+/* Contenido inferior (user, comentarios, estrellas, etc) */
+.cf-body {
+  padding: 12px 14px;
+}
+
+/* Usuario: avatar pequeño + nombre */
+.cf-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+/* Nombre de usuario */
+.cf-username {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+/* Título de la foto: máximo 2 líneas, con elipsis si es muy largo. */
+.cf-titulo {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text);
+  margin: 0 0 6px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Reto asociado: texto pequeño, con elipsis en una sola línea. */
+.cf-reto {
+  margin: -2px 0 6px;
+  font-size: 12px;
+  color: var(--color-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Stats: fila con iconos y números para estrellas, comentarios, etc. */
+.cf-stats {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.cf-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.cf-stat--stars {
+  color: var(--color-warning);
+}
+
+/* Grid reutilizable */
+.cf-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+/* Responsive: ajusta el número de columnas según el ancho de pantalla. */
+/* En pantallas medianas, muestra 3 columnas. */
+@media (max-width: 1199px) {
+  .cf-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* En pantallas pequeñas, muestra 2 columnas. */
+@media (max-width: 767px) {
+  .cf-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* En móviles, muestra 1 columna para mejor legibilidad. */
+@media (max-width: 480px) {
+  .cf-grid {
+    grid-template-columns: 1fr;
+  }
+}

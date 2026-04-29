@@ -1,0 +1,240 @@
+﻿/* 
+    MODAL SUBIR FOTO — Estilos para el formulario de subida de fotografía
+    Prefijo: ms-
+*/
+
+/* Contenido del modal: bloque principal con sombra y radios. */
+#modal-subir-foto .modal-content {
+    border: 0;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-modal);
+    overflow: hidden;
+    max-height: calc(100vh - 2rem);
+}
+
+/* Encabezado: título, subtítulo y botón cerrar. */
+.ms-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 24px 32px 0;
+}
+
+/* Cuerpo: área desplazable del formulario de subida. */
+.ms-body {
+    padding: 24px 32px 28px;
+    overflow-y: auto;
+}
+
+/* Título: identifica la acción de subir fotografía. */
+.ms-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 6px;
+}
+
+/* Subtítulo: explica el paso o el alcance del formulario. */
+.ms-subtitle {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    margin: 0;
+}
+
+/* Descripción: indica instrucciones o contexto. */
+.ms-description {
+    margin: 0 0 16px;
+    font-size: 14px;
+    color: var(--color-text-secondary);
+}
+
+/* Botón cerrar: salida rápida del modal. */
+.ms-close {
+    border: 0;
+    background: transparent;
+    color: var(--color-text-secondary);
+    font-size: 24px;
+    line-height: 1;
+}
+
+/* Campo: separa cada bloque del formulario. */
+.ms-field {
+    margin-bottom: 16px;
+}
+
+/* Zona de subida: área clicable para seleccionar archivo. */
+.ms-upload-area {
+    border: 2px dashed var(--color-border);
+    border-radius: var(--radius-lg);
+    background: #FAFAFA;
+    padding: 28px 20px;
+    min-height: 240px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+    cursor: pointer;
+}
+
+/* Hover de zona: destaca el dropzone. */
+.ms-upload-area:hover {
+    border-color: #C7CDD6;
+    background: #F9FAFB;
+}
+
+/* Prompt: texto que invita a subir o arrastrar una imagen. */
+.ms-upload-prompt {
+    margin: 12px 0 4px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+}
+
+/* Vista previa: contenedor de la imagen seleccionada. */
+.ms-upload-preview {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 240px;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: #000000;
+}
+
+/* Imagen previa: mantiene proporción dentro del contenedor. */
+.ms-upload-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    background: #000000;
+}
+
+/* Botón quitar: elimina la imagen elegida. */
+.ms-upload-remove {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 32px;
+    height: 32px;
+    border: 0;
+    border-radius: var(--radius-full);
+    background: rgba(255, 255, 255, 0.94);
+    color: var(--color-text);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+/* Ayuda: texto de soporte con indicaciones adicionales. */
+.ms-upload-helper {
+    font-size: 14px;
+    color: var(--color-text-muted);
+    margin: 0;
+}
+
+/* Etiqueta del campo: aclara qué información va aquí. */
+.ms-upload-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0 0 8px;
+}
+
+/* Controles de texto: campos de entrada del formulario. */
+.ms-upload-input,
+.ms-upload-textarea {
+    width: 100%;
+    border: 1px solid var(--color-border);
+    background: #F9FAFB;
+    border-radius: var(--radius-md);
+    padding: 10px 12px;
+    font-size: 14px;
+    color: var(--color-text);
+}
+
+/* Textarea: espacio para descripciones largas. */
+.ms-upload-textarea {
+    min-height: 110px;
+    resize: vertical;
+}
+
+/* Focus: muestra el control activo al usuario. */
+.ms-upload-input:focus,
+.ms-upload-textarea:focus {
+    outline: none;
+    border-color: var(--color-text);
+}
+
+/* Error por campo: valida entrada puntual. */
+.ms-field-error {
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--color-danger);
+    min-height: 16px;
+}
+
+/* Error general: avisa un problema del formulario completo. */
+.ms-modal-error {
+    margin-top: 12px;
+    font-size: 13px;
+    color: var(--color-danger);
+    min-height: 18px;
+}
+
+/* Spinner: indicador de envío en progreso. */
+.ms-submit-spinner {
+    width: 1rem;
+    height: 1rem;
+    border-width: .16em;
+    margin-right: 8px;
+}
+
+/* Botón principal: acción de subir/guardar. */
+.ms-upload-btn {
+    background: var(--color-text);
+    color: #FFFFFF;
+    border: 0;
+    border-radius: var(--radius-md);
+    padding: 10px 16px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* Estado disabled: evita doble envío. */
+.ms-upload-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Botón outline: acción secundaria o cancelar. */
+.ms-upload-outline {
+    background: var(--color-surface);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 10px 16px;
+    font-weight: 600;
+}
+
+/* Acciones: alinea botones de confirmación/cancelación. */
+.ms-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+@media (max-width: 991.98px) {
+
+    .ms-header,
+    .ms-body {
+        padding-inline: 24px;
+    }
+}

@@ -1,0 +1,195 @@
+/* 
+    MODAL CREAR RETO — Estilos para el formulario de creación y edición de retos
+    Prefijo: mcr-
+*/
+
+/* Contenido del modal: bloque principal con sombra y radios. */
+#modal-crear-reto .modal-content {
+    border: 0;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-modal);
+    overflow: hidden;
+    max-height: calc(100vh - 2rem);
+}
+
+/* Encabezado: título, subtítulo y cierre del modal. */
+.mcr-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 24px 32px 0 !important;
+}
+
+/* Cuerpo: área desplazable del formulario. */
+.mcr-body {
+    padding: 24px 32px 28px !important;
+    overflow-y: auto;
+}
+
+/* Título: identifica la acción de crear o editar un reto. */
+.mcr-title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+/* Subtítulo: explica el contexto del formulario. */
+.mcr-subtitle {
+    margin: 6px 0 0;
+    font-size: 14px;
+    color: var(--color-text-secondary);
+}
+
+/* Formulario: organiza los campos con separación consistente. */
+.mcr-form {
+    display: grid;
+    gap: 14px;
+}
+
+/* Sección: agrupa un campo o bloque relacionado. */
+.mcr-section {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* Etiqueta: aclara el dato solicitado. */
+.mcr-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+/* Controles de formulario: entrada de texto, área y select. */
+.mcr-input,
+.mcr-textarea,
+.mcr-select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--color-text);
+    background: var(--color-neutral-bg);
+}
+
+/* Focus: resalta el control activo. */
+.mcr-input:focus,
+.mcr-textarea:focus,
+.mcr-select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(91, 106, 245, 0.1);
+    background: #FFFFFF;
+}
+
+/* Textarea: permite descripciones largas. */
+.mcr-textarea {
+    min-height: 112px;
+    resize: vertical;
+}
+
+/* Error por campo: muestra validación puntual. */
+.mcr-error {
+    font-size: 12px;
+    color: var(--color-danger);
+    min-height: 16px;
+    margin: 0;
+}
+
+/* Error general: comunica fallos del formulario completo. */
+.mcr-form-error {
+    margin-top: 8px;
+}
+
+/* Fila: distribución en dos columnas para campos relacionados. */
+.mcr-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+/* Columna: bloque vertical para campo individual. */
+.mcr-col {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* Espacio superior: separa grupos sin duplicar reglas. */
+.mcr-mt-1 {
+    margin-top: 10px;
+}
+
+/* Acciones: agrupa botones de guardar y cancelar. */
+.mcr-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* Botón base: estilo común para todas las acciones. */
+.mcr-btn {
+    border-radius: var(--radius-md);
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    border: 0;
+    font-family: inherit;
+}
+
+/* Botón primario: confirma el guardado del reto. */
+.mcr-btn--primary {
+    background: var(--color-text);
+    color: #FFFFFF;
+}
+
+/* Hover primario: feedback de acción disponible. */
+.mcr-btn--primary:hover:not(:disabled) {
+    opacity: 0.9;
+}
+
+/* Estado disabled: evita envíos duplicados. */
+.mcr-btn--primary:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Botón outline: acción secundaria o cancelar. */
+.mcr-btn--outline {
+    background: var(--color-neutral-bg);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+}
+
+@media (max-width: 767px) {
+    .mcr-header {
+        padding: 18px 20px 0 !important;
+    }
+
+    .mcr-body {
+        padding: 18px 20px 20px !important;
+    }
+
+    .mcr-row {
+        grid-template-columns: 1fr;
+    }
+
+    .mcr-actions {
+        flex-direction: column-reverse;
+    }
+
+    .mcr-btn {
+        width: 100%;
+    }
+}

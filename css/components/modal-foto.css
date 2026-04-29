@@ -1,0 +1,382 @@
+﻿/*
+    MODAL FOTO — Componente para mostrar detalles de una fotografía
+    Prefijo: mf-
+*/
+
+/* Contenido del modal: bloque principal con sombra y radios. */
+#modal-foto .modal-content {
+    border: 0;
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    box-shadow: var(--shadow-modal);
+    max-height: calc(100vh - 2rem);
+}
+
+/* Layout principal: divide imagen y panel informativo. */
+.mf-modal-layout {
+    display: flex;
+    min-height: 560px;
+}
+
+/* Columna izquierda: área visual de la fotografía. */
+.mf-modal-left {
+    flex: 0 0 55%;
+    max-width: 55%;
+    background: #000000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+}
+
+/* Imagen del modal: muestra la foto en tamaño completo. */
+.mf-modal-image {
+    width: 100%;
+    height: 100%;
+    max-height: 540px;
+    object-fit: contain;
+    display: block;
+}
+
+/* Columna derecha: metadatos, rating y comentarios. */
+.mf-modal-right {
+    flex: 0 0 45%;
+    max-width: 45%;
+    background: var(--color-surface);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+/* Panel interno: separa secciones del modal. */
+.mf-modal-panel {
+    padding: 18px 20px;
+}
+
+/* Separador: divide bloques de información. */
+.mf-divider {
+    height: 1px;
+    background: var(--color-border);
+    margin: 0;
+}
+
+/* Fila de usuario: avatar, nombre y acciones. */
+.mf-user-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Avatar del autor: foto circular del usuario. */
+.mf-user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-full);
+    object-fit: cover;
+    background: var(--color-neutral-bg);
+}
+
+/* Nombre del usuario: enlace o texto del autor. */
+.mf-user-name {
+    color: var(--color-text);
+    font-size: 24px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+/* Fecha del usuario: marca temporal de publicación. */
+.mf-user-date {
+    color: var(--color-text-muted);
+    font-size: 20px;
+    line-height: 1.2;
+}
+
+/* Botón cerrar: acción para salir del modal. */
+.mf-close {
+    margin-left: auto;
+    border: 0;
+    background: transparent;
+    color: var(--color-text-secondary);
+    font-size: 26px;
+    line-height: 1;
+}
+
+/* Título de la foto: encabezado principal del detalle. */
+.mf-title {
+    margin: 14px 0 8px;
+    font-size: 34px;
+    line-height: 1.15;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+/* Descripción: texto explicativo de la fotografía. */
+.mf-description {
+    margin: 0;
+    font-size: 30px;
+    line-height: 1.25;
+    color: var(--color-text-secondary);
+}
+
+/* Encabezado de calificación: título y acción de evaluar. */
+.mf-rating-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+/* Score: promedio o resumen de puntuación. */
+.mf-rating-score {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+/* Icono de score: refuerzo visual de la calificación. */
+.mf-rating-score i {
+    color: var(--color-warning);
+}
+
+/* Botón evaluar: activa el flujo de calificación. */
+.mf-evaluar-btn {
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    padding: 6px 12px;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--color-text);
+}
+
+/* Fila de estrellas: controles visibles de valoración. */
+.mf-stars-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+/* Grupo de criterios: organiza las líneas por métrica. */
+.mf-stars-group {
+    display: grid;
+    gap: 8px;
+}
+
+/* Línea de criterio: etiqueta + estrellas en una sola fila. */
+.mf-stars-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+/* Etiqueta del criterio: nombre de la métrica evaluada. */
+.mf-stars-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    min-width: 92px;
+}
+
+/* Botón estrella: permite seleccionar una puntuación. */
+.mf-star-btn {
+    border: 0;
+    background: transparent;
+    padding: 0;
+    font-size: 28px;
+    line-height: 1;
+    color: #D1D5DB;
+    cursor: pointer;
+}
+
+/* Estado activo: marca la estrella seleccionada. */
+.mf-star-btn.is-active {
+    color: var(--color-warning);
+}
+
+/* Estado deshabilitado: evita interacción durante envío. */
+.mf-star-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Nota de rating: ayuda contextual para el usuario. */
+.mf-rating-note {
+    margin: 0 0 10px;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+}
+
+/* Desglose: lista de métricas y su interpretación. */
+.mf-breakdown {
+    display: grid;
+    gap: 6px;
+    font-size: 14px;
+}
+
+/* Ítem de desglose: línea con criterio y valor. */
+.mf-breakdown-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--color-text-secondary);
+}
+
+/* Énfasis del criterio: resalta el nombre de la métrica. */
+.mf-breakdown-item strong {
+    font-weight: 600;
+}
+
+/* Métrica creatividad: usa color temático. */
+.mf-breakdown-item--creatividad strong {
+    color: var(--color-creatividad);
+}
+
+/* Métrica composición: usa color temático. */
+.mf-breakdown-item--composicion strong {
+    color: var(--color-composicion);
+}
+
+/* Métrica tema: usa color temático. */
+.mf-breakdown-item--tema strong {
+    color: var(--color-tema);
+}
+
+/* Encabezado de comentarios: título con iconografía. */
+.mf-comments-head {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+/* Lista de comentarios: contenedor con scroll interno. */
+.mf-comments-list {
+    max-height: 180px;
+    overflow: auto;
+    display: grid;
+    gap: 12px;
+    padding-right: 4px;
+}
+
+/* Comentario: fila con avatar y texto asociado. */
+.mf-comment {
+    display: grid;
+    grid-template-columns: 34px 1fr;
+    gap: 10px;
+}
+
+/* Avatar del comentario: usuario que opina. */
+.mf-comment-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: var(--radius-full);
+    object-fit: cover;
+    background: var(--color-neutral-bg);
+}
+
+/* Cabecera de comentario: nombre y fecha. */
+.mf-comment-top {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
+/* Nombre del comentarista: identifica la autoría. */
+.mf-comment-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--color-text);
+}
+
+/* Fecha del comentario: contexto temporal. */
+.mf-comment-date {
+    font-size: 12px;
+    color: var(--color-text-muted);
+}
+
+.mf-comment-text {
+    margin: 2px 0 0;
+    font-size: 14px;
+    line-height: 1.35;
+    color: #374151;
+    word-break: break-word;
+}
+
+.mf-comment-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.mf-comment-input {
+    flex: 1;
+    border: 1px solid var(--color-border);
+    background: #F9FAFB;
+    border-radius: var(--radius-md);
+    padding: 10px 12px;
+    font-size: 14px;
+    color: var(--color-text);
+}
+
+.mf-comment-input:focus {
+    outline: none;
+    border-color: var(--color-text);
+}
+
+.mf-send-btn {
+    width: 40px;
+    height: 40px;
+    border: 0;
+    border-radius: var(--radius-md);
+    background: var(--color-text);
+    color: #FFFFFF;
+}
+
+.mf-login-hint {
+    margin: 12px 0 0;
+    font-size: 14px;
+    color: var(--color-text-secondary);
+}
+
+.mf-login-hint a {
+    color: var(--color-text);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.mf-comments-empty {
+    margin: 4px 0 0;
+    font-size: 14px;
+    color: var(--color-text-muted);
+}
+
+.mf-error {
+    padding: 20px;
+}
+
+@media (max-width: 991.98px) {
+    .mf-modal-layout {
+        flex-direction: column;
+        min-height: auto;
+    }
+
+    .mf-modal-left,
+    .mf-modal-right {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    .mf-modal-left {
+        min-height: 320px;
+    }
+}

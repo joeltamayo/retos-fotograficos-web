@@ -1,0 +1,578 @@
+﻿/* 
+    RANKING — Estilos para la página de ranking
+    Prefijo: rk-
+*/
+
+/* Página de ranking: contenedor principal. */
+.rk-page {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: 28px var(--page-padding-x) 48px;
+}
+
+/* Encabezado: título y filtros superiores. */
+.rk-header {
+  text-align: center;
+  margin-bottom: 22px;
+}
+
+/* Título principal: identifica la vista de ranking. */
+.rk-title {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--color-text);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Icono del título: refuerzo visual de ranking. */
+.rk-title i {
+  font-size: 24px;
+}
+
+/* Filtros: agrupan selectores de criterio. */
+.rk-filters {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+/* Selector: cambia el criterio o periodo. */
+.rk-select {
+  background: var(--color-neutral-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  font-size: 15px;
+  color: var(--color-text);
+  min-width: 220px;
+}
+
+/* Estado disabled: evita cambios no disponibles. */
+.rk-select:disabled {
+  opacity: 1;
+  cursor: default;
+}
+
+/* Rango: texto resumen del periodo mostrado. */
+.rk-range {
+  margin: 14px 0 0;
+  font-size: 16px;
+  color: var(--color-text-secondary);
+}
+
+/* Estado: etiqueta informativa del ranking. */
+.rk-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 12px;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  background: var(--color-info-bg);
+  color: #1D4ED8;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Contenedor del contenido: permite transición al recargar. */
+.rk-content {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* Fade out: oculta contenido durante el cambio. */
+.rk-content.is-fading-out {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+/* Fade in: entrada suave del nuevo contenido. */
+.rk-content.is-fading-in {
+  animation: rk-fade-in 0.24s ease;
+}
+
+@keyframes rk-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Podio: top 3 en formato destacado. */
+.rk-podium {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+  align-items: end;
+}
+
+/* Card del podio: bloque individual de posición. */
+.rk-podium-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+/* Card oro: resalta el primer lugar. */
+.rk-podium-card--oro {
+  border: 2px solid rgba(234, 179, 8, 0.75);
+  box-shadow: 0 8px 20px rgba(234, 179, 8, 0.22);
+}
+
+/* Media del podio: contenedor de imagen. */
+.rk-podium-media {
+  position: relative;
+  background: var(--color-border);
+  overflow: hidden;
+}
+
+/* Media plata: altura del segundo lugar. */
+.rk-podium-media--plata {
+  height: 370px;
+}
+
+/* Media oro: altura del primer lugar. */
+.rk-podium-media--oro {
+  height: 430px;
+}
+
+/* Media bronce: altura del tercer lugar. */
+.rk-podium-media--bronce {
+  height: 345px;
+}
+
+/* Imagen del podio: foto principal destacada. */
+.rk-podium-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Placeholder del podio: fallback cuando no hay imagen. */
+.rk-podium-image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  background: var(--color-border);
+}
+
+/* Badge del podio: número o medalla en la esquina. */
+.rk-podium-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  border-radius: var(--radius-full);
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  color: #FFFFFF;
+}
+
+/* Badge oro: estilo del primer lugar. */
+.rk-podium-badge--oro {
+  background: linear-gradient(135deg, #FACC15, #EAB308);
+}
+
+/* Badge plata: estilo del segundo lugar. */
+.rk-podium-badge--plata {
+  background: linear-gradient(135deg, #94A3B8, #64748B);
+}
+
+/* Badge bronce: estilo del tercer lugar. */
+.rk-podium-badge--bronce {
+  background: linear-gradient(135deg, #EA580C, #C2410C);
+}
+
+/* Cuerpo del podio: agrupa nombre, usuario y score. */
+.rk-podium-body {
+  padding: 14px;
+}
+
+/* Lugar: número grande de la posición. */
+.rk-place {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 28px;
+  color: var(--color-text-secondary);
+}
+
+/* Label de lugar: texto complementario del ranking. */
+.rk-place-label {
+  font-size: 30px;
+  font-weight: 400;
+  color: var(--color-text-secondary);
+}
+
+/* Título de foto: nombre de la imagen destacada. */
+.rk-photo-title {
+  margin: 6px 0 8px;
+  font-size: 32px;
+  font-weight: 500;
+  line-height: 1.22;
+  color: var(--color-text);
+}
+
+/* Fila de usuario: avatar y nombre del participante. */
+.rk-user-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-size: 28px;
+  color: var(--color-text);
+}
+
+/* Avatar de usuario: imagen circular. */
+.rk-user-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  object-fit: cover;
+  background: var(--color-border);
+}
+
+/* Placeholder de avatar: fallback textual o ícono. */
+.rk-user-avatar-placeholder {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-border);
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+/* Caja de score: contenedor del puntaje. */
+.rk-score-box {
+  border-radius: var(--radius-md);
+  padding: 12px;
+  text-align: center;
+  color: #FFFFFF;
+}
+
+/* Valor del score: puntuación principal. */
+.rk-score-value {
+  font-size: 40px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.rk-score-label {
+  margin-top: 4px;
+  font-size: 24px;
+  line-height: 1;
+}
+
+.rk-score--oro {
+  background: linear-gradient(135deg, #FACC15 0%, #EAB308 55%, #D97706 100%);
+}
+
+.rk-score--plata {
+  background: linear-gradient(135deg, #94A3B8 0%, #64748B 100%);
+}
+
+.rk-score--bronce {
+  background: linear-gradient(135deg, #EA580C 0%, #C2410C 100%);
+}
+
+.rk-details {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.rk-detail-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 22px;
+}
+
+.rk-detail-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.rk-detail-list {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rk-detail-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 0;
+  font-size: 15px;
+  color: var(--color-text);
+}
+
+.rk-detail-item strong {
+  font-weight: 700;
+}
+
+.rk-detail-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rk-detail-icon--creatividad {
+  color: var(--color-creatividad);
+}
+
+.rk-detail-icon--composicion {
+  color: var(--color-composicion);
+}
+
+.rk-detail-icon--tema {
+  color: var(--color-tema);
+}
+
+.rk-others {
+  margin-top: 20px;
+}
+
+.rk-others-title {
+  margin: 0 0 12px;
+  font-size: 28px;
+  font-weight: 400;
+  color: var(--color-text);
+}
+
+.rk-other-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.rk-other-item {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 14px 18px;
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+}
+
+.rk-other-position {
+  font-size: 36px;
+  font-weight: 400;
+  color: var(--color-text-secondary);
+  width: 40px;
+  text-align: center;
+}
+
+.rk-other-thumb {
+  width: 72px;
+  height: 72px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: var(--color-border);
+}
+
+.rk-other-thumb-placeholder {
+  width: 72px;
+  height: 72px;
+  border-radius: 8px;
+  background: var(--color-border);
+  color: var(--color-text-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rk-other-name {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--color-text);
+}
+
+.rk-other-user {
+  margin: 4px 0 0;
+  font-size: 28px;
+  font-weight: 400;
+  color: var(--color-text-secondary);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rk-other-points {
+  text-align: right;
+  min-width: 120px;
+}
+
+.rk-other-points-value {
+  display: block;
+  font-size: 40px;
+  line-height: 1;
+  color: var(--color-text);
+  font-weight: 400;
+}
+
+.rk-other-points-label {
+  display: block;
+  font-size: 24px;
+  line-height: 1.2;
+  color: var(--color-text-secondary);
+}
+
+.rk-empty,
+.rk-error {
+  margin: 0;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+}
+
+.rk-empty {
+  background: #F8FAFC;
+  color: var(--color-text-secondary);
+}
+
+.rk-error {
+  background: var(--color-danger-bg);
+  color: #991B1B;
+}
+
+.rk-skeleton-podium {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.rk-skeleton-details {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.rk-skeleton-others {
+  margin-top: 20px;
+}
+
+.rk-skeleton-others h3 {
+  font-size: 28px;
+  font-weight: 400;
+  margin: 0 0 12px;
+}
+
+.rk-skeleton-rows {
+  display: grid;
+  gap: 10px;
+}
+
+.rk-sk-podium {
+  flex: 1 1 32%;
+}
+
+.rk-sk-podium--left {
+  height: 500px;
+}
+
+.rk-sk-podium--center {
+  height: 580px;
+  flex-basis: 35%;
+}
+
+.rk-sk-podium--right {
+  height: 450px;
+}
+
+@media (max-width: 1199.98px) {
+
+  .rk-photo-title,
+  .rk-other-name {
+    font-size: 24px;
+  }
+
+  .rk-place-label,
+  .rk-user-row,
+  .rk-other-user,
+  .rk-score-label,
+  .rk-other-points-label {
+    font-size: 18px;
+  }
+
+  .rk-score-value,
+  .rk-other-points-value {
+    font-size: 30px;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .rk-page {
+    padding: 22px 16px 40px;
+  }
+
+  .rk-title {
+    font-size: 28px;
+  }
+
+  .rk-podium,
+  .rk-details,
+  .rk-skeleton-podium,
+  .rk-skeleton-details {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+
+  .rk-podium-card--oro {
+    order: 1;
+  }
+
+  .rk-podium-card--plata {
+    order: 2;
+  }
+
+  .rk-podium-card--bronce {
+    order: 3;
+  }
+
+  .rk-podium-media--plata,
+  .rk-podium-media--oro,
+  .rk-podium-media--bronce {
+    height: 300px;
+  }
+
+  .rk-other-item {
+    grid-template-columns: auto auto minmax(0, 1fr);
+  }
+
+  .rk-other-points {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: baseline;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+}

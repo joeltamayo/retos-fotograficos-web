@@ -1,0 +1,71 @@
+﻿/*
+  Badges y estados
+
+  - Define estilos para badges de estado (activo, finalizado, programado, etc.).
+  - Prefijo: bd- */
+
+/* Badge base: contenedor común para todos los estados visuales. */
+.bd-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius-full);
+  padding: 3px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+/* Estado activo: usado para retos o elementos habilitados. */
+.bd-badge--activo {
+  background: var(--color-success-bg);
+  color: #16A34A;
+}
+
+/* Estado finalizado: indica contenido cerrado o completado. */
+.bd-badge--finalizado {
+  background: var(--color-neutral-bg);
+  color: var(--color-neutral);
+}
+
+/* Estado programado: marca contenido pendiente de publicación. */
+.bd-badge--programado {
+  background: var(--color-info-bg);
+  color: #1D4ED8;
+}
+
+/* Estado archivado: conserva historial sin protagonismo visual. */
+.bd-badge--archivado {
+  background: var(--color-neutral-bg);
+  color: var(--color-text-muted);
+}
+
+/* Estado aprobada: usado en revisiones o moderación. */
+.bd-badge--aprobada {
+  background: var(--color-success-bg);
+  color: #16A34A;
+}
+
+/* Estado en revisión: señala una acción pendiente de validar. */
+.bd-badge--revision {
+  background: var(--color-warning-bg);
+  color: #B45309;
+}
+
+/* Estado desaprobada: indica rechazo de moderación. */
+.bd-badge--desaprobada {
+  background: var(--color-danger-bg);
+  color: #DC2626;
+}
+
+/* Estado suspendido: comunica bloqueo temporal o definitivo. */
+.bd-badge--suspendido {
+  background: var(--color-danger-bg);
+  color: #DC2626;
+}
+
+/* Estado en curso: usado en procesos activos o en progreso. */
+.bd-badge--en-curso {
+  background: var(--color-info-bg);
+  color: #1D4ED8;
+}

@@ -1,0 +1,235 @@
+﻿/*
+    MODAL EDITAR PERFIL — Componente para editar información del perfil
+    Prefijo: me-
+*/
+
+/* Contenido del modal: bloque principal con sombra y radios. */
+#modal-editar-perfil .modal-content {
+    border: 0;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-modal);
+    overflow: hidden;
+    max-height: calc(100vh - 2rem);
+}
+
+.me-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 24px 32px 0;
+}
+
+.me-body {
+    padding: 24px 32px 28px;
+    overflow-y: auto;
+}
+
+.me-title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+.me-subtitle {
+    margin: 6px 0 0;
+    font-size: 15px;
+    color: var(--color-text-secondary);
+}
+
+.me-close {
+    border: 0;
+    background: transparent;
+    color: var(--color-text-secondary);
+    font-size: 24px;
+    line-height: 1;
+}
+
+/* Foto de perfil: bloque para mostrar y cambiar la imagen del usuario. */
+.me-photo-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+}
+
+.me-photo-button {
+    position: relative;
+    width: 122px;
+    height: 122px;
+    border-radius: var(--radius-full);
+    border: 3px solid var(--color-border);
+    background: var(--color-neutral-bg);
+    overflow: hidden;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex: none;
+}
+
+.me-photo-button img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.me-photo-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-muted);
+    font-size: 42px;
+}
+
+.me-camera-btn {
+    position: absolute;
+    right: -2px;
+    bottom: -2px;
+    width: 36px;
+    height: 36px;
+    border: 0;
+    border-radius: var(--radius-full);
+    background: var(--color-text);
+    color: #FFFFFF;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 18px rgba(17, 24, 39, 0.28);
+}
+
+.me-photo-action {
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    padding: 8px 14px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.me-section {
+    margin-bottom: 16px;
+}
+
+.me-section--tight {
+    margin-bottom: 8px;
+}
+
+.me-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 8px;
+}
+
+.me-input,
+.me-textarea {
+    width: 100%;
+    border: 1px solid var(--color-border);
+    background: #F9FAFB;
+    border-radius: var(--radius-md);
+    padding: 11px 14px;
+    font-size: 14px;
+    color: var(--color-text);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.me-textarea {
+    min-height: 88px;
+    resize: vertical;
+}
+
+.me-input::placeholder,
+.me-textarea::placeholder {
+    color: var(--color-text-muted);
+}
+
+.me-input:focus,
+.me-textarea:focus {
+    outline: none;
+    border-color: var(--color-text);
+    box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.08);
+}
+
+.me-hint {
+    margin-top: 7px;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+}
+
+.me-error {
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--color-danger);
+    min-height: 16px;
+}
+
+.me-counter {
+    margin-top: 7px;
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    text-align: right;
+}
+
+.me-modal-error {
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--color-danger);
+    min-height: 18px;
+}
+
+.me-outline {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 10px 16px;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.me-primary {
+    background: var(--color-text);
+    border: 0;
+    border-radius: var(--radius-md);
+    padding: 10px 16px;
+    font-weight: 600;
+    color: #FFFFFF;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.me-primary:disabled,
+.me-outline:disabled,
+.me-photo-action:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.me-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+@media (max-width: 991.98px) {
+
+    .me-header,
+    .me-body {
+        padding-inline: 24px;
+    }
+}

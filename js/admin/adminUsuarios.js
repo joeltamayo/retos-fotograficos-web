@@ -2,7 +2,6 @@ import api from '../api.js';
 import { renderPaginacion } from '../components/paginacion.js';
 import { mostrarToast, skeletonCard } from '../utils.js';
 
-const STYLE_ID = 'admin-usuarios-styles';
 const DELETE_MODAL_ID = 'admin-usuario-delete-modal';
 const LIMITE = 10;
 
@@ -10,8 +9,8 @@ const LIMITE = 10;
  * Metadatos visuales para badges de estado en la tabla.
  */
 const ESTADO_META = {
-	activo: { label: 'Activo', bg: 'var(--color-success-bg)', color: 'var(--color-success)', icon: 'bi-check-circle' },
-	suspendido: { label: 'Suspendido', bg: 'var(--color-danger-bg)', color: 'var(--color-danger)', icon: 'bi-slash-circle' },
+	activo: { label: 'Activo', badgeClass: 'admin-usuarios-badge--activo', icon: 'bi-check-circle' },
+	suspendido: { label: 'Suspendido', badgeClass: 'admin-usuarios-badge--suspendido', icon: 'bi-slash-circle' },
 };
 
 /**
@@ -70,357 +69,11 @@ function getEstadoMeta(estadoRaw) {
 	const key = String(estadoRaw ?? '').trim().toLowerCase();
 	return ESTADO_META[key] || {
 		label: key || '—',
-		bg: 'var(--color-neutral-bg)',
-		color: 'var(--color-neutral)',
+		badgeClass: 'admin-usuarios-badge--muted',
 		icon: 'bi-circle',
 	};
 }
 
-/**
- * Inyecta estilos del módulo una sola vez por sesión.
- */
-function ensureStyles() {
-	if (document.getElementById(STYLE_ID)) {
-		return;
-	}
-
-	const style = document.createElement('style');
-	style.id = STYLE_ID;
-	style.textContent = `
-		.admin-usuarios {
-			display: grid;
-			gap: 24px;
-		}
-
-		.admin-usuarios-summary {
-			display: grid;
-			grid-template-columns: repeat(4, minmax(0, 1fr));
-			gap: 16px;
-		}
-
-		.admin-usuarios-card,
-		.admin-usuarios-filter,
-		.admin-usuarios-table-card {
-			background: #FFFFFF;
-			border-radius: 14px;
-			box-shadow: var(--shadow-card);
-		}
-
-		.admin-usuarios-card {
-			position: relative;
-			padding: 18px;
-			min-height: 138px;
-			overflow: hidden;
-		}
-
-		.admin-usuarios-card i {
-			position: absolute;
-			top: 16px;
-			right: 16px;
-			font-size: 18px;
-		}
-
-		.admin-usuarios-card-title {
-			margin: 0;
-			font-size: 14px;
-			font-weight: 500;
-			color: #111827;
-		}
-
-		.admin-usuarios-card-value {
-			margin-top: 34px;
-			font-size: 34px;
-			font-weight: 700;
-			line-height: 1;
-			color: #111827;
-		}
-
-		.admin-usuarios-card-meta {
-			margin-top: 6px;
-			font-size: 14px;
-			color: #6B7280;
-		}
-
-		.admin-usuarios-filter {
-			padding: 14px;
-			display: grid;
-			grid-template-columns: minmax(0, 1fr) 170px 170px;
-			gap: 12px;
-			align-items: center;
-		}
-
-		.admin-usuarios-search,
-		.admin-usuarios-select,
-		.admin-usuarios-role {
-			width: 100%;
-			border: 1px solid #E5E7EB;
-			background: #F9FAFB;
-			border-radius: 10px;
-			padding: 11px 14px;
-			font-size: 14px;
-			color: #111827;
-		}
-
-		.admin-usuarios-search::placeholder {
-			color: #9CA3AF;
-		}
-
-		.admin-usuarios-table-card {
-			padding: 18px;
-		}
-
-		.admin-usuarios-table-title {
-			margin: 0 0 14px;
-			font-size: 18px;
-			font-weight: 600;
-			color: #111827;
-		}
-
-		.admin-usuarios-table-wrap {
-			overflow-x: auto;
-		}
-
-		.admin-usuarios-table {
-			width: 100%;
-			min-width: 1180px;
-			border-collapse: collapse;
-		}
-
-		.admin-usuarios-table th {
-			text-align: left;
-			font-size: 14px;
-			font-weight: 600;
-			color: #374151;
-			padding: 12px 10px;
-			border-bottom: 1px solid #E5E7EB;
-			white-space: nowrap;
-		}
-
-		.admin-usuarios-table td {
-			padding: 14px 10px;
-			border-bottom: 1px solid #F3F4F6;
-			vertical-align: middle;
-			font-size: 14px;
-			color: #111827;
-		}
-
-		.admin-usuarios-user {
-			display: inline-flex;
-			align-items: center;
-			gap: 10px;
-		}
-
-		.admin-usuarios-avatar,
-		.admin-usuarios-avatar-placeholder {
-			width: 36px;
-			height: 36px;
-			border-radius: 50%;
-			flex: 0 0 auto;
-		}
-
-		.admin-usuarios-avatar {
-			object-fit: cover;
-			background: #E5E7EB;
-		}
-
-		.admin-usuarios-avatar-placeholder {
-			background: #E5E7EB;
-			display: inline-flex;
-			align-items: center;
-			justify-content: center;
-			color: #9CA3AF;
-		}
-
-		.admin-usuarios-name {
-			display: grid;
-			gap: 2px;
-		}
-
-		.admin-usuarios-name strong {
-			font-size: 14px;
-			font-weight: 600;
-			color: #111827;
-		}
-
-		.admin-usuarios-name span {
-			font-size: 13px;
-			color: #6B7280;
-		}
-
-		.admin-usuarios-email {
-			color: #111827;
-			font-size: 14px;
-		}
-
-		.admin-usuarios-badge {
-			display: inline-flex;
-			align-items: center;
-			justify-content: center;
-			padding: 4px 10px;
-			border-radius: 9999px;
-			font-size: 12px;
-			font-weight: 500;
-			white-space: nowrap;
-		}
-
-		.admin-usuarios-badge--muted {
-			background: var(--color-neutral-bg);
-			color: var(--color-neutral);
-		}
-
-		.admin-usuarios-role-select {
-			min-width: 132px;
-			padding: 10px 12px;
-			border-radius: 10px;
-			border: 1px solid #E5E7EB;
-			background: #F9FAFB;
-			font-size: 14px;
-			color: #111827;
-		}
-
-		.admin-usuarios-actions {
-			display: inline-flex;
-			align-items: center;
-			gap: 8px;
-			flex-wrap: wrap;
-		}
-
-		.admin-usuarios-action-btn {
-			width: 32px;
-			height: 32px;
-			border-radius: 8px;
-			border: 1px solid #E5E7EB;
-			background: #FFFFFF;
-			color: #111827;
-			display: inline-flex;
-			align-items: center;
-			justify-content: center;
-			padding: 0;
-		}
-
-		.admin-usuarios-action-btn--danger {
-			color: #DC2626;
-		}
-
-		.admin-usuarios-action-btn--success {
-			color: #16A34A;
-		}
-
-		.admin-usuarios-action-btn--warning {
-			color: #D97706;
-		}
-
-		.admin-usuarios-empty,
-		.admin-usuarios-error {
-			margin: 0;
-			padding: 16px;
-			border-radius: 10px;
-			font-size: 14px;
-		}
-
-		.admin-usuarios-empty {
-			background: #F8FAFC;
-			color: #6B7280;
-		}
-
-		.admin-usuarios-error {
-			background: #FEE2E2;
-			color: #991B1B;
-		}
-
-		.admin-usuarios-pagination {
-			margin-top: 16px;
-		}
-
-		.admin-usuarios-skeleton-grid {
-			display: grid;
-			grid-template-columns: repeat(4, minmax(0, 1fr));
-			gap: 16px;
-		}
-
-		.admin-usuarios-skeleton-table {
-			display: grid;
-			gap: 12px;
-		}
-
-		#${DELETE_MODAL_ID} .modal-content {
-			border: 0;
-			border-radius: 20px;
-			box-shadow: var(--shadow-modal);
-			overflow: hidden;
-		}
-
-		.admin-modal-title {
-			margin: 0;
-			font-size: 20px;
-			font-weight: 700;
-			color: #111827;
-		}
-
-		.admin-modal-subtitle {
-			margin: 6px 0 0;
-			font-size: 14px;
-			color: #6B7280;
-		}
-
-		.admin-modal-confirm {
-			font-size: 14px;
-			color: #374151;
-		}
-
-		.admin-modal-actions {
-			display: flex;
-			justify-content: flex-end;
-			gap: 10px;
-			margin-top: 16px;
-		}
-
-		.admin-modal-btn {
-			border-radius: 10px;
-			padding: 10px 16px;
-			font-size: 14px;
-			font-weight: 600;
-			display: inline-flex;
-			align-items: center;
-			justify-content: center;
-			gap: 8px;
-		}
-
-		.admin-modal-btn--dark {
-			background: #111827;
-			color: #FFFFFF;
-			border: 0;
-		}
-
-		.admin-modal-btn--outline {
-			background: #FFFFFF;
-			color: #111827;
-			border: 1px solid #E5E7EB;
-		}
-
-		@media (max-width: 1199.98px) {
-			.admin-usuarios-summary,
-			.admin-usuarios-skeleton-grid {
-				grid-template-columns: repeat(2, minmax(0, 1fr));
-			}
-		}
-
-		@media (max-width: 991.98px) {
-			.admin-usuarios-filter {
-				grid-template-columns: 1fr;
-			}
-		}
-
-		@media (max-width: 767.98px) {
-			.admin-usuarios-summary,
-			.admin-usuarios-skeleton-grid {
-				grid-template-columns: 1fr;
-			}
-		}
-	`;
-
-	document.head.appendChild(style);
-}
 
 /**
  * Recupera estado de UI persistido en el contenedor.
@@ -446,17 +99,17 @@ function setState(contenedor, state) {
  */
 function renderSummaryCards(resumen = {}) {
 	const cards = [
-		{ label: 'Total Usuarios', meta: 'Registrados', value: toInt(resumen.total), icon: 'bi-people', color: '#3B82F6' },
-		{ label: 'Activos', meta: 'En la plataforma', value: toInt(resumen.activos), icon: 'bi-person-check', color: '#16A34A' },
-		{ label: 'Suspendidos', meta: 'Bloqueados', value: toInt(resumen.suspendidos), icon: 'bi-person-slash', color: '#DC2626' },
-		{ label: 'Moderadores', meta: 'Con permisos', value: toInt(resumen.moderadores), icon: 'bi-shield-lock', color: '#2563EB' },
+		{ label: 'Total Usuarios', meta: 'Registrados', value: toInt(resumen.total), icon: 'bi-people', iconClass: 'admin-usuarios-icon--info' },
+		{ label: 'Activos', meta: 'En la plataforma', value: toInt(resumen.activos), icon: 'bi-person-check', iconClass: 'admin-usuarios-icon--success' },
+		{ label: 'Suspendidos', meta: 'Bloqueados', value: toInt(resumen.suspendidos), icon: 'bi-person-slash', iconClass: 'admin-usuarios-icon--danger' },
+		{ label: 'Moderadores', meta: 'Con permisos', value: toInt(resumen.moderadores), icon: 'bi-shield-lock', iconClass: 'admin-usuarios-icon--primary' },
 	];
 
 	return `
 		<div class="admin-usuarios-summary">
 			${cards.map((card) => `
 				<article class="admin-usuarios-card">
-					<i class="bi ${card.icon}" style="color:${card.color}"></i>
+					<i class="bi ${card.icon} ${card.iconClass}"></i>
 					<p class="admin-usuarios-card-title">${escapeHtml(card.label)}</p>
 					<div class="admin-usuarios-card-value">${card.value}</div>
 					<div class="admin-usuarios-card-meta">${escapeHtml(card.meta)}</div>
@@ -475,15 +128,15 @@ function renderSkeleton(contenedor) {
 			${Array.from({ length: 4 }, () => skeletonCard('138px')).join('')}
 		</div>
 
-		<div class="admin-usuarios-filter mt-1">
+		<div class="admin-usuarios-filter admin-mt-1">
 			${skeletonCard('44px')}
 			${skeletonCard('44px')}
 			${skeletonCard('44px')}
 		</div>
 
-		<div class="admin-usuarios-table-card mt-1">
+		<div class="admin-usuarios-table-card admin-mt-1">
 			${skeletonCard('42px')}
-			<div class="admin-usuarios-skeleton-table mt-3">
+			<div class="admin-usuarios-skeleton-table admin-mt-3">
 				${Array.from({ length: 4 }, () => skeletonCard('78px')).join('')}
 			</div>
 		</div>
@@ -495,7 +148,7 @@ function renderSkeleton(contenedor) {
  */
 function renderEstadoBadge(estado) {
 	const meta = getEstadoMeta(estado);
-	return `<span class="admin-usuarios-badge" style="background:${meta.bg};color:${meta.color}">${escapeHtml(meta.label)}</span>`;
+	return `<span class="admin-usuarios-badge ${meta.badgeClass}">${escapeHtml(meta.label)}</span>`;
 }
 
 /**
@@ -650,14 +303,14 @@ function ensureDeleteModal() {
 			<div class="modal fade" id="${DELETE_MODAL_ID}" tabindex="-1" aria-hidden="true">
 				<div class="modal-dialog modal-dialog-centered">
 					<div class="modal-content">
-						<div class="modal-header border-0 pb-0 px-4 px-md-5 pt-4 pt-md-5">
+						<div class="admin-modal-header">
 							<div>
 								<h3 class="admin-modal-title">Eliminar Usuario</h3>
 								<p class="admin-modal-subtitle">Esta acción eliminará la cuenta y sus datos relacionados.</p>
 							</div>
-							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+							<button type="button" class="admin-modal-close" data-bs-dismiss="modal" aria-label="Cerrar">&times;</button>
 						</div>
-						<div class="modal-body px-4 px-md-5 pb-4 pb-md-5 pt-3">
+						<div class="admin-modal-body">
 							<p class="admin-modal-confirm" id="admin-usuario-delete-message"></p>
 							<div class="admin-modal-actions">
 								<button type="button" class="admin-modal-btn admin-modal-btn--outline" data-bs-dismiss="modal">Cancelar</button>
@@ -882,8 +535,6 @@ async function render(contenedor) {
 	if (!(contenedor instanceof HTMLElement)) {
 		return;
 	}
-
-	ensureStyles();
 
 	const state = getState(contenedor);
 	contenedor.innerHTML = '<div class="admin-usuarios"><div id="admin-usuarios-root"></div></div>';

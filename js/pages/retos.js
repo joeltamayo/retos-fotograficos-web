@@ -4,7 +4,6 @@ import { gridRetos } from '../components/cardReto.js';
 import { renderPaginacion } from '../components/paginacion.js';
 import { manejarErrorDePagina, mostrarToast, skeletonCard } from '../utils.js';
 
-const STYLE_ID = 'retos-page-styles';
 const LIMITE_ACTIVOS = 6;
 const LIMITE_FINALIZADOS = 6;
 
@@ -29,150 +28,20 @@ function toSafeNumber(value, fallback = 0) {
 }
 
 /**
- * Inyecta estilos de la vista una sola vez.
- */
-function ensureStyles() {
-	if (document.getElementById(STYLE_ID)) {
-		return;
-	}
-
-	const style = document.createElement('style');
-	style.id = STYLE_ID;
-	style.textContent = `
-		.retos-page {
-			max-width: var(--content-max-width);
-			margin: 0 auto;
-			padding: 34px var(--page-padding-x) 50px;
-		}
-
-		.retos-header {
-			display: flex;
-			justify-content: space-between;
-			align-items: flex-start;
-			gap: 16px;
-			margin-bottom: 28px;
-		}
-
-		.retos-title {
-			margin: 0;
-			font-size: 36px;
-			font-weight: 700;
-			color: #111827;
-		}
-
-		.retos-description {
-			margin: 6px 0 0;
-			font-size: 16px;
-			color: #6B7280;
-		}
-
-		.retos-create-btn {
-			margin-top: 2px;
-			border: 0;
-			border-radius: 10px;
-			background: #111827;
-			color: #FFFFFF;
-			padding: 10px 16px;
-			font-weight: 600;
-			font-size: 14px;
-			display: inline-flex;
-			align-items: center;
-			gap: 8px;
-		}
-
-		.retos-section {
-			margin-top: 18px;
-		}
-
-		.retos-section + .retos-section {
-			margin-top: 34px;
-		}
-
-		.retos-section-title {
-			margin: 0 0 14px;
-			font-size: 30px;
-			font-weight: 600;
-			color: #111827;
-		}
-
-		.retos-skeleton-grid {
-			display: grid;
-			grid-template-columns: repeat(3, minmax(0, 1fr));
-			gap: 24px;
-		}
-
-		.retos-footer {
-			margin-top: 22px;
-		}
-
-		.retos-empty,
-		.retos-error {
-			margin: 0;
-			padding: 16px;
-			border-radius: 10px;
-			font-size: 14px;
-		}
-
-		.retos-empty {
-			background: #F8FAFC;
-			color: #6B7280;
-		}
-
-		.retos-error {
-			background: #FEE2E2;
-			color: #991B1B;
-		}
-
-		@media (max-width: 1199.98px) {
-			.retos-skeleton-grid {
-				grid-template-columns: repeat(2, minmax(0, 1fr));
-			}
-		}
-
-		@media (max-width: 991.98px) {
-			.retos-page {
-				padding: 24px 16px 40px;
-			}
-
-			.retos-title {
-				font-size: 30px;
-			}
-
-			.retos-section-title {
-				font-size: 24px;
-			}
-
-			.retos-header {
-				flex-direction: column;
-				align-items: flex-start;
-			}
-		}
-
-		@media (max-width: 767.98px) {
-			.retos-skeleton-grid {
-				grid-template-columns: repeat(1, minmax(0, 1fr));
-			}
-		}
-	`;
-
-	document.head.appendChild(style);
-}
-
-/**
  * Construye el layout base de la vista y devuelve referencias DOM.
  */
 function renderLayout(contenedor, esAdmin) {
 	contenedor.innerHTML = `
-		<section class="retos-page page-enter">
-			<header class="retos-header">
+		<section class="rt-page page-enter">
+			<header class="rt-header">
 				<div>
-					<h1 class="retos-title">Todos los Retos</h1>
-					<p class="retos-description">Participa en retos y demuestra tu talento</p>
+					<h1 class="rt-title">Todos los Retos</h1>
+					<p class="rt-description">Participa en retos y demuestra tu talento</p>
 				</div>
 
 				${esAdmin
 					? `
-						<button type="button" class="retos-create-btn" id="retos-crear-btn">
+						<button type="button" class="rt-create-btn" id="retos-crear-btn">
 							<i class="bi bi-plus"></i>
 							<span>Crear Reto</span>
 						</button>
@@ -180,15 +49,15 @@ function renderLayout(contenedor, esAdmin) {
 					: ''}
 			</header>
 
-			<section class="retos-section" aria-label="Retos activos">
-				<h2 class="retos-section-title">Activos</h2>
+			<section class="rt-section" aria-label="Retos activos">
+				<h2 class="rt-section-title">Activos</h2>
 				<div id="retos-activos-contenido"></div>
 			</section>
 
-			<section class="retos-section" aria-label="Retos finalizados">
-				<h2 class="retos-section-title">Finalizados</h2>
+			<section class="rt-section" aria-label="Retos finalizados">
+				<h2 class="rt-section-title">Finalizados</h2>
 				<div id="retos-finalizados-contenido"></div>
-				<div class="retos-footer" id="retos-finalizados-paginacion"></div>
+				<div class="rt-footer" id="retos-finalizados-paginacion"></div>
 			</section>
 		</section>
 	`;
@@ -210,7 +79,7 @@ function showSectionSkeleton(contenedor, cantidad = 3) {
 	}
 
 	contenedor.innerHTML = `
-		<div class="retos-skeleton-grid">
+		<div class="rt-skeleton-grid">
 			${Array.from({ length: cantidad }, () => skeletonCard('290px')).join('')}
 		</div>
 	`;
@@ -224,7 +93,7 @@ function showError(contenedor, mensaje) {
 		return;
 	}
 
-	contenedor.innerHTML = `<p class="retos-error">${escapeHtml(mensaje)}</p>`;
+	contenedor.innerHTML = `<p class="rt-error">${escapeHtml(mensaje)}</p>`;
 }
 
 /**
@@ -235,7 +104,7 @@ function showEmpty(contenedor, mensaje) {
 		return;
 	}
 
-	contenedor.innerHTML = `<p class="retos-empty">${escapeHtml(mensaje)}</p>`;
+	contenedor.innerHTML = `<p class="rt-empty">${escapeHtml(mensaje)}</p>`;
 }
 
 /**
@@ -243,27 +112,18 @@ function showEmpty(contenedor, mensaje) {
  * Si aún no existe el componente, muestra un toast informativo.
  */
 async function abrirModalCrearRetoAdmin() {
-	const rutas = [
-		'../admin/modalCrearReto.js',
-		'../components/admin/modalCrearReto.js',
-		'../components/modalCrearReto.js',
-		'../admin/retos/modalCrearReto.js',
-	];
-
-	for (const ruta of rutas) {
-		try {
-			const module = await import(ruta);
-			const abrir = module?.abrirModalCrearReto || module?.default?.abrirModalCrearReto || module?.default;
-			if (typeof abrir === 'function') {
-				await abrir();
-				return;
-			}
-		} catch {
-			// Continuamos con la siguiente ruta posible.
+	try {
+		const module = await import('../admin/adminRetos.js');
+		const abrir = module?.abrirModalCrearRetoAdmin;
+		if (typeof abrir === 'function') {
+			await abrir();
+			return;
 		}
+	} catch {
+		// ignore and show fallback
 	}
 
-	mostrarToast('El modal para crear reto aún no está disponible.', 'info');
+	mostrarToast('El modal para crear reto aún no está disponible.', 'warning');
 }
 
 /**
@@ -301,6 +161,27 @@ function renderFinalizadosSection(state) {
 			state.finalizados.total = toSafeNumber(response?.total, 0);
 			state.finalizados.paginaActual = nuevaPagina;
 			renderFinalizadosSection(state);
+
+			// Auto-refresh when a reto is created or edited
+			window.addEventListener('reto-creado-o-editado', async () => {
+				try {
+					const activosResp = await api.get('/retos/activos');
+					const activosList = Array.isArray(activosResp?.retos) ? activosResp.retos.slice(0, LIMITE_ACTIVOS) : [];
+					if (activosList.length === 0) {
+						showEmpty(state.refs.activos, 'No hay retos activos en este momento.');
+					} else {
+						gridRetos(activosList, state.refs.activos);
+					}
+
+					const finalizadosResp = await api.get('/retos/finalizados', { pagina: 1, limite: LIMITE_FINALIZADOS });
+					state.finalizados.items = Array.isArray(finalizadosResp?.retos) ? finalizadosResp.retos : [];
+					state.finalizados.total = toSafeNumber(finalizadosResp?.total, 0);
+					state.finalizados.paginaActual = 1;
+					renderFinalizadosSection(state);
+				} catch {
+					// ignore errors during background refresh
+				}
+			});
 		} catch (error) {
 			manejarErrorDePagina(state.refs.finalizados, error, {
 				notFoundMessage: 'No encontramos los retos finalizados solicitados.',
@@ -322,7 +203,6 @@ async function render(contenedor, params = {}) {
 	}
 
 	void params;
-	ensureStyles();
 
 	const usuario = auth.getUsuario();
 	const esAdmin = auth.esAdmin();
@@ -388,6 +268,8 @@ async function render(contenedor, params = {}) {
 	};
 
 	renderFinalizadosSection(state);
+
+
 }
 
 export { render };

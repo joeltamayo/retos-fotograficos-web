@@ -2,7 +2,6 @@ import api from '../api.js';
 import { mostrarToast } from '../utils.js';
 
 const MODAL_ID = 'modal-subir-foto';
-const STYLE_ID = 'modal-subir-foto-styles';
 const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
 
 /**
@@ -17,176 +16,6 @@ function escapeHtml(value) {
 		.replaceAll("'", '&#39;');
 }
 
-/**
- * Inyecta estilos del modal una sola vez para mantener el look del prototipo.
- */
-function ensureStyles() {
-	if (document.getElementById(STYLE_ID)) {
-		return;
-	}
-
-	const style = document.createElement('style');
-	style.id = STYLE_ID;
-	style.textContent = `
-		#${MODAL_ID} .modal-content {
-			border: 0;
-			border-radius: 20px;
-			box-shadow: var(--shadow-modal);
-			overflow: hidden;
-		}
-
-		.pc-upload-title {
-			font-size: 20px;
-			font-weight: 700;
-			color: #111827;
-			margin: 0 0 6px;
-		}
-
-		.pc-upload-subtitle {
-			font-size: 14px;
-			color: #6B7280;
-			margin: 0;
-		}
-
-		.pc-upload-area {
-			border: 2px dashed #E5E7EB;
-			border-radius: 16px;
-			background: #FAFAFA;
-			padding: 28px 20px;
-			min-height: 240px;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			text-align: center;
-			transition: border-color 0.2s ease, background-color 0.2s ease;
-			cursor: pointer;
-		}
-
-		.pc-upload-area:hover {
-			border-color: #C7CDD6;
-			background: #F9FAFB;
-		}
-
-		.pc-upload-preview {
-			position: relative;
-			width: 100%;
-			height: 100%;
-			min-height: 240px;
-			border-radius: 16px;
-			overflow: hidden;
-			background: #000000;
-		}
-
-		.pc-upload-preview img {
-			width: 100%;
-			height: 100%;
-			object-fit: contain;
-			display: block;
-			background: #000000;
-		}
-
-		.pc-upload-remove {
-			position: absolute;
-			top: 10px;
-			right: 10px;
-			width: 32px;
-			height: 32px;
-			border: 0;
-			border-radius: 9999px;
-			background: rgba(255,255,255,0.94);
-			color: #111827;
-			display: inline-flex;
-			align-items: center;
-			justify-content: center;
-			box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-		}
-
-		.pc-upload-helper {
-			font-size: 14px;
-			color: #9CA3AF;
-			margin: 0;
-		}
-
-		.pc-upload-label {
-			font-size: 14px;
-			font-weight: 600;
-			color: #111827;
-			margin: 0 0 8px;
-		}
-
-		.pc-upload-input,
-		.pc-upload-textarea {
-			width: 100%;
-			border: 1px solid #E5E7EB;
-			background: #F9FAFB;
-			border-radius: 10px;
-			padding: 10px 12px;
-			font-size: 14px;
-			color: #111827;
-		}
-
-		.pc-upload-textarea {
-			min-height: 110px;
-			resize: vertical;
-		}
-
-		.pc-upload-input:focus,
-		.pc-upload-textarea:focus {
-			outline: none;
-			border-color: #111827;
-		}
-
-		.pc-field-error {
-			margin-top: 6px;
-			font-size: 12px;
-			color: #DC2626;
-			min-height: 16px;
-		}
-
-		.pc-modal-error {
-			margin-top: 12px;
-			font-size: 13px;
-			color: #DC2626;
-			min-height: 18px;
-		}
-
-		.pc-submit-spinner {
-			width: 1rem;
-			height: 1rem;
-			border-width: .16em;
-			margin-right: 8px;
-		}
-
-		.pc-upload-btn {
-			background: #111827;
-			color: #FFFFFF;
-			border: 0;
-			border-radius: 10px;
-			padding: 10px 16px;
-			font-weight: 600;
-			display: inline-flex;
-			align-items: center;
-			justify-content: center;
-			gap: 8px;
-		}
-
-		.pc-upload-btn:disabled {
-			opacity: 0.7;
-			cursor: not-allowed;
-		}
-
-		.pc-upload-outline {
-			background: #FFFFFF;
-			color: #111827;
-			border: 1px solid #E5E7EB;
-			border-radius: 10px;
-			padding: 10px 16px;
-			font-weight: 600;
-		}
-	`;
-
-	document.head.appendChild(style);
-}
 
 /**
  * Resuelve el contenedor global de modales.
@@ -211,8 +40,8 @@ function getLoadingHtml(retoTitulo) {
 		<div class="modal fade" id="${MODAL_ID}" tabindex="-1" aria-hidden="true">
 			<div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
 				<div class="modal-content">
-					<div class="d-flex justify-content-center align-items-center" style="min-height:420px">
-						<div class="spinner-border" style="color:var(--color-primary)"></div>
+					<div class="u-center-content u-min-h-420">
+						<div class="app-spinner"></div>
 					</div>
 				</div>
 			</div>
@@ -247,53 +76,64 @@ function renderModalContent(state) {
 	const descripcion = escapeHtml(state.retoDescripcion || '');
 
 	state.modalElement.querySelector('.modal-content').innerHTML = `
-		<div class="modal-header border-0 pb-0 px-4 px-md-5 pt-4 pt-md-5">
+		<div class="ms-header">
 			<div>
-				<h3 class="pc-upload-title">Subir Fotografía para &quot;${titulo}&quot;</h3>
-				<p class="pc-upload-subtitle">Completa el formulario para subir tu fotografía al reto.</p>
+				<h3 class="ms-title">Subir Fotografía para &quot;${titulo}&quot;</h3>
+				<p class="ms-subtitle">Completa el formulario para subir tu fotografía al reto.</p>
 			</div>
-			<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+			<button type="button" class="ms-close" data-bs-dismiss="modal" aria-label="Cerrar">&times;</button>
 		</div>
 
-		<div class="modal-body px-4 px-md-5 pb-4 pb-md-5 pt-4">
-			${descripcion ? `<p class="pc-upload-subtitle mb-4">${descripcion}</p>` : ''}
+		<div class="ms-body">
+			${descripcion ? `<p class="ms-description">${descripcion}</p>` : ''}
 
 			<form id="pc-upload-form" novalidate>
 				<input type="file" id="pc-upload-file" accept="image/jpeg,image/png,image/webp" hidden>
 
-				<div class="mb-3">
-					<div class="pc-upload-label">Fotografía *</div>
+				<div class="ms-field">
+					<div class="ms-upload-label">Fotografía *</div>
 					<div id="pc-upload-zone"></div>
-					<div class="pc-field-error" data-error-for="file"></div>
+					<div class="ms-field-error" data-error-for="file"></div>
 				</div>
 
-				<div class="mb-3">
-					<div class="pc-upload-label">Título *</div>
+				<div class="ms-field">
+					<div class="ms-upload-label">Título *</div>
 					<input
 						type="text"
-						class="pc-upload-input"
+						class="ms-upload-input"
 						id="pc-upload-title"
 						placeholder="Dale un título a tu fotografía"
 						maxlength="120"
 					>
-					<div class="pc-field-error" data-error-for="title"></div>
+					<div class="ms-field-error" data-error-for="title"></div>
 				</div>
 
-				<div class="mb-3">
-					<div class="pc-upload-label">Descripción</div>
+				<div class="ms-field">
+					<div class="ms-upload-label">Descripción</div>
 					<textarea
-						class="pc-upload-textarea"
+						class="ms-upload-textarea"
 						id="pc-upload-description"
 						placeholder="Cuéntanos sobre tu fotografía..."
 						maxlength="500"
 					></textarea>
 				</div>
 
-				<div class="pc-modal-error" id="pc-upload-error"></div>
+				<div class="ms-field">
+					<div class="ms-upload-label">O URL de la imagen</div>
+					<input
+						type="url"
+						class="ms-upload-input"
+						id="pc-upload-image-url"
+						placeholder="https://ejemplo.com/imagen.jpg"
+					>
+					<div class="ms-field-error" data-error-for="image_url"></div>
+				</div>
 
-				<div class="d-flex justify-content-end gap-2 mt-4">
-					<button type="button" class="pc-upload-outline" data-accion="cancelar">Cancelar</button>
-					<button type="submit" class="pc-upload-btn" id="pc-upload-submit">
+				<div class="ms-modal-error" id="pc-upload-error"></div>
+
+				<div class="ms-actions">
+					<button type="button" class="ms-upload-outline" data-accion="cancelar">Cancelar</button>
+					<button type="submit" class="ms-upload-btn" id="pc-upload-submit">
 						<i class="bi bi-upload"></i>
 						<span>Subir Fotografía</span>
 					</button>
@@ -314,11 +154,11 @@ function renderUploadZone(state) {
 
 	if (!state.previewUrl) {
 		zone.innerHTML = `
-			<div class="pc-upload-area" data-accion="abrir-file">
+			<div class="ms-upload-area" data-accion="abrir-file">
 				<div>
-					<i class="bi bi-image" style="font-size:3rem;color:#9CA3AF"></i>
-					<p class="mt-3 mb-1" style="color:#6B7280;font-weight:500">Click para seleccionar imagen</p>
-					<p class="pc-upload-helper">PNG, JPG hasta 10MB</p>
+					<i class="bi bi-image u-icon-3xl u-text-muted"></i>
+					<p class="ms-upload-prompt">Click para seleccionar imagen</p>
+					<p class="ms-upload-helper">PNG, JPG hasta 10MB</p>
 				</div>
 			</div>
 		`;
@@ -326,9 +166,9 @@ function renderUploadZone(state) {
 	}
 
 	zone.innerHTML = `
-		<div class="pc-upload-preview">
+		<div class="ms-upload-preview">
 			<img src="${escapeHtml(state.previewUrl)}" alt="Preview de fotografía">
-			<button type="button" class="pc-upload-remove" data-accion="quitar-imagen" aria-label="Quitar imagen">
+			<button type="button" class="ms-upload-remove" data-accion="quitar-imagen" aria-label="Quitar imagen">
 				<i class="bi bi-x"></i>
 			</button>
 		</div>
@@ -339,7 +179,7 @@ function renderUploadZone(state) {
  * Limpia errores inline y el mensaje principal.
  */
 function clearErrors(state) {
-	state.modalElement.querySelectorAll('.pc-field-error').forEach((node) => {
+	state.modalElement.querySelectorAll('.ms-field-error').forEach((node) => {
 		node.textContent = '';
 	});
 
@@ -391,14 +231,29 @@ function validateForm(state) {
 
 	let isValid = true;
 
-	if (!state.file) {
-		setFieldError(state, 'file', 'Selecciona una imagen para continuar.');
+	const imageUrlInput = state.modalElement.querySelector('#pc-upload-image-url');
+	const imageUrl = String(imageUrlInput?.value || '').trim();
+
+	if (!state.file && !imageUrl) {
+		setFieldError(state, 'file', 'Selecciona una imagen o usa una URL.');
 		isValid = false;
 	}
 
 	if (state.file && state.file.size > MAX_FILE_SIZE_BYTES) {
 		setFieldError(state, 'file', 'La imagen no puede superar 10MB.');
 		isValid = false;
+	}
+
+	if (imageUrl) {
+		try {
+			const parsed = new URL(imageUrl);
+			if (!['http:', 'https:'].includes(parsed.protocol)) {
+				throw new Error('invalid');
+			}
+		} catch {
+			setFieldError(state, 'image_url', 'Ingresa una URL válida (http/https).');
+			isValid = false;
+		}
 	}
 
 	const titleInput = state.modalElement.querySelector('#pc-upload-title');
@@ -421,7 +276,7 @@ function setSubmittingState(state, isSubmitting) {
 
 	submitButton.disabled = isSubmitting;
 	submitButton.innerHTML = isSubmitting
-		? '<span class="spinner-border spinner-border-sm pc-submit-spinner" aria-hidden="true"></span><span>Subiendo...</span>'
+		? '<span class="app-spinner app-spinner--sm ms-submit-spinner" aria-hidden="true"></span><span>Subiendo...</span>'
 		: '<i class="bi bi-upload"></i><span>Subir Fotografía</span>';
 }
 
@@ -497,11 +352,17 @@ function bindEvents(state) {
 
 		const titleInput = state.modalElement.querySelector('#pc-upload-title');
 		const descriptionInput = state.modalElement.querySelector('#pc-upload-description');
+		const imageUrlInput = state.modalElement.querySelector('#pc-upload-image-url');
 		const formData = new FormData();
 		formData.append('reto_id', state.retoId);
 		formData.append('titulo', titleInput.value.trim());
 		formData.append('descripcion', descriptionInput?.value.trim() || '');
-		formData.append('imagen', state.file);
+		if (state.file) {
+			formData.append('imagen', state.file);
+		}
+		if (imageUrlInput?.value?.trim()) {
+			formData.append('imagen_url', imageUrlInput.value.trim());
+		}
 
 		setSubmittingState(state, true);
 
@@ -512,6 +373,7 @@ function bindEvents(state) {
 			if (modal) {
 				modal.hide();
 			}
+			window.dispatchEvent(new CustomEvent('fotografia-subida', { detail: { retoId: state.retoId } }));
 		} catch (error) {
 			setModalError(state, error?.error || 'No se pudo subir la fotografía. Intenta nuevamente.');
 			setSubmittingState(state, false);
@@ -524,8 +386,6 @@ function bindEvents(state) {
  * Acepta tanto la firma solicitada como un objeto compatibilidad con llamadas previas.
  */
 function abrirModalSubirFoto(retoIdOrObject, retoTitulo, retoDescripcion = '') {
-	ensureStyles();
-
 	const { retoId, retoTitulo: tituloResuelto, retoDescripcion: descripcionResuelta } = normalizeArgs(retoIdOrObject, retoTitulo, retoDescripcion);
 
 	if (!retoId) {

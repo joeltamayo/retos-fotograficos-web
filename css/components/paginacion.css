@@ -1,0 +1,76 @@
+﻿/* 
+    PAGINACIÓN — Estilos para el control de paginación
+    Prefijo: pg-
+*/
+
+/* Contenedor general: centra el control de paginación. */
+.pg-wrap {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+/* Variante desktop: muestra el listado completo de botones. */
+.pg-desktop {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Variante mobile: simplifica el control en pantallas pequeñas. */
+.pg-mobile {
+  display: none;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Botón base: navegación entre páginas o segmentos. */
+.pg-btn {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  border-radius: var(--radius-sm);
+  min-width: 36px;
+  height: 36px;
+  padding: 0 10px;
+}
+
+/* Estado deshabilitado: evita interacción cuando no hay página. */
+.pg-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Botón activo: resalta la página actual. */
+.pg-btn--active {
+  background: #111827;
+  color: #FFFFFF;
+  border-color: #111827;
+}
+
+/* Botón icono: versión compacta sin padding lateral. */
+.pg-btn--icon {
+  padding: 0;
+}
+
+/* Elipsis: indica salto entre páginas sin botón directo. */
+.pg-ellipsis {
+  color: var(--color-text-muted);
+}
+
+/* Texto de estado mobile: resume la página actual y el total. */
+.pg-mobile-status {
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+@media (max-width: 767px) {
+  .pg-desktop {
+    display: none;
+  }
+
+  .pg-mobile {
+    display: inline-flex;
+  }
+}

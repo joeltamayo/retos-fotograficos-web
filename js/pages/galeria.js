@@ -4,7 +4,6 @@ import { abrirModalFoto } from '../components/modalFoto.js';
 import { renderPaginacion } from '../components/paginacion.js';
 import { formatearFechaCorta, manejarErrorDePagina, skeletonCard } from '../utils.js';
 
-const STYLE_ID = 'galeria-page-styles';
 const LIMITE_FOTOS = 9;
 
 const ORDENES = {
@@ -83,153 +82,21 @@ function getCurrentWeekRange() {
 }
 
 /**
- * Inyecta estilos específicos de la página de galería.
- */
-function ensureStyles() {
-	if (document.getElementById(STYLE_ID)) {
-		return;
-	}
-
-	const style = document.createElement('style');
-	style.id = STYLE_ID;
-	style.textContent = `
-		.galeria-page {
-			max-width: var(--content-max-width);
-			margin: 0 auto;
-			padding: 28px var(--page-padding-x) 48px;
-		}
-
-		.galeria-header {
-			text-align: center;
-			margin-bottom: 18px;
-		}
-
-		.galeria-title {
-			margin: 0;
-			font-size: 34px;
-			font-weight: 700;
-			color: #111827;
-			display: inline-flex;
-			align-items: center;
-			gap: 8px;
-		}
-
-		.galeria-title i {
-			color: #EAB308;
-		}
-
-		.galeria-subtitle {
-			margin: 8px 0 0;
-			font-size: 16px;
-			color: #6B7280;
-		}
-
-		.galeria-order-row {
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			gap: 10px;
-			margin-bottom: 20px;
-		}
-
-		.galeria-order-label {
-			font-size: 16px;
-			color: #6B7280;
-		}
-
-		.galeria-order-select {
-			border: 1px solid #E5E7EB;
-			border-radius: 10px;
-			background: #F9FAFB;
-			padding: 10px 14px;
-			font-size: 15px;
-			color: #111827;
-			min-width: 180px;
-		}
-
-		.galeria-grid {
-			display: grid;
-			grid-template-columns: repeat(3, minmax(0, 1fr));
-			gap: 22px;
-		}
-
-		.galeria-card-slot .card-foto {
-			height: 100%;
-		}
-
-		.galeria-pagination {
-			margin-top: 20px;
-		}
-
-		.galeria-empty {
-			margin: 8px 0 0;
-			padding: 16px;
-			border-radius: 10px;
-			background: #F8FAFC;
-			color: #6B7280;
-			font-size: 14px;
-			text-align: center;
-		}
-
-		.galeria-skeleton-grid {
-			display: grid;
-			grid-template-columns: repeat(3, minmax(0, 1fr));
-			gap: 22px;
-		}
-
-		.galeria-skeleton-square {
-			height: auto;
-			aspect-ratio: 1/1;
-			border-radius: 14px;
-		}
-
-		@media (max-width: 1199.98px) {
-			.galeria-grid,
-			.galeria-skeleton-grid {
-				grid-template-columns: repeat(2, minmax(0, 1fr));
-			}
-		}
-
-		@media (max-width: 767.98px) {
-			.galeria-page {
-				padding: 22px 16px 40px;
-			}
-
-			.galeria-title {
-				font-size: 28px;
-			}
-
-			.galeria-grid,
-			.galeria-skeleton-grid {
-				grid-template-columns: repeat(1, minmax(0, 1fr));
-			}
-
-			.galeria-order-row {
-				flex-direction: column;
-				gap: 8px;
-			}
-		}
-	`;
-
-	document.head.appendChild(style);
-}
-
-/**
  * Renderiza la estructura base y devuelve referencias de secciones dinámicas.
  */
 function renderLayout(contenedor, ordenActual) {
 	const { inicio, fin } = getCurrentWeekRange();
 
 	contenedor.innerHTML = `
-		<section class="galeria-page page-enter">
-			<header class="galeria-header">
-				<h1 class="galeria-title"><i class="bi bi-stars"></i>Galería de la Semana</h1>
-				<p class="galeria-subtitle">Semana del ${escapeHtml(inicio)} al ${escapeHtml(fin)}</p>
+		<section class="gl-page page-enter">
+			<header class="gl-header">
+				<h1 class="gl-title"><i class="bi bi-stars"></i>Galería de la Semana</h1>
+				<p class="gl-subtitle">Semana del ${escapeHtml(inicio)} al ${escapeHtml(fin)}</p>
 			</header>
 
-			<div class="galeria-order-row">
-				<span class="galeria-order-label">Ordenar por:</span>
-				<select class="galeria-order-select" id="galeria-order-select">
+			<div class="gl-order-row">
+				<span class="gl-order-label">Ordenar por:</span>
+				<select class="gl-order-select" id="galeria-order-select">
 					${Object.entries(ORDENES)
 						.map(([value, label]) => `<option value="${value}" ${value === ordenActual ? 'selected' : ''}>${escapeHtml(label)}</option>`)
 						.join('')}
@@ -237,7 +104,7 @@ function renderLayout(contenedor, ordenActual) {
 			</div>
 
 			<div id="galeria-grid-area"></div>
-			<div class="galeria-pagination" id="galeria-pagination-area"></div>
+			<div class="gl-pagination" id="galeria-pagination-area"></div>
 		</section>
 	`;
 
@@ -253,8 +120,8 @@ function renderLayout(contenedor, ordenActual) {
  */
 function renderSkeletonGrid(contenedor) {
 	contenedor.innerHTML = `
-		<div class="galeria-skeleton-grid">
-			${Array.from({ length: 9 }, () => `<div class="galeria-skeleton-square skeleton">${skeletonCard('100%')}</div>`).join('')}
+		<div class="gl-skeleton-grid">
+			${Array.from({ length: 9 }, () => `<div class="gl-skeleton-square skeleton">${skeletonCard('100%')}</div>`).join('')}
 		</div>
 	`;
 }
@@ -264,17 +131,17 @@ function renderSkeletonGrid(contenedor) {
  */
 function renderFotosGrid(contenedor, fotos = []) {
 	if (!Array.isArray(fotos) || fotos.length === 0) {
-		contenedor.innerHTML = '<p class="galeria-empty">No hay fotografías para mostrar.</p>';
+		contenedor.innerHTML = '<p class="gl-empty">No hay fotografías para mostrar.</p>';
 		return;
 	}
 
 	contenedor.innerHTML = `
-		<div class="galeria-grid">
-			${fotos.map((foto) => `<div class="galeria-card-slot">${cardFoto(foto)}</div>`).join('')}
+		<div class="gl-grid">
+			${fotos.map((foto) => `<div class="gl-card-slot">${cardFoto(foto)}</div>`).join('')}
 		</div>
 	`;
 
-	contenedor.querySelectorAll('.card-foto').forEach((card, index) => {
+	contenedor.querySelectorAll('.cf-card').forEach((card, index) => {
 		const foto = fotos[index];
 
 		card.addEventListener('mouseenter', () => {
@@ -302,7 +169,6 @@ async function render(contenedor, params = {}) {
 	}
 
 	void params;
-	ensureStyles();
 
 	const state = getStateFromHash();
 	const refs = renderLayout(contenedor, state.orden);
@@ -334,6 +200,36 @@ async function render(contenedor, params = {}) {
 		renderPaginacion(refs.pagination, state.pagina, totalPaginas, (nuevaPagina) => {
 			updateHashState(state.orden, nuevaPagina);
 		});
+
+		// Auto-refresh handlers: when a photo is uploaded/updated elsewhere, refresh current view
+		const refreshGallery = async () => {
+			try {
+				const resp = await api.get('/galeria', {
+					orden: state.orden,
+					pagina: state.pagina,
+					limite: LIMITE_FOTOS,
+				});
+
+				const raw = Array.isArray(resp?.fotos) ? resp.fotos : [];
+				const mapped = state.orden === 'mejores'
+					? raw.map((foto, index) => ({ ...foto, posicion: index < 3 ? index + 1 : undefined }))
+					: raw;
+
+				renderFotosGrid(refs.grid, mapped);
+
+				const tot = Math.max(0, toSafeInt(resp?.total, mapped.length));
+				const pages = Math.max(1, Math.ceil(tot / LIMITE_FOTOS));
+				renderPaginacion(refs.pagination, state.pagina, pages, (nuevaPagina) => {
+					updateHashState(state.orden, nuevaPagina);
+				});
+			} catch {
+				// ignore background refresh errors
+			}
+		};
+
+		window.addEventListener('fotografia-subida', refreshGallery);
+		window.addEventListener('fotografia-actualizada', refreshGallery);
+		window.addEventListener('reto-creado-o-editado', refreshGallery);
 	} catch (error) {
 		manejarErrorDePagina(contenedor, error, {
 			notFoundMessage: 'No encontramos la galeria solicitada.',

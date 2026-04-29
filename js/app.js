@@ -28,6 +28,20 @@ const KEY_RUTA_DESTINO = 'rutaDestino';
  */
 let navigationToken = 0;
 
+function closeOpenModals() {
+	if (!window.bootstrap?.Modal) {
+		return;
+	}
+
+	document.querySelectorAll('.modal.show').forEach((modalEl) => {
+		const instance = window.bootstrap.Modal.getInstance(modalEl) || new window.bootstrap.Modal(modalEl);
+		instance.hide();
+	});
+
+	document.querySelectorAll('.modal-backdrop').forEach((backdrop) => backdrop.remove());
+	document.body.classList.remove('modal-open');
+}
+
 /**
  * Normaliza el hash actual a una ruta usable por el matcher.
  */
@@ -172,6 +186,8 @@ function canAccessRoute(route) {
  * Flujo: resolver ruta -> validar acceso -> mostrar loader -> render pagina.
  */
 async function renderCurrentRoute() {
+	closeOpenModals();
+
 	const appContainer = document.getElementById('app');
 	if (!appContainer) {
 		return;

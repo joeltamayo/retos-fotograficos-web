@@ -1,0 +1,49 @@
+﻿/*
+ main.css — Punto de entrada del CSS
+
+ Propósito:
+ - Actúa como el único punto de entrada para los estilos del frontend.
+ - Define el orden de carga: `base/` → `components/` → `pages/` para asegurar
+    que las variables y utilidades estén disponibles antes de los estilos de
+    componentes y páginas.
+
+ Cómo usar:
+ - No agregar reglas CSS en este archivo; únicamente `@import` de los archivos
+    listados a continuación. Esto facilita el mantenimiento y la generación
+    de bundles si se desea.
+
+ Dependencias:
+ - `css/base/variables.css` debe cargarse primero para disponer de tokens
+    (colores, radios, sombras, etc.).
+
+ Convenciones:
+ - Cada componente tiene su propio archivo en `css/components/` y usa un
+    prefijo de clase consistente. Las páginas quedan en `css/pages/`.
+*/
+
+/* Base */
+@import 'base/variables.css';
+@import 'base/reset.css';
+@import 'base/animations.css';
+
+/* Componentes */
+@import 'components/badges.css';
+@import 'components/navbar.css';
+@import 'components/card-reto.css';
+@import 'components/card-foto.css';
+@import 'components/modal-foto.css';
+@import 'components/modal-subir-foto.css';
+@import 'components/modalCrearReto.css';
+@import 'components/modal-editar-perfil.css';
+@import 'components/estrellas.css';
+@import 'components/paginacion.css';
+
+/* PÃ¡ginas */
+@import 'pages/home.css';
+@import 'pages/login.css';
+@import 'pages/retos.css';
+@import 'pages/reto-detalle.css';
+@import 'pages/galeria.css';
+@import 'pages/ranking.css';
+@import 'pages/perfil.css';
+@import 'pages/admin.css';

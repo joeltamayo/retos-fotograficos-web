@@ -1,8 +1,6 @@
 import api from '../api.js';
 import { mostrarToast } from '../utils.js';
 
-const STYLE_ID = 'pc-estrellas-styles';
-
 /**
  * Convierte un valor a número finito con fallback.
  */
@@ -16,56 +14,6 @@ function toNumber(value, fallback = 0) {
  */
 function clamp(value, min, max) {
 	return Math.min(max, Math.max(min, value));
-}
-
-/**
- * Inyecta estilos del componente una sola vez.
- */
-function ensureStyles() {
-	if (document.getElementById(STYLE_ID)) {
-		return;
-	}
-
-	const style = document.createElement('style');
-	style.id = STYLE_ID;
-	style.textContent = `
-		.pc-stars-row {
-			display: inline-flex;
-			align-items: center;
-			gap: 8px;
-		}
-
-		.pc-stars-row .pc-star-btn {
-			border: 0;
-			background: transparent;
-			padding: 0;
-			font-size: 28px;
-			line-height: 1;
-			color: #D1D5DB;
-			cursor: pointer;
-			transition: color 0.15s ease, transform 0.15s ease;
-		}
-
-		.pc-stars-row .pc-star-btn i {
-			pointer-events: none;
-		}
-
-		.pc-stars-row .pc-star-btn:hover {
-			transform: translateY(-1px);
-		}
-
-		.pc-stars-row .pc-star-btn.is-active {
-			color: #EAB308;
-		}
-
-		.pc-stars-row .pc-star-btn:disabled {
-			cursor: not-allowed;
-			opacity: 0.7;
-			transform: none;
-		}
-	`;
-
-	document.head.appendChild(style);
 }
 
 /**
@@ -149,13 +97,13 @@ function patchBreakdownUI(contenedor, detalleFotografia) {
  */
 function getStarsMarkup() {
 	return `
-		<div class="pc-stars-row" data-stars-row>
+		<div class="es-stars-row" data-stars-row>
 			${Array.from({ length: 5 }, (_, index) => {
 				const value = index + 1;
 				return `
 					<button
 						type="button"
-						class="pc-star-btn"
+						class="es-star-btn"
 						data-star-value="${value}"
 						aria-label="Calificar con ${value} estrella(s)"
 					>
@@ -176,7 +124,6 @@ async function renderComponenteCalificar(contenedor, fotografiaId) {
 		return null;
 	}
 
-	ensureStyles();
 	contenedor.innerHTML = getStarsMarkup();
 
 	const state = {
@@ -201,7 +148,7 @@ async function renderComponenteCalificar(contenedor, fotografiaId) {
 
 		evaluarButton.disabled = loading;
 		evaluarButton.innerHTML = loading
-			? '<span class="spinner-border spinner-border-sm" aria-hidden="true"></span>'
+			? '<span class="app-spinner app-spinner--sm" aria-hidden="true"></span>'
 			: 'Evaluar';
 	};
 

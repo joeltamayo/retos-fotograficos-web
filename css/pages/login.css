@@ -1,0 +1,191 @@
+﻿/* 
+    LOGIN — Estilos para la página de inicio de sesión
+    Prefijo: lg-
+*/
+
+/* Página de login: contenedor principal con layout centrado. */
+.lg-page {
+  min-height: calc(100vh - var(--navbar-height));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px var(--page-padding-x);
+}
+
+/* Columna izquierda: formulario principal de acceso. */
+.lg-card {
+  display: flex;
+  width: min(100%, 860px);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-modal);
+  overflow: hidden;
+}
+
+/* Panel izquierdo: área de formulario y título. */
+.lg-left {
+  flex: 1;
+  background: var(--color-surface);
+  padding: 48px 40px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Panel derecho: sección de beneficios / marketing. */
+.lg-right {
+  flex: 1;
+  background: var(--color-primary-gradient);
+  padding: 48px 40px;
+  color: var(--color-text-on-gradient);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 20px;
+}
+
+/* Título del formulario: identifica la acción de autenticación. */
+.lg-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 24px;
+  text-align: center;
+}
+
+/* Etiqueta del campo: aclara el dato requerido. */
+.lg-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 6px;
+}
+
+/* Input base: control de texto para credenciales. */
+.lg-input {
+  width: 100%;
+  height: 44px;
+  background: #F9FAFB;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 0 14px;
+  font-size: 14px;
+  color: var(--color-text);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  font-family: inherit;
+}
+
+/* Focus del input: deja claro el campo activo. */
+.lg-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(91, 106, 245, 0.15);
+}
+
+/* Placeholder: texto guía dentro del campo. */
+.lg-input::placeholder {
+  color: var(--color-text-muted);
+}
+
+/* Botón primario: ejecuta el inicio de sesión. */
+.lg-btn-primary {
+  width: 100%;
+  height: 46px;
+  background: var(--color-primary-gradient);
+  color: #FFFFFF;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  font-family: inherit;
+  margin-top: 8px;
+}
+
+/* Hover del botón primario: feedback de acción disponible. */
+.lg-btn-primary:hover {
+  opacity: 0.9;
+}
+
+/* Estado disabled: evita envíos duplicados o inválidos. */
+.lg-btn-primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Botón secundario en panel derecho: CTA alterna. */
+.lg-btn-outline {
+  padding: 10px 24px;
+  background: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  border-radius: var(--radius-full);
+  color: #FFFFFF;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-family: inherit;
+}
+
+/* Hover del botón secundario: aclara interacción. */
+.lg-btn-outline:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Mensaje de error: informa validación fallida. */
+.lg-error {
+  font-size: 12px;
+  color: var(--color-danger);
+  margin-top: 4px;
+  min-height: 16px;
+}
+
+/* Título del panel derecho: presenta beneficios de la app. */
+.lg-right-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* Beneficio: bloque con icono y texto explicativo. */
+.lg-benefit {
+  display: flex;
+  gap: 14px;
+  text-align: left;
+}
+
+/* Icono del beneficio: marca visual del item. */
+.lg-benefit__icon {
+  font-size: 20px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* Título del beneficio: resume la propuesta de valor. */
+.lg-benefit__title {
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0 0 3px;
+}
+
+/* Descripción del beneficio: ampliación breve del punto. */
+.lg-benefit__desc {
+  font-size: 13px;
+  opacity: 0.85;
+  margin: 0;
+}
+
+@media (max-width: 767px) {
+  .lg-card {
+    flex-direction: column;
+  }
+
+  .lg-right {
+    padding: 32px 24px;
+  }
+
+  .lg-left {
+    padding: 32px 24px;
+  }
+}

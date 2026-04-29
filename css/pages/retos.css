@@ -1,0 +1,133 @@
+﻿/* 
+    RETOS — Estilos para la página de listado de retos
+    Prefijo: rt-
+*/
+
+/* Página: contenedor principal del listado de retos*/
+.rt-page {
+	max-width: var(--content-max-width);
+	margin: 0 auto;
+	padding: 34px var(--page-padding-x) 50px;
+}
+
+/* Header: fila superior con título, descripción y botón crear */
+.rt-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	gap: 16px;
+	margin-bottom: 28px;
+}
+
+/* Título principal de la página */
+.rt-title {
+	margin: 0;
+	font-size: 36px;
+	font-weight: 700;
+	color: var(--color-text);
+}
+
+/* Texto descriptivo bajo el título */
+.rt-description {
+	margin: 6px 0 0;
+	font-size: 16px;
+	color: var(--color-text-secondary);
+}
+
+/* Botón de crear reto (visible solo para admins) */
+.rt-create-btn {
+	margin-top: 2px;
+	border: 0;
+	border-radius: var(--radius-md);
+	background: var(--color-text);
+	color: #FFFFFF;
+	padding: 10px 16px;
+	font-weight: 600;
+	font-size: 14px;
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	cursor: pointer;
+}
+
+/* Sección (Activos / Finalizados): simple separador vertical */
+.rt-section {
+	margin-top: 18px;
+}
+
+/* Espacio extra entre secciones consecutivas */
+.rt-section + .rt-section {
+	margin-top: 34px;
+}
+
+/* Título de cada sección (Activos, Finalizados) */
+.rt-section-title {
+	margin: 0 0 14px;
+	font-size: 30px;
+	font-weight: 600;
+	color: var(--color-text);
+}
+
+/* Skeleton grid usado durante la carga de datos (placeholder) */
+.rt-skeleton-grid {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 24px;
+}
+
+/* Footer de la sección (paginación, etc.) */
+.rt-footer {
+	margin-top: 22px;
+}
+
+/* Mensajes vacíos o de error usados dentro de las secciones */
+.rt-empty,
+.rt-error {
+	margin: 0;
+	padding: 16px;
+	border-radius: var(--radius-md);
+	font-size: 14px;
+}
+
+/* Estado vacío: fondo sutil para indicar ausencia de contenido */
+.rt-empty {
+	background: #F8FAFC;
+	color: var(--color-text-secondary);
+}
+
+/* Error: informa un fallo al cargar retos. */
+.rt-error {
+	background: var(--color-danger-bg);
+	color: #991B1B;
+}
+
+@media (max-width: 1199.98px) {
+	.rt-skeleton-grid {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+@media (max-width: 991.98px) {
+	.rt-page {
+		padding: 24px 16px 40px;
+	}
+
+	.rt-title {
+		font-size: 30px;
+	}
+
+	.rt-section-title {
+		font-size: 24px;
+	}
+
+	.rt-header {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+}
+
+@media (max-width: 767.98px) {
+	.rt-skeleton-grid {
+		grid-template-columns: repeat(1, minmax(0, 1fr));
+	}
+}

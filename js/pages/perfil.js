@@ -5,7 +5,6 @@ import { abrirModalFoto } from '../components/modalFoto.js';
 import { abrirModalEditarPerfil } from '../components/modalEditarPerfil.js';
 import { manejarErrorDePagina, mostrarErrorPagina, skeletonCard } from '../utils.js';
 
-const STYLE_ID = 'perfil-page-styles';
 const ORDEN_RECIENTES = 'recientes';
 const ORDEN_MEJORES = 'mejores';
 
@@ -62,279 +61,16 @@ function getFullName(perfil) {
 	return joined || perfil?.nombre_usuario || 'Usuario';
 }
 
-/**
- * Inyecta estilos de la vista una sola vez.
- */
-function ensureStyles() {
-	if (document.getElementById(STYLE_ID)) {
-		return;
-	}
-
-	const style = document.createElement('style');
-	style.id = STYLE_ID;
-	style.textContent = `
-		.perfil-page {
-			max-width: var(--content-max-width);
-			margin: 0 auto;
-			padding: 28px var(--page-padding-x) 48px;
-		}
-
-		.perfil-breadcrumb {
-			display: inline-flex;
-			align-items: center;
-			gap: 8px;
-			margin-bottom: 16px;
-			font-size: 16px;
-			font-weight: 500;
-			color: #111827;
-			text-decoration: none;
-		}
-
-		.perfil-breadcrumb:hover {
-			text-decoration: underline;
-		}
-
-		.perfil-card {
-			background: #FFFFFF;
-			border-radius: 14px;
-			box-shadow: var(--shadow-card);
-			padding: 24px;
-		}
-
-		.perfil-header {
-			display: grid;
-			grid-template-columns: auto minmax(0, 1fr) auto;
-			gap: 18px;
-			align-items: start;
-		}
-
-		.perfil-avatar {
-			width: 92px;
-			height: 92px;
-			border-radius: 9999px;
-			object-fit: cover;
-			background: #E5E7EB;
-			display: block;
-		}
-
-		.perfil-avatar-placeholder {
-			width: 92px;
-			height: 92px;
-			border-radius: 9999px;
-			background: #E5E7EB;
-			display: inline-flex;
-			align-items: center;
-			justify-content: center;
-			color: #9CA3AF;
-			font-size: 34px;
-		}
-
-		.perfil-name {
-			margin: 0;
-			font-size: 22px;
-			font-weight: 700;
-			line-height: 1.2;
-			color: #111827;
-		}
-
-		.perfil-username {
-			margin: 3px 0 0;
-			font-size: 15px;
-			color: #6B7280;
-		}
-
-		.perfil-bio {
-			margin: 12px 0 0;
-			font-size: 16px;
-			line-height: 1.35;
-			color: #4B5563;
-		}
-
-		.perfil-member {
-			margin: 10px 0 0;
-			display: inline-flex;
-			align-items: center;
-			gap: 8px;
-			font-size: 14px;
-			color: #6B7280;
-		}
-
-		.perfil-edit-btn {
-			border: 0;
-			border-radius: 10px;
-			background: #111827;
-			color: #FFFFFF;
-			padding: 10px 14px;
-			font-size: 14px;
-			font-weight: 600;
-			display: inline-flex;
-			align-items: center;
-			gap: 8px;
-		}
-
-		.perfil-divider {
-			height: 1px;
-			background: #E5E7EB;
-			margin: 18px 0;
-		}
-
-		.perfil-stats {
-			display: grid;
-			grid-template-columns: repeat(4, minmax(0, 1fr));
-			gap: 12px;
-		}
-
-		.perfil-stat {
-			text-align: center;
-		}
-
-		.perfil-stat-value {
-			display: block;
-			font-size: 32px;
-			font-weight: 700;
-			line-height: 1.05;
-			color: #111827;
-		}
-
-		.perfil-stat-label {
-			margin-top: 4px;
-			display: inline-flex;
-			align-items: center;
-			gap: 6px;
-			font-size: 14px;
-			color: #9CA3AF;
-		}
-
-		.perfil-badges-title {
-			margin: 0;
-			font-size: 18px;
-			font-weight: 600;
-			color: #111827;
-			display: inline-flex;
-			align-items: center;
-			gap: 8px;
-		}
-
-		.perfil-badges-placeholders {
-			margin-top: 10px;
-			display: inline-flex;
-			gap: 8px;
-		}
-
-		.perfil-badge-placeholder {
-			width: 18px;
-			height: 18px;
-			border-radius: 9999px;
-			background: #E5E7EB;
-		}
-
-		.perfil-tabs {
-			margin-top: 18px;
-			display: inline-flex;
-			align-items: center;
-			gap: 4px;
-			background: #F3F4F6;
-			padding: 4px;
-			border-radius: 12px;
-		}
-
-		.perfil-tab-btn {
-			border: 0;
-			background: transparent;
-			border-radius: 10px;
-			padding: 8px 12px;
-			font-size: 15px;
-			font-weight: 600;
-			color: #111827;
-			display: inline-flex;
-			align-items: center;
-			gap: 8px;
-		}
-
-		.perfil-tab-btn.is-active {
-			background: #FFFFFF;
-			box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
-		}
-
-		.perfil-grid-wrap {
-			margin-top: 16px;
-		}
-
-		.perfil-grid {
-			display: grid;
-			grid-template-columns: repeat(3, minmax(0, 1fr));
-			gap: 18px;
-		}
-
-		.perfil-grid-item .card-foto {
-			height: 100%;
-		}
-
-		.perfil-empty,
-		.perfil-error {
-			margin: 0;
-			padding: 16px;
-			border-radius: 10px;
-			font-size: 14px;
-		}
-
-		.perfil-empty {
-			background: #F8FAFC;
-			color: #6B7280;
-		}
-
-		.perfil-error {
-			background: #FEE2E2;
-			color: #991B1B;
-		}
-
-		.perfil-skeleton-grid {
-			display: grid;
-			grid-template-columns: repeat(3, minmax(0, 1fr));
-			gap: 18px;
-		}
-
-		@media (max-width: 1199.98px) {
-			.perfil-grid,
-			.perfil-skeleton-grid {
-				grid-template-columns: repeat(2, minmax(0, 1fr));
-			}
-		}
-
-		@media (max-width: 991.98px) {
-			.perfil-page {
-				padding: 22px 16px 40px;
-			}
-
-			.perfil-header {
-				grid-template-columns: 1fr;
-			}
-
-			.perfil-stats {
-				grid-template-columns: repeat(2, minmax(0, 1fr));
-			}
-		}
-
-		@media (max-width: 767.98px) {
-			.perfil-grid,
-			.perfil-skeleton-grid {
-				grid-template-columns: repeat(1, minmax(0, 1fr));
-			}
-		}
-	`;
-
-	document.head.appendChild(style);
-}
 
 /**
  * Devuelve avatar o placeholder.
  */
 function renderAvatar(url, altText) {
 	if (url) {
-		return `<img class="perfil-avatar" src="${escapeHtml(url)}" alt="${escapeHtml(altText)}">`;
+		return `<img class="pf-avatar" src="${escapeHtml(url)}" alt="${escapeHtml(altText)}">`;
 	}
 
-	return '<span class="perfil-avatar-placeholder"><i class="bi bi-person"></i></span>';
+	return '<span class="pf-avatar-placeholder"><i class="bi bi-person"></i></span>';
 }
 
 /**
@@ -349,26 +85,26 @@ function renderLayout(contenedor, perfil, esPerfilPropio, ordenActivo) {
 	const nombreCompleto = getFullName(perfil);
 
 	contenedor.innerHTML = `
-		<section class="perfil-page page-enter">
-			<a class="perfil-breadcrumb" href="#/home">
+		<section class="pf-page page-enter">
+			<a class="pf-breadcrumb" href="#/home">
 				<span>←</span>
 				<span>Perfil de Usuario</span>
 			</a>
 
-			<section class="perfil-card" aria-label="Perfil de usuario">
-				<header class="perfil-header">
+			<section class="pf-card" aria-label="Perfil de usuario">
+				<header class="pf-header">
 					<div>${renderAvatar(perfil?.foto_perfil_url || '', `Avatar de ${nombreCompleto}`)}</div>
 
 					<div>
-						<h1 class="perfil-name">${escapeHtml(nombreCompleto)}</h1>
-						<p class="perfil-username">@${escapeHtml(nombreUsuario)}</p>
-						<p class="perfil-bio">${escapeHtml(perfil?.biografia || 'Este usuario aún no agregó una biografía.')}</p>
-						<p class="perfil-member"><i class="bi bi-calendar3"></i>Miembro desde ${escapeHtml(formatMemberSince(perfil?.fecha_registro))}</p>
+						<h1 class="pf-name">${escapeHtml(nombreCompleto)}</h1>
+						<p class="pf-username">@${escapeHtml(nombreUsuario)}</p>
+						<p class="pf-bio">${escapeHtml(perfil?.biografia || 'Este usuario aún no agregó una biografía.')}</p>
+						<p class="pf-member"><i class="bi bi-calendar3"></i>Miembro desde ${escapeHtml(formatMemberSince(perfil?.fecha_registro))}</p>
 					</div>
 
 					${esPerfilPropio
 						? `
-							<button type="button" id="perfil-editar-btn" class="perfil-edit-btn">
+							<button type="button" id="perfil-editar-btn" class="pf-edit-btn">
 								<i class="bi bi-pencil-square"></i>
 								<span>Editar Perfil</span>
 							</button>
@@ -376,61 +112,61 @@ function renderLayout(contenedor, perfil, esPerfilPropio, ordenActivo) {
 						: ''}
 				</header>
 
-				<div class="perfil-divider"></div>
+				<div class="pf-divider"></div>
 
-				<section class="perfil-stats" aria-label="Estadísticas del perfil">
-					<article class="perfil-stat">
-						<span class="perfil-stat-value">${totalFotos}</span>
-						<span class="perfil-stat-label"><i class="bi bi-camera"></i>Fotografías</span>
+				<section class="pf-stats" aria-label="Estadísticas del perfil">
+					<article class="pf-stat">
+						<span class="pf-stat-value">${totalFotos}</span>
+						<span class="pf-stat-label"><i class="bi bi-camera"></i>Fotografías</span>
 					</article>
 
-					<article class="perfil-stat">
-						<span class="perfil-stat-value">${totalRetos}</span>
-						<span class="perfil-stat-label"><i class="bi bi-trophy"></i>Retos</span>
+					<article class="pf-stat">
+						<span class="pf-stat-value">${totalRetos}</span>
+						<span class="pf-stat-label"><i class="bi bi-trophy"></i>Retos</span>
 					</article>
 
-					<article class="perfil-stat">
-						<span class="perfil-stat-value">${totalVotos}</span>
-						<span class="perfil-stat-label"><i class="bi bi-star"></i>Votos</span>
+					<article class="pf-stat">
+						<span class="pf-stat-value">${totalVotos}</span>
+						<span class="pf-stat-label"><i class="bi bi-star"></i>Votos</span>
 					</article>
 
-					<article class="perfil-stat">
-						<span class="perfil-stat-value">${promedio}</span>
-						<span class="perfil-stat-label"><i class="bi bi-bar-chart-line"></i>Promedio</span>
+					<article class="pf-stat">
+						<span class="pf-stat-value">${promedio}</span>
+						<span class="pf-stat-label"><i class="bi bi-bar-chart-line"></i>Promedio</span>
 					</article>
 				</section>
 
-				<div class="perfil-divider"></div>
+				<div class="pf-divider"></div>
 
 				<section aria-label="Insignias">
-					<h2 class="perfil-badges-title"><i class="bi bi-award"></i>Insignias</h2>
-					<div class="perfil-badges-placeholders">
-						<span class="perfil-badge-placeholder"></span>
-						<span class="perfil-badge-placeholder"></span>
-						<span class="perfil-badge-placeholder"></span>
+					<h2 class="pf-badges-title"><i class="bi bi-award"></i>Insignias</h2>
+					<div class="pf-badges-placeholders">
+						<span class="pf-badge-placeholder"></span>
+						<span class="pf-badge-placeholder"></span>
+						<span class="pf-badge-placeholder"></span>
 					</div>
 				</section>
 			</section>
 
-			<div class="perfil-tabs" role="tablist" aria-label="Cambiar orden de fotos">
-				<button type="button" class="perfil-tab-btn ${ordenActivo === ORDEN_RECIENTES ? 'is-active' : ''}" data-orden="${ORDEN_RECIENTES}">
+			<div class="pf-tabs" role="tablist" aria-label="Cambiar orden de fotos">
+				<button type="button" class="pf-tab-btn ${ordenActivo === ORDEN_RECIENTES ? 'is-active' : ''}" data-orden="${ORDEN_RECIENTES}">
 					<i class="bi bi-image"></i>
 					<span>Fotografías (${totalFotos})</span>
 				</button>
 
-				<button type="button" class="perfil-tab-btn ${ordenActivo === ORDEN_MEJORES ? 'is-active' : ''}" data-orden="${ORDEN_MEJORES}">
+				<button type="button" class="pf-tab-btn ${ordenActivo === ORDEN_MEJORES ? 'is-active' : ''}" data-orden="${ORDEN_MEJORES}">
 					<i class="bi bi-trophy"></i>
 					<span>Más Votadas</span>
 				</button>
 			</div>
 
-			<section class="perfil-grid-wrap" id="perfil-fotos-wrap" aria-label="Fotografías del usuario"></section>
+			<section class="pf-grid-wrap" id="perfil-fotos-wrap" aria-label="Fotografías del usuario"></section>
 		</section>
 	`;
 
 	return {
 		editarBtn: contenedor.querySelector('#perfil-editar-btn'),
-		tabs: Array.from(contenedor.querySelectorAll('.perfil-tab-btn')),
+		tabs: Array.from(contenedor.querySelectorAll('.pf-tab-btn')),
 		fotosWrap: contenedor.querySelector('#perfil-fotos-wrap'),
 	};
 }
@@ -444,50 +180,50 @@ function renderProfileHeaderSkeleton(contenedor) {
 	}
 
 	contenedor.innerHTML = `
-		<section class="perfil-page page-enter">
-			<a class="perfil-breadcrumb" href="#/home">
+		<section class="pf-page page-enter">
+			<a class="pf-breadcrumb" href="#/home">
 				<span>←</span>
 				<span>Perfil de Usuario</span>
 			</a>
 
-			<section class="perfil-card" aria-label="Perfil de usuario">
-				<header class="perfil-header">
-					<div class="skeleton" style="width:92px;height:92px;border-radius:9999px;flex-shrink:0"></div>
+			<section class="pf-card" aria-label="Perfil de usuario">
+				<header class="pf-header">
+					<div class="skeleton pf-sk-avatar"></div>
 					<div>
-						<div class="skeleton" style="height:22px;width:180px;margin-bottom:8px"></div>
-						<div class="skeleton" style="height:15px;width:120px;margin-bottom:12px"></div>
-						<div class="skeleton" style="height:16px;width:280px;margin-bottom:10px"></div>
-						<div class="skeleton" style="height:14px;width:200px"></div>
+						<div class="skeleton pf-sk-line pf-sk-line--title"></div>
+						<div class="skeleton pf-sk-line pf-sk-line--user"></div>
+						<div class="skeleton pf-sk-line pf-sk-line--bio"></div>
+						<div class="skeleton pf-sk-line pf-sk-line--meta"></div>
 					</div>
 				</header>
 
-				<div class="perfil-divider"></div>
+				<div class="pf-divider"></div>
 
-				<section class="perfil-stats" aria-label="Estadísticas del perfil">
-					${Array.from({ length: 4 }, () => `<article class="perfil-stat">
-						<div class="skeleton" style="height:32px;width:40px;margin:0 auto 8px"></div>
-						<div class="skeleton" style="height:14px;width:80px;margin:0 auto"></div>
+				<section class="pf-stats" aria-label="Estadísticas del perfil">
+					${Array.from({ length: 4 }, () => `<article class="pf-stat">
+						<div class="skeleton pf-sk-stat-num"></div>
+						<div class="skeleton pf-sk-stat-label"></div>
 					</article>`).join('')}
 				</section>
 
-				<div class="perfil-divider"></div>
+				<div class="pf-divider"></div>
 
 				<section aria-label="Insignias">
-					<h2 class="perfil-badges-title"><i class="bi bi-award"></i>Insignias</h2>
-					<div class="perfil-badges-placeholders">
-						${Array.from({ length: 3 }, () => '<div class="skeleton" style="width:18px;height:18px;border-radius:9999px"></div>').join('')}
+					<h2 class="pf-badges-title"><i class="bi bi-award"></i>Insignias</h2>
+					<div class="pf-badges-placeholders">
+						${Array.from({ length: 3 }, () => '<div class="skeleton pf-sk-dot"></div>').join('')}
 					</div>
 				</section>
 			</section>
 
-			<div class="perfil-tabs" role="tablist" aria-label="Cambiar orden de fotos">
-				${Array.from({ length: 2 }, () => `<button class="perfil-tab-btn" disabled>
-					<div class="skeleton" style="height:15px;width:100px"></div>
+			<div class="pf-tabs" role="tablist" aria-label="Cambiar orden de fotos">
+				${Array.from({ length: 2 }, () => `<button class="pf-tab-btn" disabled>
+					<div class="skeleton pf-sk-tab-label"></div>
 				</button>`).join('')}
 			</div>
 
-			<section class="perfil-grid-wrap">
-				<div class="perfil-skeleton-grid">
+			<section class="pf-grid-wrap">
+				<div class="pf-skeleton-grid">
 					${Array.from({ length: 6 }, () => skeletonCard('300px')).join('')}
 				</div>
 			</section>
@@ -504,7 +240,7 @@ function renderFotosSkeleton(contenedor) {
 	}
 
 	contenedor.innerHTML = `
-		<div class="perfil-skeleton-grid">
+		<div class="pf-skeleton-grid">
 			${Array.from({ length: 6 }, () => skeletonCard('300px')).join('')}
 		</div>
 	`;
@@ -519,17 +255,17 @@ function renderFotosGrid(contenedor, fotos) {
 	}
 
 	if (!Array.isArray(fotos) || fotos.length === 0) {
-		contenedor.innerHTML = '<p class="perfil-empty">Este usuario no tiene fotografías en esta sección.</p>';
+		contenedor.innerHTML = '<p class="pf-empty">Este usuario no tiene fotografías en esta sección.</p>';
 		return;
 	}
 
 	contenedor.innerHTML = `
-		<div class="perfil-grid">
-			${fotos.map((foto) => `<div class="perfil-grid-item">${cardFoto(foto)}</div>`).join('')}
+		<div class="pf-grid">
+			${fotos.map((foto) => `<div class="pf-grid-item">${cardFoto(foto)}</div>`).join('')}
 		</div>
 	`;
 
-	contenedor.querySelectorAll('.card-foto').forEach((card, index) => {
+	contenedor.querySelectorAll('.cf-card').forEach((card, index) => {
 		const foto = fotos[index];
 
 		card.addEventListener('mouseenter', () => {
@@ -631,8 +367,6 @@ async function render(contenedor, params = {}) {
 		return;
 	}
 
-	ensureStyles();
-
 	const usuarioSesion = auth.getUsuario()?.nombre_usuario || '';
 	const usuarioObjetivo = String(params?.usuario || usuarioSesion).trim();
 
@@ -645,7 +379,7 @@ async function render(contenedor, params = {}) {
 
 	try {
 		const perfil = await api.get(`/usuarios/${encodeURIComponent(usuarioObjetivo)}`);
-		const esPerfilPropio = auth.getUsuario()?.nombre_usuario === params.usuario;
+		const esPerfilPropio = auth.getUsuario()?.nombre_usuario === usuarioObjetivo;
 
 		const state = {
 			usuario: usuarioObjetivo,

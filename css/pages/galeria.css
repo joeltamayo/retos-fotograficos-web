@@ -1,0 +1,136 @@
+﻿/* 
+    GALERÍA — Estilos para la página de galería de fotos
+    Prefijo: gl-
+*/
+
+/* Página de galería: contenedor principal. */
+.gl-page {
+    max-width: var(--content-max-width);
+    margin: 0 auto;
+    padding: 28px var(--page-padding-x) 48px;
+}
+
+/* Encabezado: centra título y mensaje introductorio. */
+.gl-header {
+    text-align: center;
+    margin-bottom: 18px;
+}
+
+/* Título: identifica la galería de fotos. */
+.gl-title {
+    margin: 0;
+    font-size: 34px;
+    font-weight: 700;
+    color: var(--color-text);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Icono decorativo del título. */
+.gl-title i {
+    color: var(--color-oro);
+}
+
+/* Subtítulo: aclara el propósito del listado. */
+.gl-subtitle {
+    margin: 8px 0 0;
+    font-size: 16px;
+    color: var(--color-text-secondary);
+}
+
+/* Fila de ordenamiento: agrupa etiqueta y selector. */
+.gl-order-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+/* Etiqueta de orden: explica el control de selección. */
+.gl-order-label {
+    font-size: 16px;
+    color: var(--color-text-secondary);
+}
+
+/* Selector de orden: cambia el criterio de visualización. */
+.gl-order-select {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: #F9FAFB;
+    padding: 10px 14px;
+    font-size: 15px;
+    color: var(--color-text);
+    min-width: 180px;
+}
+
+/* Grid de fotos: organiza las tarjetas de la galería. */
+.gl-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 22px;
+}
+
+/* Slot de tarjeta: asegura que card-foto ocupe todo el alto. */
+.gl-card-slot .card-foto {
+    height: 100%;
+}
+
+/* Paginación: separa el listado del control inferior. */
+.gl-pagination {
+    margin-top: 20px;
+}
+
+/* Estado vacío: mensaje cuando no hay fotos que mostrar. */
+.gl-empty {
+    margin: 8px 0 0;
+    padding: 16px;
+    border-radius: var(--radius-md);
+    background: #F8FAFC;
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    text-align: center;
+}
+
+/* Skeleton grid: placeholder mientras se cargan las imágenes. */
+.gl-skeleton-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 22px;
+}
+
+/* Cuadro skeleton: reserva el espacio de cada foto. */
+.gl-skeleton-square {
+    height: auto;
+    aspect-ratio: 1 / 1;
+    border-radius: var(--radius-lg);
+}
+
+@media (max-width: 1199.98px) {
+
+    .gl-grid,
+    .gl-skeleton-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 767.98px) {
+    .gl-page {
+        padding: 22px 16px 40px;
+    }
+
+    .gl-title {
+        font-size: 28px;
+    }
+
+    .gl-grid,
+    .gl-skeleton-grid {
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+
+    .gl-order-row {
+        flex-direction: column;
+        gap: 8px;
+    }
+}

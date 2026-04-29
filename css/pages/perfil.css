@@ -1,0 +1,353 @@
+﻿/* 
+    PERFIL — Estilos para la página de perfil de usuario
+    Prefijo: pf-
+*/
+
+/* Página de perfil: contenedor principal. */
+.pf-page {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: 28px var(--page-padding-x) 48px;
+}
+
+/* Breadcrumb: navegación de regreso. */
+.pf-breadcrumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+/* Hover del breadcrumb: resalta navegación. */
+.pf-breadcrumb:hover {
+  text-decoration: underline;
+}
+
+/* Card principal: bloque con información del usuario. */
+.pf-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 24px;
+}
+
+/* Header de perfil: avatar, info y acciones. */
+.pf-header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: start;
+}
+
+/* Avatar: foto principal del usuario. */
+.pf-avatar {
+  width: 92px;
+  height: 92px;
+  border-radius: var(--radius-full);
+  object-fit: cover;
+  background: var(--color-border);
+  display: block;
+}
+
+/* Placeholder de avatar: fallback cuando no hay imagen. */
+.pf-avatar-placeholder {
+  width: 92px;
+  height: 92px;
+  border-radius: var(--radius-full);
+  background: var(--color-border);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  font-size: 34px;
+}
+
+/* Nombre: identidad visual principal. */
+.pf-name {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--color-text);
+}
+
+/* Username: identificador corto del usuario. */
+.pf-username {
+  margin: 3px 0 0;
+  font-size: 15px;
+  color: var(--color-text-secondary);
+}
+
+/* Bio: texto descriptivo del perfil. */
+.pf-bio {
+  margin: 12px 0 0;
+  font-size: 16px;
+  line-height: 1.35;
+  color: #4B5563;
+}
+
+/* Estado de miembro: fecha o info adicional. */
+.pf-member {
+  margin: 10px 0 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+/* Botón editar: acción principal sobre el perfil. */
+.pf-edit-btn {
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--color-text);
+  color: #FFFFFF;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+/* Separador: divide header y estadísticas. */
+.pf-divider {
+  height: 1px;
+  background: var(--color-border);
+  margin: 18px 0;
+}
+
+/* Estadísticas: resumen numérico del perfil. */
+.pf-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+/* Stat individual: bloque centrado. */
+.pf-stat {
+  text-align: center;
+}
+
+/* Valor estadístico: número destacado. */
+.pf-stat-value {
+  display: block;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.05;
+  color: var(--color-text);
+}
+
+/* Etiqueta estadística: explica el valor. */
+.pf-stat-label {
+  margin-top: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+/* Título de badges: sección de reconocimientos. */
+.pf-badges-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Placeholders de badges: marcadores vacíos. */
+.pf-badges-placeholders {
+  margin-top: 10px;
+  display: inline-flex;
+  gap: 8px;
+}
+
+/* Badge placeholder: círculo de carga o vacío. */
+.pf-badge-placeholder {
+  width: 18px;
+  height: 18px;
+  border-radius: var(--radius-full);
+  background: var(--color-border);
+}
+
+/* Tabs: navegación entre secciones del perfil. */
+.pf-tabs {
+  margin-top: 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--color-neutral-bg);
+  padding: 4px;
+  border-radius: 12px;
+}
+
+/* Botón tab: opción de navegación interna. */
+.pf-tab-btn {
+  border: 0;
+  background: transparent;
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Tab activo: sección actualmente visible. */
+.pf-tab-btn.is-active {
+  background: var(--color-surface);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+/* Wrapper del grid: separa tabs del contenido. */
+.pf-grid-wrap {
+  margin-top: 16px;
+}
+
+/* Grid de fotos: organiza el contenido del usuario. */
+.pf-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+/* Item de grid: hace que card-foto ocupe el alto. */
+.pf-grid-item .card-foto {
+  height: 100%;
+}
+
+/* Estado base: comparte formato entre vacío y error. */
+.pf-empty,
+.pf-error {
+  margin: 0;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+}
+
+/* Vacío: no hay fotos o contenido aún. */
+.pf-empty {
+  background: #F8FAFC;
+  color: var(--color-text-secondary);
+}
+
+/* Error: problema al cargar contenido. */
+.pf-error {
+  background: var(--color-danger-bg);
+  color: #991B1B;
+}
+
+/* Skeleton grid: placeholders durante carga. */
+.pf-skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+/* Skeleton avatar: reserva espacio del perfil. */
+.pf-sk-avatar {
+  width: 92px;
+  height: 92px;
+  border-radius: 9999px;
+  flex-shrink: 0;
+}
+
+/* Skeleton line: separa bloques de texto. */
+.pf-sk-line {
+  margin-bottom: 8px;
+}
+
+/* Skeleton title: placeholder del nombre. */
+.pf-sk-line--title {
+  height: 22px;
+  width: 180px;
+}
+
+/* Skeleton user: placeholder del username. */
+.pf-sk-line--user {
+  height: 15px;
+  width: 120px;
+  margin-bottom: 12px;
+}
+
+/* Skeleton bio: placeholder de la biografía. */
+.pf-sk-line--bio {
+  height: 16px;
+  width: 280px;
+  margin-bottom: 10px;
+}
+
+/* Skeleton meta: placeholder de datos secundarios. */
+.pf-sk-line--meta {
+  height: 14px;
+  width: 200px;
+  margin-bottom: 0;
+}
+
+/* Skeleton numérico: reserva el valor estadístico. */
+.pf-sk-stat-num {
+  height: 32px;
+  width: 40px;
+  margin: 0 auto 8px;
+}
+
+/* Skeleton label: reserva la explicación del dato. */
+.pf-sk-stat-label {
+  height: 14px;
+  width: 80px;
+  margin: 0 auto;
+}
+
+/* Skeleton dot: placeholder para badges o íconos. */
+.pf-sk-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 9999px;
+}
+
+/* Skeleton tab: placeholder del texto de navegación. */
+.pf-sk-tab-label {
+  height: 15px;
+  width: 100px;
+}
+
+@media (max-width: 1199.98px) {
+
+  .pf-grid,
+  .pf-skeleton-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 991.98px) {
+  .pf-page {
+    padding: 22px 16px 40px;
+  }
+
+  .pf-header {
+    grid-template-columns: 1fr;
+  }
+
+  .pf-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767.98px) {
+
+  .pf-grid,
+  .pf-skeleton-grid {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+}

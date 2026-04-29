@@ -12,8 +12,8 @@ import {
 	skeletonCard,
 } from '../utils.js';
 
-const STYLE_ID = 'reto-detalle-page-styles';
 const LIMITE_FOTOS = 9;
+const KEY_RUTA_DESTINO = 'rutaDestino';
 
 /**
  * Escapa texto para renderizar de forma segura en HTML.
@@ -63,224 +63,23 @@ function getEstadoBadgeStyle(estado) {
 	const normalized = String(estado ?? '').trim().toLowerCase();
 
 	if (normalized === 'activo') {
-		return 'background:#22C55E;color:#FFFFFF;';
+		return 'rd-banner__badge--activo';
 	}
 
 	if (normalized === 'finalizado') {
-		return 'background:#6B7280;color:#FFFFFF;';
+		return 'rd-banner__badge--finalizado';
 	}
 
-	return 'background:#3B82F6;color:#FFFFFF;';
+	return 'rd-banner__badge--programado';
 }
 
 /**
- * Inyecta estilos específicos de la página una sola vez.
+ * Redirige a login guardando la ruta actual para volver despues de autenticar.
  */
-function ensureStyles() {
-	if (document.getElementById(STYLE_ID)) {
-		return;
-	}
-
-	const style = document.createElement('style');
-	style.id = STYLE_ID;
-	style.textContent = `
-		.reto-detalle-page {
-			max-width: var(--content-max-width);
-			margin: 0 auto;
-			padding: 26px var(--page-padding-x) 50px;
-		}
-
-		.reto-detalle-breadcrumb {
-			display: inline-flex;
-			align-items: center;
-			gap: 8px;
-			font-size: 15px;
-			font-weight: 600;
-			color: #111827;
-			text-decoration: none;
-			margin-bottom: 16px;
-		}
-
-		.reto-banner {
-			position: relative;
-			height: 280px;
-			border-radius: 14px;
-			overflow: hidden;
-			background: #111827;
-		}
-
-		.reto-banner__image {
-			width: 100%;
-			height: 100%;
-			object-fit: cover;
-			display: block;
-		}
-
-		.reto-banner__overlay {
-			position: absolute;
-			inset: 0;
-			background: linear-gradient(to top, rgba(0,0,0,0.76) 8%, rgba(0,0,0,0.38) 45%, rgba(0,0,0,0.05) 100%);
-			display: flex;
-			flex-direction: column;
-			justify-content: flex-end;
-			padding: 18px 20px;
-		}
-
-		.reto-banner__badges {
-			display: inline-flex;
-			gap: 8px;
-			margin-bottom: 10px;
-			flex-wrap: wrap;
-		}
-
-		.reto-banner__badge {
-			padding: 4px 10px;
-			border-radius: 9999px;
-			font-size: 12px;
-			font-weight: 600;
-		}
-
-		.reto-banner__badge--categoria {
-			background: rgba(255, 255, 255, 0.16);
-			border: 1px solid rgba(255, 255, 255, 0.55);
-			color: #FFFFFF;
-		}
-
-		.reto-banner__title {
-			margin: 0;
-			font-size: 24px;
-			line-height: 1.2;
-			font-weight: 700;
-			color: #FFFFFF;
-		}
-
-		.reto-banner__description {
-			margin: 6px 0 0;
-			font-size: 14px;
-			line-height: 1.4;
-			color: rgba(255,255,255,0.94);
-			max-width: 720px;
-		}
-
-		.reto-stats-row {
-			margin-top: 14px;
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			gap: 16px;
-			flex-wrap: wrap;
-		}
-
-		.reto-stats-items {
-			display: flex;
-			align-items: center;
-			gap: 30px;
-			flex-wrap: wrap;
-		}
-
-		.reto-stat-item {
-			display: inline-flex;
-			align-items: center;
-			gap: 8px;
-			color: #6B7280;
-			font-size: 16px;
-		}
-
-		.reto-stat-item i {
-			font-size: 18px;
-		}
-
-		.reto-cta-btn {
-			border: 0;
-			border-radius: 10px;
-			background: #111827;
-			color: #FFFFFF;
-			padding: 10px 16px;
-			font-weight: 600;
-			font-size: 14px;
-			display: inline-flex;
-			align-items: center;
-			gap: 8px;
-		}
-
-		.reto-section {
-			margin-top: 26px;
-		}
-
-		.reto-section-title {
-			margin: 0 0 14px;
-			font-size: 34px;
-			font-weight: 600;
-			color: #111827;
-		}
-
-		.reto-top5-grid {
-			display: grid;
-			grid-template-columns: repeat(5, minmax(0, 1fr));
-			gap: 16px;
-		}
-
-		.reto-fotos-grid {
-			display: grid;
-			grid-template-columns: repeat(3, minmax(0, 1fr));
-			gap: 18px;
-		}
-
-		.reto-pagination-wrap {
-			margin-top: 18px;
-		}
-
-		.reto-skeleton-grid {
-			display: grid;
-			gap: 16px;
-		}
-
-		.reto-skeleton-grid.top5 {
-			grid-template-columns: repeat(5, minmax(0, 1fr));
-		}
-
-		.reto-skeleton-grid.fotos {
-			grid-template-columns: repeat(3, minmax(0, 1fr));
-		}
-
-		@media (max-width: 1199.98px) {
-			.reto-top5-grid {
-				grid-template-columns: repeat(3, minmax(0, 1fr));
-			}
-
-			.reto-fotos-grid,
-			.reto-skeleton-grid.fotos {
-				grid-template-columns: repeat(2, minmax(0, 1fr));
-			}
-
-			.reto-skeleton-grid.top5 {
-				grid-template-columns: repeat(3, minmax(0, 1fr));
-			}
-		}
-
-		@media (max-width: 767.98px) {
-			.reto-detalle-page {
-				padding: 20px 16px 40px;
-			}
-
-			.reto-banner {
-				height: 240px;
-			}
-
-			.reto-section-title {
-				font-size: 28px;
-			}
-
-			.reto-top5-grid,
-			.reto-fotos-grid,
-			.reto-skeleton-grid.top5,
-			.reto-skeleton-grid.fotos {
-				grid-template-columns: repeat(1, minmax(0, 1fr));
-			}
-		}
-	`;
-
-	document.head.appendChild(style);
+function redirectToLoginKeepingRoute() {
+	const rutaActual = window.location.hash || '#/home';
+	sessionStorage.setItem(KEY_RUTA_DESTINO, rutaActual);
+	window.location.hash = '#/login';
 }
 
 /**
@@ -288,21 +87,21 @@ function ensureStyles() {
  */
 function renderLayout(contenedor) {
 	contenedor.innerHTML = `
-		<section class="reto-detalle-page page-enter">
-			<a class="reto-detalle-breadcrumb" href="#/retos">&larr; Volver a Retos</a>
+		<section class="rd-page page-enter">
+			<a class="rd-breadcrumb" href="#/retos">&larr; Volver a Retos</a>
 
 			<div id="reto-banner-area"></div>
 			<div id="reto-stats-area"></div>
 
-			<section class="reto-section" aria-label="Top 5 del reto">
-				<h2 class="reto-section-title">🏅 Top 5 del Reto</h2>
+			<section class="rd-section" aria-label="Top 5 del reto">
+				<h2 class="rd-section-title">🏅 Top 5 del Reto</h2>
 				<div id="reto-top5-area"></div>
 			</section>
 
-			<section class="reto-section" aria-label="Todas las fotografías">
-				<h2 class="reto-section-title">Todas las Fotografías</h2>
+			<section class="rd-section" aria-label="Todas las fotografías">
+				<h2 class="rd-section-title">Todas las Fotografías</h2>
 				<div id="reto-fotos-area"></div>
-				<div class="reto-pagination-wrap" id="reto-fotos-pagination"></div>
+				<div class="rd-pagination" id="reto-fotos-pagination"></div>
 			</section>
 		</section>
 	`;
@@ -323,12 +122,12 @@ function renderSkeletons(refs) {
 	refs.banner.innerHTML = skeletonCard('280px');
 	refs.stats.innerHTML = skeletonCard('66px');
 	refs.top5.innerHTML = `
-		<div class="reto-skeleton-grid top5">
+		<div class="rd-skeleton-grid rd-skeleton-grid--top5">
 			${Array.from({ length: 5 }, () => skeletonCard('260px')).join('')}
 		</div>
 	`;
 	refs.fotos.innerHTML = `
-		<div class="reto-skeleton-grid fotos">
+		<div class="rd-skeleton-grid rd-skeleton-grid--fotos">
 			${Array.from({ length: 6 }, () => skeletonCard('300px')).join('')}
 		</div>
 	`;
@@ -365,19 +164,19 @@ function renderBanner(refs, reto) {
 	const categoria = escapeHtml(reto?.categoria_nombre || 'Sin categoría');
 
 	refs.banner.innerHTML = `
-		<article class="reto-banner">
+		<article class="rd-banner">
 			${imagen
-				? `<img class="reto-banner__image" src="${imagen}" alt="${escapeHtml(reto?.titulo || 'Reto')}">`
-				: '<div class="d-flex align-items-center justify-content-center w-100 h-100" style="color:#9CA3AF"><i class="bi bi-image" style="font-size:3rem"></i></div>'}
+				? `<img class="rd-banner__image" src="${imagen}" alt="${escapeHtml(reto?.titulo || 'Reto')}">`
+				: '<div class="u-center-content u-w-full u-h-full u-text-muted"><i class="bi bi-image u-icon-3xl"></i></div>'}
 
-			<div class="reto-banner__overlay">
-				<div class="reto-banner__badges">
-					<span class="reto-banner__badge" style="${getEstadoBadgeStyle(reto?.estado)}">${escapeHtml(estadoTexto)}</span>
-					<span class="reto-banner__badge reto-banner__badge--categoria">${categoria}</span>
+			<div class="rd-banner__overlay">
+				<div class="rd-banner__badges">
+					<span class="rd-banner__badge ${getEstadoBadgeStyle(reto?.estado)}">${escapeHtml(estadoTexto)}</span>
+					<span class="rd-banner__badge rd-banner__badge--categoria">${categoria}</span>
 				</div>
 
-				<h1 class="reto-banner__title">${escapeHtml(reto?.titulo || 'Reto')}</h1>
-				<p class="reto-banner__description">${escapeHtml(reto?.descripcion || 'Sin descripción')}</p>
+				<h1 class="rd-banner__title">${escapeHtml(reto?.titulo || 'Reto')}</h1>
+				<p class="rd-banner__description">${escapeHtml(reto?.descripcion || 'Sin descripción')}</p>
 			</div>
 		</article>
 	`;
@@ -389,27 +188,23 @@ function renderBanner(refs, reto) {
 function resolveCtaAction(reto, participating) {
 	const estado = String(reto?.estado ?? '').toLowerCase();
 
-	if (estado === 'finalizado') {
-		return null;
-	}
+	if (estado === 'finalizado') return null;
 
 	if (!auth.estaAutenticado()) {
 		return {
 			label: 'Participar',
 			icon: 'bi-box-arrow-in-right',
-			action: async () => {
-				window.location.hash = '#/login';
-			},
+			action: async () => redirectToLoginKeepingRoute(),
 		};
 	}
 
 	if (participating) {
 		return {
-			label: 'Subir Fotografía',
-			icon: 'bi-upload',
-			action: async () => {
-				abrirModalSubirFoto(reto.id, reto.titulo, reto.descripcion || '');
-			},
+			label: 'Ya estás participando',
+			icon: 'bi-person-check',
+			disabled: true,
+			tooltip: 'Ya estás participando en este reto',
+			action: async () => {},
 		};
 	}
 
@@ -419,12 +214,12 @@ function resolveCtaAction(reto, participating) {
 		action: async () => {
 			try {
 				await api.post(`/retos/${encodeURIComponent(reto.id)}/participar`, {});
-				mostrarToast('Te uniste al reto correctamente.', 'success');
+				abrirModalSubirFoto(reto.id, reto.titulo, reto.descripcion || '');
 			} catch (error) {
 				const status = Number(error?.status);
 
 				if (status === 401) {
-					window.location.hash = '#/login';
+					redirectToLoginKeepingRoute();
 					return;
 				}
 
@@ -455,20 +250,23 @@ function renderStats(refs, reto, participating) {
 	const fotografias = toSafeNumber(reto?.total_fotografias, 0);
 	const cta = resolveCtaAction(reto, participating);
 
-	refs.stats.innerHTML = `
-		<div class="reto-stats-row">
-			<div class="reto-stats-items">
-				<span class="reto-stat-item">
+		const disabledAttr = cta?.disabled ? ' disabled aria-disabled="true"' : '';
+		const titleAttr = cta?.tooltip ? ` title="${escapeHtml(cta.tooltip)}"` : '';
+
+		refs.stats.innerHTML = `
+		<div class="rd-stats-row">
+			<div class="rd-stats-items">
+				<span class="rd-stat-item">
 					<i class="bi bi-calendar3"></i>
 					<span>${escapeHtml(rangoFechas)}</span>
 				</span>
 
-				<span class="reto-stat-item">
+				<span class="rd-stat-item">
 					<i class="bi bi-people"></i>
 					<span>${participantes} Participantes</span>
 				</span>
 
-				<span class="reto-stat-item">
+				<span class="rd-stat-item">
 					<i class="bi bi-image"></i>
 					<span>${fotografias} Fotografías</span>
 				</span>
@@ -476,7 +274,7 @@ function renderStats(refs, reto, participating) {
 
 			${cta
 				? `
-					<button type="button" class="reto-cta-btn" id="reto-cta-btn">
+					<button type="button" class="rd-cta-btn" id="reto-cta-btn"${disabledAttr}${titleAttr}>
 						<i class="bi ${cta.icon}"></i>
 						<span>${escapeHtml(cta.label)}</span>
 					</button>
@@ -485,20 +283,20 @@ function renderStats(refs, reto, participating) {
 		</div>
 	`;
 
-	if (cta) {
-		const btn = refs.stats.querySelector('#reto-cta-btn');
-		btn?.addEventListener('click', async () => {
-			await cta.action();
-		});
-	}
+    if (cta && !cta.disabled) {
+        const btn = refs.stats.querySelector('#reto-cta-btn');
+        btn?.addEventListener('click', async () => {
+            await cta.action();
+        });
+    }
 }
 
 /**
  * Renderiza un conjunto de cards de foto en un grid controlado por la vista.
  */
-function renderFotosGrid(contenedor, fotos = [], columnsClass = 'reto-fotos-grid') {
+function renderFotosGrid(contenedor, fotos = [], columnsClass = 'rd-fotos-grid') {
 	if (!Array.isArray(fotos) || fotos.length === 0) {
-		contenedor.innerHTML = '<p class="retos-empty">No hay fotografías para mostrar.</p>';
+		contenedor.innerHTML = '<p class="rd-empty">No hay fotografías para mostrar.</p>';
 		return;
 	}
 
@@ -508,7 +306,7 @@ function renderFotosGrid(contenedor, fotos = [], columnsClass = 'reto-fotos-grid
 		</div>
 	`;
 
-	contenedor.querySelectorAll('.card-foto').forEach((card, index) => {
+	contenedor.querySelectorAll('.cf-card').forEach((card, index) => {
 		const foto = fotos[index];
 
 		card.addEventListener('mouseenter', () => {
@@ -539,11 +337,11 @@ function renderTop5(refs, top5 = []) {
 		: [];
 
 	if (normalizedTop.length === 0) {
-		refs.top5.innerHTML = '<p class="retos-empty">Aún no hay fotos destacadas en este reto.</p>';
+		refs.top5.innerHTML = '<p class="rd-empty">Aún no hay fotos destacadas en este reto.</p>';
 		return;
 	}
 
-	renderFotosGrid(refs.top5, normalizedTop, 'reto-top5-grid');
+	renderFotosGrid(refs.top5, normalizedTop, 'rd-top5-grid');
 }
 
 /**
@@ -567,7 +365,7 @@ function renderAllFotosSection(refs, state) {
 	const totalPaginas = Math.max(1, Math.ceil(total / LIMITE_FOTOS));
 
 	state.paginaActual = paginaActual;
-	renderFotosGrid(refs.fotos, items, 'reto-fotos-grid');
+	renderFotosGrid(refs.fotos, items, 'rd-fotos-grid');
 
 	renderPaginacion(refs.pagination, paginaActual, totalPaginas, async (nuevaPagina) => {
 		if (nuevaPagina === state.paginaActual || state.loadingFotos) {
@@ -576,7 +374,7 @@ function renderAllFotosSection(refs, state) {
 
 		state.loadingFotos = true;
 		refs.fotos.innerHTML = `
-			<div class="reto-skeleton-grid fotos">
+			<div class="rd-skeleton-grid rd-skeleton-grid--fotos">
 				${Array.from({ length: 6 }, () => skeletonCard('300px')).join('')}
 			</div>
 		`;
@@ -605,8 +403,6 @@ async function render(contenedor, params = {}) {
 		return;
 	}
 
-	ensureStyles();
-
 	const retoId = params?.id;
 	if (!retoId) {
 		mostrarErrorPagina(contenedor, '404', 'Reto no encontrado');
@@ -631,9 +427,20 @@ async function render(contenedor, params = {}) {
 			detalle,
 			paginaActual: 1,
 			loadingFotos: false,
+			participating,
+			refs,
 		};
 
 		renderAllFotosSection(refs, state);
+
+		const handleFotoSubida = async (event) => {
+			if (event.detail?.retoId === retoId) {
+				state.participating = true;
+				renderStats(refs, detalle?.reto || {}, true);
+			}
+		};
+
+		window.addEventListener('fotografia-subida', handleFotoSubida);
 	} catch (error) {
 		manejarErrorDePagina(contenedor, error, {
 			notFoundMessage: 'Reto no encontrado',

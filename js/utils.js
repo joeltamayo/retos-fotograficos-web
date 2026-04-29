@@ -31,23 +31,19 @@ const formatoRelativo = new Intl.RelativeTimeFormat('es-MX', {
 const TOAST_VARIANTES = {
 	success: {
 		icono: 'bi-check-circle-fill',
-		color: 'var(--color-success)',
-		fondo: 'var(--color-success-bg)',
+		clase: 'pc-toast--success',
 	},
 	danger: {
 		icono: 'bi-x-circle-fill',
-		color: 'var(--color-danger)',
-		fondo: 'var(--color-danger-bg)',
+		clase: 'pc-toast--danger',
 	},
 	warning: {
 		icono: 'bi-exclamation-triangle-fill',
-		color: 'var(--color-warning)',
-		fondo: 'var(--color-warning-bg)',
+		clase: 'pc-toast--warning',
 	},
 	info: {
 		icono: 'bi-info-circle-fill',
-		color: 'var(--color-info)',
-		fondo: 'var(--color-info-bg)',
+		clase: 'pc-toast--info',
 	},
 };
 
@@ -240,55 +236,26 @@ function mostrarToast(mensaje, tipo = 'success') {
 	const variante = TOAST_VARIANTES[tipo] ?? TOAST_VARIANTES.success;
 	const texto = escaparHtml(mensaje || 'Operacion realizada correctamente.');
 
-	let contenedor = document.getElementById('toast-container');
-	if (!contenedor) {
-		contenedor = document.createElement('div');
-		contenedor.id = 'toast-container';
-		contenedor.className = 'position-fixed bottom-0 end-0 p-3';
-		contenedor.style.zIndex = '1100';
-		document.body.appendChild(contenedor);
+	const existing = document.getElementById('pc-system-popup');
+	if (existing) {
+		existing.remove();
 	}
 
-	const toast = document.createElement('div');
-	toast.className = 'toast border-0 shadow-sm';
-	toast.setAttribute('role', 'alert');
-	toast.setAttribute('aria-live', 'assertive');
-	toast.setAttribute('aria-atomic', 'true');
-	toast.style.backgroundColor = variante.fondo;
-	toast.style.borderLeft = `4px solid ${variante.color}`;
-	toast.dataset.bsAutohide = 'true';
-	toast.dataset.bsDelay = '4000';
-
-	toast.innerHTML = `
-		<div class="toast-body d-flex align-items-center gap-2" style="color:var(--color-text)">
-			<i class="bi ${variante.icono}" style="color:${variante.color}"></i>
-			<span>${texto}</span>
+	const popup = document.createElement('div');
+	popup.id = 'pc-system-popup';
+	popup.className = 'pc-system-popup';
+	popup.innerHTML = `
+		<div class="pc-system-popup__backdrop"></div>
+		<div class="pc-system-popup__card ${variante.clase}" role="alert" aria-live="assertive" aria-atomic="true">
+			<div class="pc-system-popup__body">
+				<i class="bi ${variante.icono} pc-system-popup__icon"></i>
+				<span>${texto}</span>
+			</div>
 		</div>
 	`;
 
-	contenedor.appendChild(toast);
-
-	toast.addEventListener(
-		'hidden.bs.toast',
-		() => {
-			toast.remove();
-		},
-		{ once: true },
-	);
-
-	if (window.bootstrap?.Toast) {
-		const instancia = new window.bootstrap.Toast(toast, {
-			autohide: true,
-			delay: 4000,
-		});
-		instancia.show();
-		return;
-	}
-
-	toast.classList.add('show');
-	setTimeout(() => {
-		toast.remove();
-	}, 4000);
+	document.body.appendChild(popup);
+	window.setTimeout(() => popup.remove(), 2300);
 }
 
 /**
@@ -302,8 +269,8 @@ function mostrarLoader(contenedor) {
 	}
 
 	nodo.innerHTML = `
-		<div class="d-flex justify-content-center p-5" data-loader="true">
-			<div class="spinner-border" style="color:var(--color-primary)"></div>
+		<div class="u-center-content u-py-5" data-loader="true">
+			<div class="app-spinner"></div>
 		</div>
 	`;
 }
@@ -347,8 +314,20 @@ function construirQueryString(params = {}) {
  * Devuelve el HTML de una tarjeta skeleton configurable por alto.
  */
 function skeletonCard(alto = '200px') {
-	const valorAlto = escaparHtml(alto);
-	return `<div class="skeleton" style="height:${valorAlto}"></div>`;
+	const mapAltos = {
+		'66px': 'sk-h-66',
+		'98px': 'sk-h-98',
+		'180px': 'sk-h-180',
+		'200px': 'sk-h-200',
+		'260px': 'sk-h-260',
+		'280px': 'sk-h-280',
+		'290px': 'sk-h-290',
+		'300px': 'sk-h-300',
+		'100%': 'sk-h-full',
+	};
+
+	const clase = mapAltos[alto] ?? 'sk-h-200';
+	return `<div class="skeleton ${clase}"></div>`;
 }
 
 /**
@@ -364,7 +343,7 @@ function renderEstrellas(promedio, max = 5) {
 	const llenas = Array.from({ length: estrellasLlenas }, () => '<i class="bi bi-star-fill"></i>').join('');
 	const vacias = Array.from({ length: estrellasVacias }, () => '<i class="bi bi-star"></i>').join('');
 
-	return `<span class="d-inline-flex align-items-center gap-1" style="color:var(--color-warning)">${llenas}${vacias}</span>`;
+	return `<span class="u-inline-flex u-align-center u-gap-1 u-text-warning">${llenas}${vacias}</span>`;
 }
 
 /**
@@ -382,11 +361,11 @@ function mostrarErrorPagina(contenedor, tipo, mensaje) {
 	const texto = escaparHtml(mensaje || config.mensaje);
 
 	nodo.innerHTML = `
-		<div class="text-center py-5 page-enter">
-			<i class="bi ${config.icono} d-block mb-3" style="font-size:4rem;color:var(--color-text-muted)"></i>
-			<h3 class="mb-2">${titulo}</h3>
-			<p class="text-muted mb-4">${texto}</p>
-			<button type="button" class="btn btn-outline-dark" onclick="history.back()">&larr; Volver</button>
+		<div class="u-text-center u-py-5 page-enter">
+			<i class="bi ${config.icono} u-icon-4xl u-text-muted u-mb-3"></i>
+			<h3 class="u-mb-2">${titulo}</h3>
+			<p class="u-text-muted u-mb-4">${texto}</p>
+			<button type="button" class="u-btn-outline" onclick="history.back()">&larr; Volver</button>
 		</div>
 	`;
 }

@@ -1,0 +1,64 @@
+﻿/* ============================================================
+   VARIABLES GLOBALES
+   ============================================================ */
+
+:root {
+  /* Gradiente primario para botones de auth, paneles decorativos */
+  --color-primary: #5B6AF5;
+  --color-primary-end: #9B3AF5;
+  --color-primary-gradient: linear-gradient(135deg, #000000 0%, #9b93a3 100%);
+
+  /* Fondos */
+  --color-bg: #ffffff;
+  --color-surface: #FFFFFF;
+  --color-surface-hover: #F8F9FF;
+
+  /* Texto */
+  --color-text: #111827;
+  --color-text-secondary: #6B7280;
+  --color-text-muted: #9CA3AF;
+  --color-text-on-gradient: #FFFFFF;
+
+  /* Estados */
+  --color-success: #22C55E;
+  --color-success-bg: #DCFCE7;
+  --color-danger: #EF4444;
+  --color-danger-bg: #FEE2E2;
+  --color-warning: #F59E0B;
+  --color-warning-bg: #FEF3C7;
+  --color-info: #3B82F6;
+  --color-info-bg: #DBEAFE;
+  --color-neutral: #6B7280;
+  --color-neutral-bg: #F3F4F6;
+
+  /* Ranking del podio */
+  --color-oro: #EAB308;
+  --color-oro-gradient: linear-gradient(135deg, #EAB308, #F59E0B);
+  --color-plata: #94A3B8;
+  --color-plata-gradient: linear-gradient(135deg, #94A3B8, #CBD5E1);
+  --color-bronce: #C2410C;
+  --color-bronce-gradient: linear-gradient(135deg, #C2410C, #EA580C);
+
+  /* Criterios de calificacion */
+  --color-creatividad: #8B5CF6;
+  --color-composicion: #3B82F6;
+  --color-tema: #22C55E;
+
+  /* Bordes y sombras de cards y modales */
+  --color-border: #E5E7EB;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-card-hover: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --shadow-modal: 0 20px 60px rgba(0, 0, 0, 0.18);
+
+  /* Border radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  /* Layout */
+  --navbar-height: 64px;
+  --content-max-width: 1280px;
+  --page-padding-x: 32px;
+}

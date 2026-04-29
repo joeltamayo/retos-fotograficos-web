@@ -1,0 +1,44 @@
+﻿/* 
+    ESTRELLAS — Componente de calificación interactiva (5 estrellas)
+    Prefijo: es-
+
+/* Fila de estrellas: alinea los cinco botones de calificación. */
+.es-stars-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Botón de estrella: controla el estado visual y la interacción. */
+.es-star-btn {
+    border: 0;
+    background: transparent;
+    padding: 0;
+    font-size: 28px;
+    line-height: 1;
+    color: #D1D5DB;
+    cursor: pointer;
+    transition: color 0.15s ease, transform 0.15s ease;
+}
+
+/* El icono no captura el click (lo captura el botón padre) */
+.es-star-btn i {
+    pointer-events: none;
+}
+
+/* Hover: leve movimiento hacia arriba */
+.es-star-btn:hover {
+    transform: translateY(-1px);
+}
+
+/* Estado activo: estrella amarilla */
+.es-star-btn.is-active {
+    color: var(--color-oro);
+}
+
+/* Estado deshabilitado: mientras se envía la calificación */
+.es-star-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+    transform: none;
+}

@@ -1,0 +1,696 @@
+﻿/* ============================================================
+   RESET Y BASE
+   Reemplaza los estilos base que veng­an del bundle de Bootstrap
+   ============================================================ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--color-text);
+  background: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Compensar navbar fijo */
+#app {
+  min-height: 100vh;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* Contenedor de pagina estandar */
+.page-container {
+  max-width: var(--content-max-width);
+  margin-inline: auto;
+  padding: 32px var(--page-padding-x);
+}
+
+/* Utilidades mi­nimas que Bootstrap visual provei­a */
+.d-none {
+  display: none !important;
+}
+
+.d-flex {
+  display: flex;
+}
+
+.d-block {
+  display: block;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+/* Avatares usados en multiples componentes */
+.avatar {
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  flex-shrink: 0;
+}
+
+.avatar--sm {
+  width: 28px;
+  height: 28px;
+}
+
+.avatar--md {
+  width: 36px;
+  height: 36px;
+}
+
+.avatar--lg {
+  width: 80px;
+  height: 80px;
+}
+
+.avatar--xl {
+  width: 100px;
+  height: 100px;
+  border: 3px solid var(--color-border);
+}
+
+/* Skeleton base compartida entre componentes */
+.skeleton {
+  background: linear-gradient(90deg,
+      #F3F4F6 25%,
+      #E9EAEC 50%,
+      #F3F4F6 75%);
+  background-size: 400% 100%;
+  animation: skeleton-shimmer 1.4s ease infinite;
+  border-radius: var(--radius-md);
+}
+
+.app-toast-container {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 1100;
+}
+
+.app-initial-loader {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.app-spinner {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  border: 0.24rem solid rgba(91, 106, 245, 0.25);
+  border-top-color: var(--color-primary);
+  animation: spin 1s linear infinite;
+}
+
+.app-spinner--sm {
+  width: 1rem;
+  height: 1rem;
+  border-width: 0.15rem;
+}
+
+.u-center-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.u-min-h-420 {
+  min-height: 420px;
+}
+
+.u-min-h-520 {
+  min-height: 520px;
+}
+
+.u-w-full {
+  width: 100%;
+}
+
+.u-h-full {
+  height: 100%;
+}
+
+.u-text-muted {
+  color: var(--color-text-muted);
+}
+
+.u-text-secondary {
+  color: var(--color-text-secondary);
+}
+
+.u-text-default {
+  color: var(--color-text);
+}
+
+.u-text-warning {
+  color: var(--color-warning);
+}
+
+.u-text-center {
+  text-align: center;
+}
+
+.u-fw-500 {
+  font-weight: 500;
+}
+
+.u-fw-700 {
+  font-weight: 700;
+}
+
+.u-fs-14 {
+  font-size: 14px;
+}
+
+.u-fs-20 {
+  font-size: 20px;
+}
+
+.u-icon-2xl {
+  font-size: 2rem;
+}
+
+.u-icon-225 {
+  font-size: 2.25rem;
+}
+
+.u-icon-3xl {
+  font-size: 3rem;
+}
+
+.u-w-full {
+  width: 100%;
+}
+
+.u-h-full {
+  height: 100%;
+}
+
+.u-mb-2 {
+  margin-bottom: 0.5rem;
+}
+
+.u-text-center {
+  text-align: center;
+}
+
+.pc-system-popup {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.pc-system-popup__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(17, 24, 39, 0.45);
+}
+
+.pc-system-popup__card {
+  position: relative;
+  z-index: 1;
+  min-width: 280px;
+  max-width: 520px;
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-modal);
+  padding: 14px 16px;
+}
+
+.pc-system-popup__body {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+}
+
+.pc-system-popup__icon {
+  font-size: 18px;
+}
+
+.pc-system-popup__card.pc-toast--success .pc-system-popup__icon {
+  color: var(--color-success);
+}
+
+.pc-system-popup__card.pc-toast--danger .pc-system-popup__icon {
+  color: var(--color-danger);
+}
+
+.pc-system-popup__card.pc-toast--warning .pc-system-popup__icon {
+  color: var(--color-warning);
+}
+
+.pc-system-popup__card.pc-toast--info .pc-system-popup__icon {
+  color: var(--color-info);
+}
+
+.u-icon-4xl {
+  font-size: 4rem;
+}
+
+.u-flex {
+  display: flex;
+}
+
+.u-inline-flex {
+  display: inline-flex;
+}
+
+.u-align-center {
+  align-items: center;
+}
+
+.u-justify-center {
+  justify-content: center;
+}
+
+.u-gap-1 {
+  gap: 4px;
+}
+
+.u-gap-2 {
+  gap: 8px;
+}
+
+.u-py-5 {
+  padding-block: 48px;
+}
+
+.u-mb-1 {
+  margin-bottom: 4px;
+}
+
+.u-mb-2 {
+  margin-bottom: 8px;
+}
+
+.u-mb-3 {
+  margin-bottom: 12px;
+}
+
+.u-mb-4 {
+  margin-bottom: 16px;
+}
+
+.u-btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  padding: 10px 18px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.u-btn-outline:hover {
+  background: var(--color-neutral-bg);
+  border-color: var(--color-border);
+}
+
+.sk-h-66 {
+  height: 66px;
+}
+
+.sk-h-98 {
+  height: 98px;
+}
+
+.sk-h-180 {
+  height: 180px;
+}
+
+.sk-h-200 {
+  height: 200px;
+}
+
+.sk-h-260 {
+  height: 260px;
+}
+
+.sk-h-280 {
+  height: 280px;
+}
+
+.sk-h-290 {
+  height: 290px;
+}
+
+.sk-h-300 {
+  height: 300px;
+}
+
+.sk-h-full {
+  height: 100%;
+}
+
+.pc-toast {
+  min-width: 240px;
+  background: var(--pc-toast-bg, var(--color-surface));
+  border-left: 4px solid var(--pc-toast-border, var(--color-border));
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  padding: 10px 12px;
+}
+
+.pc-toast__body {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-text);
+  font-size: 14px;
+}
+
+.pc-toast__icon {
+  color: var(--pc-toast-icon, var(--color-text));
+}
+
+.pc-toast--success {
+  --pc-toast-bg: var(--color-success-bg);
+  --pc-toast-border: var(--color-success);
+  --pc-toast-icon: var(--color-success);
+}
+
+.pc-toast--danger {
+  --pc-toast-bg: var(--color-danger-bg);
+  --pc-toast-border: var(--color-danger);
+  --pc-toast-icon: var(--color-danger);
+}
+
+.pc-toast--warning {
+  --pc-toast-bg: var(--color-warning-bg);
+  --pc-toast-border: var(--color-warning);
+  --pc-toast-icon: var(--color-warning);
+}
+
+.pc-toast--info {
+  --pc-toast-bg: var(--color-info-bg);
+  --pc-toast-border: var(--color-info);
+  --pc-toast-icon: var(--color-info);
+}
+
+/* Modal base (Bootstrap JS + CSS propio) */
+.fade {
+  transition: opacity 0.15s linear;
+}
+
+.fade:not(.show) {
+  opacity: 0;
+}
+
+.collapse:not(.show) {
+  display: none;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1055;
+  display: none;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  outline: 0;
+}
+
+.modal.show {
+  display: block;
+}
+
+.modal-dialog {
+  position: relative;
+  width: auto;
+  margin: 1.75rem auto;
+  pointer-events: none;
+  max-width: 500px;
+}
+
+.modal.fade .modal-dialog {
+  transform: translateY(-16px);
+  transition: transform 0.2s ease-out;
+}
+
+.modal.show .modal-dialog {
+  transform: translateY(0);
+}
+
+.modal-dialog-centered {
+  display: flex;
+  align-items: center;
+  min-height: calc(100% - 3.5rem);
+}
+
+.modal-dialog-scrollable {
+  height: calc(100% - 3.5rem);
+}
+
+.modal-dialog-scrollable .modal-content {
+  max-height: 100%;
+  overflow: hidden;
+}
+
+.modal-dialog-scrollable .modal-body {
+  overflow-y: auto;
+}
+
+.modal-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  pointer-events: auto;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 1rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.modal-body {
+  position: relative;
+  flex: 1 1 auto;
+  padding: 1rem;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
+  background: #111827;
+}
+
+.modal-backdrop.fade {
+  opacity: 0;
+}
+
+.modal-backdrop.show {
+  opacity: 0.55;
+}
+
+body.modal-open {
+  overflow: hidden;
+}
+
+.modal-lg {
+  max-width: 800px;
+}
+
+.modal-xl {
+  max-width: 1140px;
+}
+
+.btn-close {
+  box-sizing: content-box;
+  width: 1em;
+  height: 1em;
+  padding: 0.25rem;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: #6B7280;
+  opacity: 0.72;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-close::before {
+  content: "\00D7";
+  font-size: 1.45rem;
+  line-height: 1;
+}
+
+.btn-close:hover {
+  opacity: 1;
+}
+
+.btn-close:focus {
+  outline: 2px solid rgba(91, 106, 245, 0.25);
+  outline-offset: 2px;
+}
+
+/* Utilidades mínimas usadas en vistas y modales */
+.w-100 {
+  width: 100%;
+}
+
+.h-100 {
+  height: 100%;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.justify-content-end {
+  justify-content: flex-end;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
+.border-0 {
+  border: 0;
+}
+
+.mb-0 {
+  margin-bottom: 0;
+}
+
+.mb-1 {
+  margin-bottom: 0.25rem;
+}
+
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+
+.mb-3 {
+  margin-bottom: 1rem;
+}
+
+.mb-4 {
+  margin-bottom: 1.5rem;
+}
+
+.mt-1 {
+  margin-top: 0.25rem;
+}
+
+.mt-3 {
+  margin-top: 1rem;
+}
+
+.mt-4 {
+  margin-top: 1.5rem;
+}
+
+.p-4 {
+  padding: 1.5rem;
+}
+
+.pt-3 {
+  padding-top: 1rem;
+}
+
+.pt-4 {
+  padding-top: 1.5rem;
+}
+
+.pb-0 {
+  padding-bottom: 0;
+}
+
+.pb-4 {
+  padding-bottom: 1.5rem;
+}
+
+.px-4 {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .p-md-5 {
+    padding: 3rem;
+  }
+
+  .pt-md-5 {
+    padding-top: 3rem;
+  }
+
+  .pb-md-5 {
+    padding-bottom: 3rem;
+  }
+
+  .px-md-5 {
+    padding-left: 3rem;
+    padding-right: 3rem;
+  }
+}
+
+@media (max-width: 991.98px) {
+
+  .modal-lg,
+  .modal-xl {
+    max-width: calc(100% - 2rem);
+  }
+}

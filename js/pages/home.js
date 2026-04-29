@@ -4,8 +4,6 @@ import { gridRetos } from '../components/cardReto.js';
 import { gridFotos } from '../components/cardFoto.js';
 import { manejarErrorDePagina, skeletonCard } from '../utils.js';
 
-const STYLE_ID = 'home-page-styles';
-
 /**
  * Escapa HTML para renderizado seguro de texto dinámico.
  */
@@ -19,172 +17,42 @@ function escapeHtml(value) {
 }
 
 /**
- * Inyecta estilos base de la vista Home una sola vez.
- */
-function ensureStyles() {
-	if (document.getElementById(STYLE_ID)) {
-		return;
-	}
-
-	const style = document.createElement('style');
-	style.id = STYLE_ID;
-	style.textContent = `
-		.home-page {
-			max-width: var(--content-max-width);
-			margin: 0 auto;
-			padding: 34px var(--page-padding-x) 48px;
-		}
-
-		.home-page .home-greeting-title {
-			margin: 0;
-			font-size: 28px;
-			font-weight: 700;
-			color: #111827;
-		}
-
-		.home-page .home-greeting-subtitle {
-			margin: 4px 0 0;
-			font-size: 16px;
-			color: #6B7280;
-		}
-
-		.home-section {
-			margin-top: 30px;
-		}
-
-		.home-section-header {
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			gap: 12px;
-			margin-bottom: 14px;
-		}
-
-		.home-section-title {
-			margin: 0;
-			font-size: 28px;
-			font-weight: 700;
-			color: #111827;
-		}
-
-		.home-ver-todos {
-			font-size: 16px;
-			font-weight: 600;
-			color: #111827;
-			text-decoration: none;
-		}
-
-		.home-ver-todos:hover {
-			text-decoration: underline;
-		}
-
-		.home-empty-note,
-		.home-error-note {
-			margin: 0;
-			padding: 16px;
-			border-radius: 10px;
-			font-size: 14px;
-		}
-
-		.home-empty-note {
-			background: #F8FAFC;
-			color: #6B7280;
-		}
-
-		.home-error-note {
-			background: #FEE2E2;
-			color: #991B1B;
-		}
-
-		.home-skeleton-grid {
-			display: grid;
-			gap: 24px;
-		}
-
-		.home-skeleton-grid.retos {
-			grid-template-columns: repeat(3, minmax(0, 1fr));
-		}
-
-		.home-skeleton-grid.fotos,
-		.home-skeleton-grid.participaciones {
-			grid-template-columns: repeat(4, minmax(0, 1fr));
-		}
-
-		.home-skeleton-square {
-			height: auto;
-			aspect-ratio: 1/1;
-			border-radius: 14px;
-		}
-
-		@media (max-width: 1199.98px) {
-			.home-skeleton-grid.fotos,
-			.home-skeleton-grid.participaciones {
-				grid-template-columns: repeat(2, minmax(0, 1fr));
-			}
-		}
-
-		@media (max-width: 991.98px) {
-			.home-page {
-				padding: 24px 16px 40px;
-			}
-
-			.home-section-title {
-				font-size: 24px;
-			}
-
-			.home-skeleton-grid.retos {
-				grid-template-columns: repeat(1, minmax(0, 1fr));
-			}
-		}
-
-		@media (max-width: 575.98px) {
-			.home-skeleton-grid.fotos,
-			.home-skeleton-grid.participaciones {
-				grid-template-columns: repeat(1, minmax(0, 1fr));
-			}
-		}
-	`;
-
-	document.head.appendChild(style);
-}
-
-/**
  * Construye el layout base de la página y devuelve referencias útiles.
  */
 function renderLayout(contenedor, usuarioAutenticado) {
 	const nombre = escapeHtml(usuarioAutenticado?.nombre || usuarioAutenticado?.nombre_usuario || 'Usuario');
 
 	contenedor.innerHTML = `
-		<section class="home-page page-enter">
+		<section class="hm-page page-enter">
 			${usuarioAutenticado
 				? `
-					<header class="home-greeting mb-2">
-						<h1 class="home-greeting-title">Bienvenido, ${nombre}</h1>
-						<p class="home-greeting-subtitle">Explora los retos activos y comparte tu mejor trabajo</p>
+					<header class="hm-greeting mb-2">
+						<h1 class="hm-greeting-title">Bienvenido, ${nombre}</h1>
+						<p class="hm-greeting-subtitle">Explora los retos activos y comparte tu mejor trabajo</p>
 					</header>
 				`
 				: ''}
 
-			<section class="home-section" aria-label="Retos activos">
-				<div class="home-section-header">
-					<h2 class="home-section-title">Retos Activos</h2>
-					<a class="home-ver-todos" href="#/retos">Ver todos &rarr;</a>
+			<section class="hm-section" aria-label="Retos activos">
+				<div class="hm-section-header">
+					<h2 class="hm-section-title">Retos Activos</h2>
+					<a class="hm-ver-todos" href="#/retos">Ver todos &rarr;</a>
 				</div>
 				<div id="home-retos-contenido"></div>
 			</section>
 
-			<section class="home-section" aria-label="Fotos recientes">
-				<div class="home-section-header">
-					<h2 class="home-section-title">Fotos Recientes</h2>
+			<section class="hm-section" aria-label="Fotos recientes">
+				<div class="hm-section-header">
+					<h2 class="hm-section-title">Fotos Recientes</h2>
 				</div>
 				<div id="home-fotos-contenido"></div>
 			</section>
 
 			${usuarioAutenticado
 				? `
-					<section class="home-section" aria-label="Mis participaciones">
-						<div class="home-section-header">
-							<h2 class="home-section-title">Mis Participaciones</h2>
+					<section class="hm-section" aria-label="Mis participaciones">
+						<div class="hm-section-header">
+							<h2 class="hm-section-title">Mis Participaciones</h2>
 						</div>
 						<div id="home-participaciones-contenido"></div>
 					</section>
@@ -209,7 +77,7 @@ function showRetosSkeleton(contenedor) {
 	}
 
 	contenedor.innerHTML = `
-		<div class="home-skeleton-grid retos">
+		<div class="hm-skeleton-grid hm-skeleton-grid--retos">
 			${Array.from({ length: 3 }, () => skeletonCard('290px')).join('')}
 		</div>
 	`;
@@ -218,14 +86,18 @@ function showRetosSkeleton(contenedor) {
 /**
  * Muestra skeletons cuadrados para fotos recientes y participaciones.
  */
-function showFotosSkeleton(contenedor, cantidad) {
+function showFotosSkeleton(contenedor, cantidad, variante = 'fotos') {
 	if (!contenedor) {
 		return;
 	}
 
+	const claseVariante = variante === 'participaciones'
+		? 'hm-skeleton-grid--participaciones'
+		: 'hm-skeleton-grid--fotos';
+
 	contenedor.innerHTML = `
-		<div class="home-skeleton-grid fotos">
-			${Array.from({ length: cantidad }, () => `<div class="home-skeleton-square skeleton"></div>`).join('')}
+		<div class="hm-skeleton-grid ${claseVariante}">
+			${Array.from({ length: cantidad }, () => `<div class="hm-skeleton-square skeleton"></div>`).join('')}
 		</div>
 	`;
 }
@@ -238,7 +110,7 @@ function showSectionError(contenedor, mensaje) {
 		return;
 	}
 
-	contenedor.innerHTML = `<p class="home-error-note">${escapeHtml(mensaje)}</p>`;
+	contenedor.innerHTML = `<p class="hm-error-note">${escapeHtml(mensaje)}</p>`;
 }
 
 /**
@@ -276,16 +148,14 @@ async function render(contenedor, params = {}) {
 
 	void params;
 
-	ensureStyles();
-
 	const usuarioAutenticado = auth.getUsuario();
 	const refs = renderLayout(contenedor, usuarioAutenticado);
 
 	showRetosSkeleton(refs.retos);
-	showFotosSkeleton(refs.fotos, 8);
+	showFotosSkeleton(refs.fotos, 8, 'fotos');
 
 	if (refs.participaciones) {
-		showFotosSkeleton(refs.participaciones, 4);
+		showFotosSkeleton(refs.participaciones, 4, 'participaciones');
 	}
 
 	const homePromise = api.get('/home');
@@ -322,7 +192,7 @@ async function render(contenedor, params = {}) {
 			const fotosParticipacion = mapParticipacionesToFotos(participaciones, usuarioAutenticado).slice(0, 4);
 
 			if (fotosParticipacion.length === 0) {
-				refs.participaciones.innerHTML = '<p class="home-empty-note">Aún no has participado en ningún reto. ¡Únete ahora!</p>';
+				refs.participaciones.innerHTML = '<p class="hm-empty-note">Aún no has participado en ningún reto. ¡Únete ahora!</p>';
 			} else {
 				gridFotos(fotosParticipacion, refs.participaciones, { mostrarReto: true });
 			}

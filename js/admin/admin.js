@@ -1,16 +1,14 @@
 import auth from '../auth.js';
 import { mostrarErrorPagina, skeletonCard } from '../utils.js';
 
-const STYLE_ID = 'admin-shell-styles';
-
 const ADMIN_TABS = [
 	{ key: 'retos', label: 'Retos', icon: 'bi-grid', hashes: ['#/admin', '#/admin/retos'], modulePath: './adminRetos.js' },
 	{ key: 'fotos', label: 'Fotos', icon: 'bi-image', hashes: ['#/admin/fotos'], modulePath: './adminFotos.js' },
 	{ key: 'usuarios', label: 'Usuarios', icon: 'bi-people', hashes: ['#/admin/usuarios'], modulePath: './adminUsuarios.js' },
-	{ key: 'comentarios', label: 'Comentarios', icon: 'bi-chat', hashes: ['#/admin/comentarios'] },
-	{ key: 'notificaciones', label: 'Notificaciones', icon: 'bi-bell', hashes: ['#/admin/notificaciones'] },
-	{ key: 'estadisticas', label: 'Estadísticas', icon: 'bi-bar-chart-line', hashes: ['#/admin/estadisticas'] },
-	{ key: 'multimedia', label: 'Multimedia', icon: 'bi-collection-play', hashes: ['#/admin/multimedia'] },
+	/*{ key: 'comentarios', label: 'Comentarios', icon: 'bi-chat', hashes: ['#/admin/comentarios'] },
+	  { key: 'notificaciones', label: 'Notificaciones', icon: 'bi-bell', hashes: ['#/admin/notificaciones'] },
+	  { key: 'estadisticas', label: 'Estadísticas', icon: 'bi-bar-chart-line', hashes: ['#/admin/estadisticas'] },
+	  { key: 'multimedia', label: 'Multimedia', icon: 'bi-collection-play', hashes: ['#/admin/multimedia'] }, */
 ];
 
 /**
@@ -78,131 +76,6 @@ function resolveActiveTab() {
 	return ADMIN_TABS[0];
 }
 
-/**
- * Inyecta estilos del shell admin una sola vez.
- */
-function ensureStyles() {
-	if (document.getElementById(STYLE_ID)) {
-		return;
-	}
-
-	const style = document.createElement('style');
-	style.id = STYLE_ID;
-	style.textContent = `
-		.admin-page {
-			max-width: var(--content-max-width);
-			margin: 0 auto;
-			padding: 24px var(--page-padding-x) 42px;
-		}
-
-		.admin-head {
-			margin-bottom: 14px;
-		}
-
-		.admin-title {
-			margin: 0;
-			font-size: 30px;
-			font-weight: 700;
-			color: #111827;
-			display: inline-flex;
-			align-items: center;
-			gap: 8px;
-		}
-
-		.admin-subtitle {
-			margin: 6px 0 0;
-			font-size: 16px;
-			color: #6B7280;
-		}
-
-		.admin-tabs-wrap {
-			margin-top: 18px;
-			overflow-x: auto;
-			padding-bottom: 4px;
-		}
-
-		.admin-tabs {
-			display: inline-flex;
-			align-items: center;
-			gap: 6px;
-			min-width: 100%;
-			background: #F3F4F6;
-			border-radius: 14px;
-			padding: 4px;
-		}
-
-		.admin-tab-btn {
-			border: 0;
-			background: transparent;
-			border-radius: 10px;
-			padding: 8px 12px;
-			font-size: 14px;
-			font-weight: 600;
-			color: #111827;
-			display: inline-flex;
-			align-items: center;
-			justify-content: center;
-			gap: 8px;
-			white-space: nowrap;
-		}
-
-		.admin-tab-btn.is-active {
-			background: #FFFFFF;
-			box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-		}
-
-		.admin-content {
-			margin-top: 14px;
-		}
-
-		.admin-upcoming {
-			background: #FFFFFF;
-			border-radius: 14px;
-			box-shadow: var(--shadow-card);
-			padding: 36px 20px;
-			text-align: center;
-		}
-
-		.admin-upcoming i {
-			font-size: 44px;
-			color: #9CA3AF;
-		}
-
-		.admin-upcoming h3 {
-			margin: 10px 0 6px;
-			font-size: 22px;
-			font-weight: 700;
-			color: #111827;
-		}
-
-		.admin-upcoming p {
-			margin: 0;
-			font-size: 14px;
-			color: #6B7280;
-		}
-
-		.admin-skeleton {
-			display: grid;
-			gap: 12px;
-		}
-
-		@media (max-width: 991.98px) {
-			.admin-page {
-				padding: 18px 16px 36px;
-			}
-
-			.admin-title {
-				font-size: 24px;
-			}
-
-			.admin-tabs {
-				min-width: max-content;
-			}
-		}
-	`;
-
-	document.head.appendChild(style);
-}
 
 /**
  * Construye estructura base y devuelve referencias útiles.
@@ -320,8 +193,6 @@ async function render(contenedor, params = {}) {
 		window.location.hash = '#/home';
 		return;
 	}
-
-	ensureStyles();
 
 	const activeTab = resolveActiveTab();
 	const refs = renderLayout(contenedor, activeTab.key);

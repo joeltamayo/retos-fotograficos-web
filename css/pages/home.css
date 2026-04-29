@@ -1,0 +1,136 @@
+﻿/* 
+    HOME — Estilos para la página principal
+    Prefijo: hm-
+*/
+
+/* Página de inicio: contenedor principal con layout y padding. */
+.hm-page {
+    max-width: var(--content-max-width);
+    margin: 0 auto;
+    padding: 34px var(--page-padding-x) 48px;
+}
+
+/* Título principal del saludo en home. */
+.hm-greeting-title {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+/* Subtítulo de bienvenida y contexto. */
+.hm-greeting-subtitle {
+    margin: 4px 0 0;
+    font-size: 16px;
+    color: var(--color-text-secondary);
+}
+
+/* Sección general: agrupa bloques de contenido del home. */
+.hm-section {
+    margin-top: 30px;
+}
+
+/* Encabezado de sección: título + acción secundaria. */
+.hm-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+/* Título de sección: nombre del bloque destacado. */
+.hm-section-title {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+/* Enlace ver todos: lleva al listado completo. */
+.hm-ver-todos {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-text);
+    text-decoration: none;
+}
+
+/* Hover del enlace: refuerza que es navegable. */
+.hm-ver-todos:hover {
+    text-decoration: underline;
+}
+
+/* Estado vacío compartido: mensaje cuando no hay contenido. */
+.hm-empty-note,
+.hm-error-note {
+    margin: 0;
+    padding: 16px;
+    border-radius: 10px;
+    font-size: 14px;
+}
+
+/* Vacío: indica ausencia de retos/fotos/datos. */
+.hm-empty-note {
+    background: #F8FAFC;
+    color: var(--color-text-secondary);
+}
+
+/* Error: comunica fallo de carga en la vista principal. */
+.hm-error-note {
+    background: var(--color-danger-bg);
+    color: #991B1B;
+}
+
+/* Grid skeleton: estructura temporal para carga diferida. */
+.hm-skeleton-grid {
+    display: grid;
+    gap: 24px;
+}
+
+/* Skeleton de retos: tres columnas en pantallas amplias. */
+.hm-skeleton-grid--retos {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* Skeleton de fotos/participaciones: tarjetas uniformes. */
+.hm-skeleton-grid--fotos,
+.hm-skeleton-grid--participaciones {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+/* Cuadro skeleton: placeholder cuadrado para cards. */
+.hm-skeleton-square {
+    height: auto;
+    aspect-ratio: 1 / 1;
+    border-radius: var(--radius-lg);
+}
+
+@media (max-width: 1199.98px) {
+
+    .hm-skeleton-grid--fotos,
+    .hm-skeleton-grid--participaciones {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 991.98px) {
+    .hm-page {
+        padding: 24px 16px 40px;
+    }
+
+    .hm-section-title {
+        font-size: 24px;
+    }
+
+    .hm-skeleton-grid--retos {
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 575.98px) {
+
+    .hm-skeleton-grid--fotos,
+    .hm-skeleton-grid--participaciones {
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+}
