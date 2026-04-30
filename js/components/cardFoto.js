@@ -99,7 +99,7 @@ function cardFoto(foto = {}, opciones = {}) {
 				<div class="cf-user">
 					${avatarUrl
 						? `<img class="avatar avatar--sm" src="${escapeHtml(avatarUrl)}" alt="Avatar de ${usuario}">`
-						: `<span class="avatar avatar--sm"><i class="bi bi-person"></i></span>`}
+						: `<span class="avatar avatar--sm"><i class="bi bi-person-square"></i></span>`}
 					<span class="cf-username">@${usuario}</span>
 				</div>
 				${retoHtml}
@@ -110,7 +110,7 @@ function cardFoto(foto = {}, opciones = {}) {
 						<span>${formatNumber(foto?.puntuacion_promedio ?? foto?.promedio ?? 0)}</span>
 					</span>
 					<span class="cf-stat">
-						<i class="bi bi-chat-left"></i>
+						<i class="bi bi-chat-square-dots"></i>
 						<span>${formatCount(foto?.total_comentarios)}</span>
 					</span>
 				</div>
