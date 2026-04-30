@@ -18,6 +18,11 @@
   cursor: pointer;
 }
 
+.cf-card:hover {
+  box-shadow: var(--shadow-card-hover);
+}
+
+
 /* Wrapper de la imagen: mantiene proporción cuadrada y maneja el overflow. */
 .cf-img-wrapper {
   position: relative;
@@ -129,12 +134,14 @@
   font-size: 13px;
   color: var(--color-text-secondary);
   font-weight: 500;
+  display: flex;
+  align-items: center;
 }
 
 /* Título de la foto: máximo 2 líneas, con elipsis si es muy largo. */
 .cf-titulo {
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 15px;
+  font-weight: 300;
   color: var(--color-text);
   margin: 0 0 6px;
   display: -webkit-box;
@@ -158,8 +165,8 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  font-size: 13px;
-  color: var(--color-text-muted);
+  font-size: 14px;
+  color: var(--color-text-secondary);
 }
 
 .cf-stat {
@@ -168,8 +175,8 @@
   gap: 4px;
 }
 
-.cf-stat--stars {
-  color: var(--color-warning);
+.cf-stat--stars i{
+  color: var(--color-estrellas);
 }
 
 /* Grid reutilizable */

@@ -40,6 +40,9 @@
   --color-bronce: #C2410C;
   --color-bronce-gradient: linear-gradient(135deg, #C2410C, #EA580C);
 
+  /* Estrellas */
+  --color-estrellas: #fdc700;
+
   /* Criterios de calificacion */
   --color-creatividad: #8B5CF6;
   --color-composicion: #3B82F6;
