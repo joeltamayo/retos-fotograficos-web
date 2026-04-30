@@ -1,3 +1,5 @@
+import { cloudinaryUrl } from '../utils.js';
+
 const ESTADO_BADGE = {
 	activo: { label: 'Activo', className: 'bd-badge--activo' },
 	finalizado: { label: 'Finalizado', className: 'bd-badge--finalizado' },
@@ -57,11 +59,14 @@ function getEstadoBadge(estadoRaw) {
 function renderMedia(reto) {
 	const imagenUrl = reto?.imagen_url ? escapeHtml(reto.imagen_url) : '';
 	const alt = escapeHtml(reto?.titulo || 'Reto fotografico');
+	const src = reto?.imagen_public_id
+		? cloudinaryUrl(reto.imagen_public_id, { width: 600, height: 338, crop: 'fill' })
+		: imagenUrl;
 
-	if (imagenUrl) {
+	if (src) {
 		return `
 			<div class="cr-img-wrapper">
-				<img src="${imagenUrl}" alt="${alt}" class="cr-img">
+				<img src="${src}" alt="${alt}" class="cr-img" loading="lazy" decoding="async" width="600" height="338">
 			</div>
 		`;
 	}

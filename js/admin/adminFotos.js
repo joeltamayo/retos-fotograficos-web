@@ -1,7 +1,7 @@
 import api from '../api.js';
 import { abrirModalFoto } from '../components/modalFoto.js';
 import { renderPaginacion } from '../components/paginacion.js';
-import { mostrarToast, skeletonCard } from '../utils.js';
+import { mostrarToast, skeletonCard, cloudinaryUrl } from '../utils.js';
 
 const DELETE_MODAL_ID = 'admin-foto-delete-modal';
 const LIMITE = 10;
@@ -137,10 +137,13 @@ function renderSkeleton(contenedor) {
  * Dibuja celda del usuario.
  */
 function renderUserCell(foto) {
-	if (foto?.foto_perfil_url) {
+	if (foto?.foto_perfil_url || foto?.foto_perfil_public_id) {
+		const avatarSrc = foto?.foto_perfil_public_id
+			? cloudinaryUrl(foto.foto_perfil_public_id, { width: 64, height: 64, crop: 'fill' })
+			: escapeHtml(foto.foto_perfil_url);
 		return `
 			<span class="admin-fotos-user">
-				<img class="admin-fotos-user-avatar" src="${escapeHtml(foto.foto_perfil_url)}" alt="${escapeHtml(foto.nombre_usuario || 'Usuario')}">
+				<img class="admin-fotos-user-avatar" src="${avatarSrc}" alt="${escapeHtml(foto.nombre_usuario || 'Usuario')}" loading="lazy" decoding="async" width="64" height="64">
 				<span class="admin-fotos-user-name">@${escapeHtml(foto.nombre_usuario || 'usuario')}</span>
 			</span>
 		`;
@@ -229,7 +232,7 @@ function renderTable(contenedor, fotos, handlers) {
 							<tr>
 								<td>
 									${foto.imagen_url
-										? `<img class="admin-fotos-thumb" src="${escapeHtml(foto.imagen_url)}" alt="${escapeHtml(foto.titulo || 'Fotografía')}">`
+											? `<img class="admin-fotos-thumb" src="${foto.imagen_public_id ? cloudinaryUrl(foto.imagen_public_id, { width: 100, height: 100, crop: 'fill' }) : escapeHtml(foto.imagen_url)}" alt="${escapeHtml(foto.titulo || 'Fotografía')}" loading="lazy" decoding="async" width="100" height="100">`
 										: '<span class="admin-fotos-thumb-placeholder"><i class="bi bi-image"></i></span>'}
 								</td>
 								<td>

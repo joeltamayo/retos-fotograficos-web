@@ -155,10 +155,13 @@ function renderEstadoBadge(estado) {
  * Renderiza celda de usuario con avatar, nombre y @usuario.
  */
 function renderUserCell(usuario) {
-	if (usuario?.foto_perfil_url) {
+	if (usuario?.foto_perfil_url || usuario?.foto_perfil_public_id) {
+		const avatarSrc = usuario?.foto_perfil_public_id
+			? cloudinaryUrl(usuario.foto_perfil_public_id, { width: 64, height: 64, crop: 'fill' })
+			: escapeHtml(usuario.foto_perfil_url);
 		return `
 			<span class="admin-usuarios-user">
-				<img class="admin-usuarios-avatar" src="${escapeHtml(usuario.foto_perfil_url)}" alt="${escapeHtml(usuario.nombre_usuario || 'Usuario')}">
+				<img class="admin-usuarios-avatar" src="${avatarSrc}" alt="${escapeHtml(usuario.nombre_usuario || 'Usuario')}" loading="lazy" decoding="async" width="64" height="64">
 				<span class="admin-usuarios-name">
 					<strong>${escapeHtml(`${usuario.nombre || ''} ${usuario.apellido || ''}`.trim() || usuario.nombre_usuario || 'Usuario')}</strong>
 					<span>@${escapeHtml(usuario.nombre_usuario || 'usuario')}</span>

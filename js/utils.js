@@ -427,6 +427,33 @@ function manejarErrorDePagina(contenedor, error, opciones = {}) {
 	mostrarToast(error?.error || error?.message || fallbackMessage, 'danger');
 }
 
+/**
+ * Construye una URL optimizada de Cloudinary a partir de un public_id.
+ */
+function cloudinaryUrl(publicId, opciones = {}) {
+	if (!publicId) {
+		return '';
+	}
+
+	const {
+		width = 800,
+		height,
+		quality = 'auto',
+		format = 'auto',
+		crop = 'fill',
+	} = opciones;
+
+	const transformaciones = [
+		`w_${width}`,
+		height ? `h_${height}` : '',
+		`c_${crop}`,
+		`q_${quality}`,
+		`f_${format}`,
+	].filter(Boolean).join(',');
+
+	return `https://res.cloudinary.com/dpwmdlttg/image/upload/${transformaciones}/${publicId}`;
+}
+
 export {
 	formatearFecha,
 	formatearFechaCorta,
@@ -442,6 +469,7 @@ export {
 	renderEstrellas,
 	mostrarErrorPagina,
 	manejarErrorDePagina,
+	cloudinaryUrl,
 };
 
 export default {
@@ -459,4 +487,5 @@ export default {
 	renderEstrellas,
 	mostrarErrorPagina,
 	manejarErrorDePagina,
+	cloudinaryUrl,
 };

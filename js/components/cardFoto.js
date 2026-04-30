@@ -1,4 +1,5 @@
 import { abrirModalFoto } from './modalFoto.js';
+import { cloudinaryUrl } from '../utils.js';
 
 function escapeHtml(value) {
 	return String(value ?? '')
@@ -42,12 +43,15 @@ function resolveContainer(contenedor) {
 function renderMedia(foto, posicionHtml) {
 	const imagenUrl = foto?.imagen_url ? escapeHtml(foto.imagen_url) : '';
 	const alt = escapeHtml(foto?.titulo || 'Fotografia');
+	const src = foto?.imagen_public_id
+		? cloudinaryUrl(foto.imagen_public_id, { width: 400, height: 400, crop: 'fill' })
+		: imagenUrl;
 
-	if (imagenUrl) {
+	if (src) {
 		return `
 			<div class="cf-img-wrapper">
 				${posicionHtml}
-				<img class="cf-img" src="${imagenUrl}" alt="${alt}">
+				<img class="cf-img" src="${src}" alt="${alt}" loading="lazy" decoding="async" width="400" height="400">
 				<div class="cf-overlay" aria-hidden="true">
 					<span class="cf-pill cf-pill--creatividad">
 						<i class="bi bi-lightbulb"></i>

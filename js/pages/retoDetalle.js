@@ -11,6 +11,7 @@ import {
 	mostrarToast,
 	skeletonCard,
 } from '../utils.js';
+import { cloudinaryUrl } from '../utils.js';
 
 const LIMITE_FOTOS = 9;
 const KEY_RUTA_DESTINO = 'rutaDestino';
@@ -159,7 +160,9 @@ async function isParticipatingInReto(retoId) {
  * Renderiza el banner principal del reto.
  */
 function renderBanner(refs, reto) {
-	const imagen = reto?.imagen_url ? escapeHtml(reto.imagen_url) : '';
+	const imagen = reto?.imagen_public_id
+		? cloudinaryUrl(reto.imagen_public_id, { width: 1200, quality: 'auto', crop: 'limit' })
+		: (reto?.imagen_url ? escapeHtml(reto.imagen_url) : '');
 	const estadoTexto = formatEstado(reto?.estado);
 	const categoria = escapeHtml(reto?.categoria_nombre || 'Sin categoría');
 

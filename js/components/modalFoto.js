@@ -1,6 +1,7 @@
 import api from '../api.js';
 import auth from '../auth.js';
 import { formatearFechaHora, mostrarToast } from '../utils.js';
+import { cloudinaryUrl } from '../utils.js';
 
 const MODAL_ID = 'modal-foto';
 
@@ -130,8 +131,12 @@ function renderModalContent(state) {
 	const descripcion = escapeHtml(foto?.descripcion || 'Sin descripcion');
 	const fecha = escapeHtml(formatearFechaHora(foto?.fecha_publicacion || foto?.created_at || ''));
 	const perfilHash = `#/perfil/${encodeURIComponent(foto?.nombre_usuario || '')}`;
-	const avatar = foto?.foto_perfil_url ? escapeHtml(foto.foto_perfil_url) : '';
-	const imagen = foto?.imagen_url ? escapeHtml(foto.imagen_url) : '';
+	const avatar = foto?.foto_perfil_public_id
+		? cloudinaryUrl(foto.foto_perfil_public_id, { width: 64, height: 64, crop: 'fill' })
+		: (foto?.foto_perfil_url ? escapeHtml(foto.foto_perfil_url) : '');
+	const imagen = foto?.imagen_public_id
+		? cloudinaryUrl(foto.imagen_public_id, { width: 900, quality: 'auto', crop: 'limit' })
+		: (foto?.imagen_url ? escapeHtml(foto.imagen_url) : '');
 	const totalCalificaciones = Number(foto?.total_calificaciones || 0);
 	const scoreGeneral = toFixedOrZero(foto?.puntuacion_total ?? foto?.puntuacion_promedio ?? 0, 2);
 	const currentRatings = state.currentRatings || {

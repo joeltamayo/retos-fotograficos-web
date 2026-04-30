@@ -1,6 +1,6 @@
 import api from '../api.js';
 import auth from '../auth.js';
-import { mostrarToast } from '../utils.js';
+import { mostrarToast, cloudinaryUrl } from '../utils.js';
 import { actualizarNavbar } from './navbar.js';
 
 const MODAL_ID = 'modal-editar-perfil';
@@ -98,6 +98,7 @@ function normalizeUsuario(usuario) {
 		nombreUsuario: normalizeText(usuario.nombre_usuario),
 		email: normalizeText(usuario.correo),
 		biografia: String(usuario.biografia ?? ''),
+		fotoPerfilPublicId: usuario.foto_perfil_public_id || usuario.foto_perfil_publicId || '',
 		fotoPerfilUrl: usuario.foto_perfil_url || usuario.foto_perfil || '',
 	};
 }
@@ -106,8 +107,11 @@ function normalizeUsuario(usuario) {
  * Renderiza el modal con los datos actuales del perfil.
  */
 function renderModalContent(state) {
-	const fotoMarkup = state.previewUrl || state.usuario.fotoPerfilUrl
-		? `<img src="${escapeHtml(state.previewUrl || state.usuario.fotoPerfilUrl)}" alt="Foto de perfil actual">`
+	const currentPhoto = state.previewUrl || (state.usuario.fotoPerfilPublicId
+		? cloudinaryUrl(state.usuario.fotoPerfilPublicId, { width: 240, height: 240, crop: 'fill' })
+		: state.usuario.fotoPerfilUrl);
+	const fotoMarkup = currentPhoto
+		? `<img src="${escapeHtml(currentPhoto)}" alt="Foto de perfil actual">`
 		: `<div class="me-photo-placeholder"><i class="bi bi-person"></i></div>`;
 
 	state.modalElement.querySelector('.modal-content').innerHTML = `

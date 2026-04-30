@@ -1,5 +1,5 @@
 import api from '../api.js';
-import { manejarErrorDePagina, skeletonCard } from '../utils.js';
+import { manejarErrorDePagina, skeletonCard, cloudinaryUrl } from '../utils.js';
 
 const PERIODOS = {
 	semanal: 'Semanal',
@@ -198,6 +198,7 @@ async function fetchRankingData(periodo) {
 			return {
 				posicion: Number(item?.posicion) || 0,
 				nombre_usuario: nombreUsuario || 'usuario',
+				foto_perfil_public_id: item?.foto_perfil_public_id || '',
 				foto_perfil_url: item?.foto_perfil_url || '',
 				puntos_totales: Number(item?.puntos_totales) || 0,
 				foto,
@@ -215,6 +216,7 @@ function createFallbackEntry(posicion) {
 	return {
 		posicion,
 		nombre_usuario: 'sin-datos',
+		foto_perfil_public_id: '',
 		foto_perfil_url: '',
 		puntos_totales: 0,
 		foto: null,
@@ -261,7 +263,7 @@ function renderPodiumCard(entry, medalla) {
 	return `
 		<article class="rk-podium-card rk-podium-card--${medalla}">
 			<div class="rk-podium-media rk-podium-media--${medalla}">
-				${renderMainImage(foto?.imagen_url || '', tituloFoto)}
+				${renderMainImage(foto?.imagen_public_id ? cloudinaryUrl(foto.imagen_public_id, { width: 900, quality: 'auto', crop: 'limit' }) : (foto?.imagen_url || ''), tituloFoto)}
 				<span class="rk-podium-badge ${badge.className}">${badge.label}</span>
 			</div>
 
@@ -274,7 +276,7 @@ function renderPodiumCard(entry, medalla) {
 				<h3 class="rk-photo-title">${escapeHtml(tituloFoto)}</h3>
 
 				<div class="rk-user-row">
-					${renderAvatar(item.foto_perfil_url, usuario)}
+					${renderAvatar(item.foto_perfil_public_id ? cloudinaryUrl(item.foto_perfil_public_id, { width: 64, height: 64, crop: 'fill' }) : item.foto_perfil_url, usuario)}
 					<span>${escapeHtml(usuario)}</span>
 				</div>
 
@@ -346,10 +348,10 @@ function renderOtherPositions(entries) {
 						const titulo = foto?.titulo || 'Sin fotografia';
 						const usuario = entry?.nombre_usuario || 'usuario';
 						const puntos = formatDecimal(entry?.puntos_totales);
-						const avatar = renderAvatar(entry?.foto_perfil_url || '', usuario);
+						const avatar = renderAvatar(entry?.foto_perfil_public_id ? cloudinaryUrl(entry.foto_perfil_public_id, { width: 64, height: 64, crop: 'fill' }) : (entry?.foto_perfil_url || ''), usuario);
 
-						const thumb = foto?.imagen_url
-							? `<img class="rk-other-thumb" src="${escapeHtml(foto.imagen_url)}" alt="${escapeHtml(titulo)}">`
+						const thumb = foto?.imagen_url || foto?.imagen_public_id
+							? `<img class="rk-other-thumb" src="${foto?.imagen_public_id ? cloudinaryUrl(foto.imagen_public_id, { width: 160, height: 160, crop: 'fill' }) : escapeHtml(foto.imagen_url)}" alt="${escapeHtml(titulo)}">`
 							: '<span class="rk-other-thumb-placeholder"><i class="bi bi-image"></i></span>';
 
 						return `
@@ -386,7 +388,6 @@ function renderRankingContent(contenedor, ranking) {
 		contenedor.innerHTML = '<p class="rk-empty">No hay datos de ranking para este periodo.</p>';
 		return;
 	}
-
 	contenedor.innerHTML = `
 		<section class="rk-podium" aria-label="Podio del ranking">
 			${renderPodiumCard(segundo, 'plata')}
@@ -460,7 +461,6 @@ async function render(contenedor, params = {}) {
 			return;
 		}
 
-		state.periodo = Object.prototype.hasOwnProperty.call(PERIODOS, nextPeriodo) ? nextPeriodo : 'semanal';
 		updatePeriodoHash(state.periodo);
 
 		await applyFade(refs.content, async () => {

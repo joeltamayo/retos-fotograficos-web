@@ -4,6 +4,7 @@ import { cardFoto } from '../components/cardFoto.js';
 import { abrirModalFoto } from '../components/modalFoto.js';
 import { abrirModalEditarPerfil } from '../components/modalEditarPerfil.js';
 import { manejarErrorDePagina, mostrarErrorPagina, skeletonCard } from '../utils.js';
+import { cloudinaryUrl } from '../utils.js';
 
 const ORDEN_RECIENTES = 'recientes';
 const ORDEN_MEJORES = 'mejores';
@@ -83,6 +84,9 @@ function renderLayout(contenedor, perfil, esPerfilPropio, ordenActivo) {
 	const promedio = toDecimal(perfil?.calificacion_promedio);
 	const nombreUsuario = perfil?.nombre_usuario || '';
 	const nombreCompleto = getFullName(perfil);
+	const avatarUrl = perfil?.foto_perfil_public_id
+		? cloudinaryUrl(perfil.foto_perfil_public_id, { width: 200, height: 200, crop: 'fill' })
+		: (perfil?.foto_perfil_url || '');
 
 	contenedor.innerHTML = `
 		<section class="pf-page page-enter">
@@ -93,7 +97,7 @@ function renderLayout(contenedor, perfil, esPerfilPropio, ordenActivo) {
 
 			<section class="pf-card" aria-label="Perfil de usuario">
 				<header class="pf-header">
-					<div>${renderAvatar(perfil?.foto_perfil_url || '', `Avatar de ${nombreCompleto}`)}</div>
+					<div>${renderAvatar(avatarUrl, `Avatar de ${nombreCompleto}`)}</div>
 
 					<div>
 						<h1 class="pf-name">${escapeHtml(nombreCompleto)}</h1>

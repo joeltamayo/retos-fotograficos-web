@@ -1,6 +1,6 @@
 import api from '../api.js';
 import { renderPaginacion } from '../components/paginacion.js';
-import { mostrarToast, skeletonCard } from '../utils.js';
+import { mostrarToast, skeletonCard, cloudinaryUrl } from '../utils.js';
 import { abrirModalCrearReto } from '../components/modalCrearReto.js';
 
 const MODAL_ID = 'admin-reto-modal';
@@ -221,7 +221,7 @@ function renderTable(contenedor, retos, handlers) {
 							<tr>
 								<td>
 									${reto.imagen_url
-				? `<img class="admin-retos-thumb" src="${escapeHtml(reto.imagen_url)}" alt="${escapeHtml(reto.titulo || 'Reto')}">`
+					? `<img class="admin-retos-thumb" src="${reto.imagen_public_id ? cloudinaryUrl(reto.imagen_public_id, { width: 100, height: 100, crop: 'fill' }) : escapeHtml(reto.imagen_url)}" alt="${escapeHtml(reto.titulo || 'Reto')}" loading="lazy" decoding="async" width="100" height="100">`
 				: '<span class="admin-retos-thumb-placeholder"><i class="bi bi-image"></i></span>'}
 								</td>
 								<td>
