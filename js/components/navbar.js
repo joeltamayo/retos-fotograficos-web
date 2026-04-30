@@ -76,9 +76,11 @@ function iconButton({ icon, filled = false, action = '', ariaLabel = '' }) {
 function renderAvatar(usuario) {
 	const isPerfilActivo = getCurrentPathFromHash().startsWith('/perfil');
 	const activeClass = isPerfilActivo ? ' nb-avatar-btn--active' : '';
-	const avatarSrc = usuario?.foto_perfil_public_id
-		? cloudinaryUrl(usuario.foto_perfil_public_id, { width: 64, height: 64, crop: 'fill' })
-		: (usuario?.foto_perfil_url ? escapeHtml(usuario.foto_perfil_url) : '');
+	const avatarSrc = usuario?.foto_perfil_url
+		? escapeHtml(usuario.foto_perfil_url)
+		: (usuario?.foto_perfil_public_id
+			? cloudinaryUrl(usuario.foto_perfil_public_id, { width: 64, height: 64, crop: 'fill' })
+			: '');
 
 	if (avatarSrc) {
 		return `

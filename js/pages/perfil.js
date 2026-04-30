@@ -84,9 +84,11 @@ function renderLayout(contenedor, perfil, esPerfilPropio, ordenActivo) {
 	const promedio = toDecimal(perfil?.calificacion_promedio);
 	const nombreUsuario = perfil?.nombre_usuario || '';
 	const nombreCompleto = getFullName(perfil);
-	const avatarUrl = perfil?.foto_perfil_public_id
-		? cloudinaryUrl(perfil.foto_perfil_public_id, { width: 200, height: 200, crop: 'fill' })
-		: (perfil?.foto_perfil_url || '');
+	const avatarUrl = perfil?.foto_perfil_url
+		? perfil.foto_perfil_url
+		: (perfil?.foto_perfil_public_id
+			? cloudinaryUrl(perfil.foto_perfil_public_id, { width: 200, height: 200, crop: 'fill' })
+			: '');
 
 	contenedor.innerHTML = `
 		<section class="pf-page page-enter">

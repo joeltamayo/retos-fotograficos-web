@@ -518,6 +518,7 @@ function bindEvents(state) {
 			const updatedUsuario = response?.usuario && typeof response.usuario === 'object' ? response.usuario : response;
 
 			syncAuthUser(updatedUsuario);
+			await auth.verificarSesion();
 			actualizarNavbar();
 			mostrarToast('Perfil actualizado correctamente.', 'success');
 			window.bootstrap?.Modal.getInstance(modalElement)?.hide();
