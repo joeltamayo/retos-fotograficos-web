@@ -60,6 +60,41 @@
     margin: 0;
 }
 
+/* Aviso de foto en revisión — visible solo al autor de la foto.
+   Se muestra en la parte superior del panel derecho con fondo ámbar claro,
+   antes del contenido de calificaciones y comentarios. */
+.mf-pending-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: var(--color-warning-bg);
+    border-left: 3px solid var(--color-warning);
+    padding: 12px 16px;
+    font-size: 13px;
+    color: #92400E;
+}
+
+.mf-pending-notice i {
+    font-size: 18px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    color: var(--color-warning);
+}
+
+.mf-pending-notice strong {
+    display: block;
+    font-weight: 700;
+    font-size: 13px;
+    margin-bottom: 3px;
+    color: #78350F;
+}
+
+.mf-pending-notice p {
+    margin: 0;
+    line-height: 1.4;
+    color: #92400E;
+}
+
 /* Fila de usuario: avatar, nombre y acciones. */
 .mf-user-row {
     display: flex;

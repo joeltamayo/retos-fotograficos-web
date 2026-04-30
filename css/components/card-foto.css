@@ -67,6 +67,71 @@
   line-height: 1.4;
 }
 
+/* Badge de foto pendiente de aprobación — visible solo al dueño.
+   Se muestra en la esquina superior derecha con fondo ámbar.
+   Al hacer hover revela un tooltip explicativo. */
+.cf-badge-pending {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: var(--color-warning);
+  color: #FFFFFF;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  z-index: 3;
+  line-height: 1.4;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: help;
+}
+
+/* Tooltip del badge pendiente: aparece al hacer hover sobre el badge.
+   Explica por qué la foto no está visible para otros usuarios. */
+.cf-badge-pending-tooltip {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background: rgba(17, 24, 39, 0.92);
+  color: #FFFFFF;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  width: 220px;
+  white-space: normal;
+  text-align: left;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Flecha del tooltip */
+.cf-badge-pending-tooltip::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  right: 12px;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 5px solid rgba(17, 24, 39, 0.92);
+}
+
+.cf-badge-pending:hover .cf-badge-pending-tooltip {
+  display: block;
+}
+
+/* Imagen con opacidad reducida cuando está pendiente de aprobación.
+   Da un feedback visual de que la foto no es completamente pública. */
+.cf-img--pendiente {
+  opacity: 0.75;
+}
+
 /* Overlay con desglose de calificacion */
 .cf-overlay {
   position: absolute;
@@ -175,7 +240,7 @@
   gap: 4px;
 }
 
-.cf-stat--stars i{
+.cf-stat--stars i {
   color: var(--color-estrellas);
 }
 

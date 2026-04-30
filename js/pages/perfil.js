@@ -290,6 +290,7 @@ function renderFotosGrid(contenedor, fotos) {
 
 /**
  * Carga fotos por orden y renderiza resultado.
+ * Para el perfil propio también incluye fotos en revisión al inicio del grid.
  */
 async function loadFotos(state, refs) {
 	renderFotosSkeleton(refs.fotosWrap);
@@ -300,15 +301,64 @@ async function loadFotos(state, refs) {
 	}
 
 	try {
-		const response = await api.get(`/usuarios/${encodeURIComponent(state.usuario)}/fotos`, {
+		// Cargar fotos aprobadas siempre
+		const fotosPromise = api.get(`/usuarios/${encodeURIComponent(state.usuario)}/fotos`, {
 			orden: state.ordenActivo,
 			pagina: 1,
 			limite: 12,
 		});
 
-		const fotos = Array.isArray(response?.fotos) ? response.fotos : [];
-		state.fotosPorOrden[state.ordenActivo] = fotos;
-		renderFotosGrid(refs.fotosWrap, fotos);
+		// Para perfil propio y solo en la vista "recientes", cargar también las
+		// fotos pendientes de aprobación (en revisión o desaprobadas).
+		// Esto evita que el dueño crea que su foto no se subió porque no la ve.
+		const pendientesPromise = (state.esPerfilPropio && state.ordenActivo === 'recientes')
+			? api.get('/usuarios/me/participaciones', { limite: 20 }).catch(() => null)
+			: Promise.resolve(null);
+
+		const [fotosResult, participacionesResult] = await Promise.allSettled([
+			fotosPromise,
+			pendientesPromise,
+		]);
+
+		const fotosAprobadas = fotosResult.status === 'fulfilled'
+			? (Array.isArray(fotosResult.value?.fotos) ? fotosResult.value.fotos : [])
+			: [];
+
+		// Extraer fotos pendientes (en revisión o desaprobadas) que no estén ya en la lista
+		let fotosPendientes = [];
+		if (participacionesResult.status === 'fulfilled' && participacionesResult.value?.participaciones) {
+			const aprobadosIds = new Set(fotosAprobadas.map((f) => f.id));
+			const usuarioSesion = auth.getUsuario();
+
+			fotosPendientes = participacionesResult.value.participaciones
+				.filter((item) =>
+					item?.fotografia_id
+					&& item.foto_estado !== 'aprobada'
+					&& !aprobadosIds.has(item.fotografia_id),
+				)
+				.map((item) => ({
+					id: item.fotografia_id,
+					imagen_url: item.foto_url || item.foto_imagen_url || '',
+					imagen_public_id: item.foto_public_id || '',
+					titulo: item.foto_titulo || 'Sin título',
+					nombre_usuario: usuarioSesion?.nombre_usuario || '',
+					foto_perfil_url: usuarioSesion?.foto_perfil_url || '',
+					total_comentarios: 0,
+					puntuacion_promedio: 0,
+					prom_creatividad: 0,
+					prom_composicion: 0,
+					prom_tema: 0,
+					reto_titulo: item.reto_titulo || '',
+					foto_estado: item.foto_estado || 'revision',
+					es_propia: true,
+				}));
+		}
+
+		// Las fotos pendientes van primero para que el dueño las vea de inmediato
+		const todasLasFotos = [...fotosPendientes, ...fotosAprobadas];
+
+		state.fotosPorOrden[state.ordenActivo] = todasLasFotos;
+		renderFotosGrid(refs.fotosWrap, todasLasFotos);
 	} catch (error) {
 		manejarErrorDePagina(refs.fotosWrap, error, {
 			notFoundMessage: 'No encontramos fotografias para este perfil.',
@@ -387,6 +437,7 @@ async function render(contenedor, params = {}) {
 
 		const state = {
 			usuario: usuarioObjetivo,
+			esPerfilPropio,
 			ordenActivo: ORDEN_RECIENTES,
 			fotosPorOrden: {
 				[ORDEN_RECIENTES]: null,

@@ -25,13 +25,13 @@ function renderLayout(contenedor, usuarioAutenticado) {
 	contenedor.innerHTML = `
 		<section class="hm-page page-enter">
 			${usuarioAutenticado
-				? `
+			? `
 					<header class="hm-greeting mb-2">
 						<h1 class="hm-greeting-title">Bienvenido, ${nombre}</h1>
 						<p class="hm-greeting-subtitle">Explora los retos activos y comparte tu mejor trabajo</p>
 					</header>
 				`
-				: ''}
+			: ''}
 
 			<section class="hm-section" aria-label="Retos activos">
 				<div class="hm-section-header">
@@ -49,7 +49,7 @@ function renderLayout(contenedor, usuarioAutenticado) {
 			</section>
 
 			${usuarioAutenticado
-				? `
+			? `
 					<section class="hm-section" aria-label="Mis participaciones">
 						<div class="hm-section-header">
 							<h2 class="hm-section-title">Mis Participaciones</h2>
@@ -57,7 +57,7 @@ function renderLayout(contenedor, usuarioAutenticado) {
 						<div id="home-participaciones-contenido"></div>
 					</section>
 				`
-				: ''}
+			: ''}
 		</section>
 	`;
 
@@ -125,7 +125,8 @@ function mapParticipacionesToFotos(participaciones, usuarioActual) {
 		.filter((item) => item?.fotografia_id)
 		.map((item) => ({
 			id: item.fotografia_id,
-			imagen_url: item.foto_imagen_url || item.imagen_url || '',
+			imagen_url: item.foto_imagen_url || item.foto_url || item.imagen_url || '',
+			imagen_public_id: item.foto_public_id || item.imagen_public_id || '',
 			titulo: item.foto_titulo || item.reto_titulo || 'Sin título',
 			nombre_usuario: usuarioActual?.nombre_usuario || 'usuario',
 			foto_perfil_url: usuarioActual?.foto_perfil_url || '',
@@ -135,6 +136,12 @@ function mapParticipacionesToFotos(participaciones, usuarioActual) {
 			prom_composicion: item.prom_composicion || 0,
 			prom_tema: item.prom_tema || 0,
 			reto_titulo: item.reto_titulo || '',
+			// Estado de moderación — necesario para mostrar el badge de pendiente al dueño
+			foto_estado: item.foto_estado || 'aprobada',
+			// Marca que esta foto pertenece al usuario autenticado
+			// Permite que cardFoto muestre el badge de revisión y que modalFoto
+			// sepa que debe usar el endpoint /fotografias/:id/owner
+			es_propia: true,
 		}));
 }
 

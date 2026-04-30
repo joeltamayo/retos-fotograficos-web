@@ -47,11 +47,28 @@ function renderMedia(foto, posicionHtml) {
 		? cloudinaryUrl(foto.imagen_public_id, { width: 400, height: 400, crop: 'fill' })
 		: imagenUrl;
 
+	// Badge de revisión: solo visible para el dueño cuando la foto aún no está aprobada.
+	// Los demás usuarios no pueden ver la foto todavía (el backend devuelve 404 para ellos).
+	const esPendiente = foto?.es_propia && foto?.foto_estado === 'revision';
+	const pendienteBadgeHtml = esPendiente
+		? `
+			<div class="cf-badge-pending" role="status" aria-label="Foto pendiente de aprobación">
+				<i class="bi bi-clock" aria-hidden="true"></i>
+				<span>Pendiente</span>
+				<div class="cf-badge-pending-tooltip" role="tooltip">
+					Solo tú puedes verla. Está esperando que un administrador la apruebe.
+				</div>
+			</div>
+		`
+		: '';
+
 	if (src) {
 		return `
 			<div class="cf-img-wrapper">
 				${posicionHtml}
-				<img class="cf-img" src="${src}" alt="${alt}" loading="lazy" decoding="async" width="400" height="400">
+				${pendienteBadgeHtml}
+				<img class="cf-img${esPendiente ? ' cf-img--pendiente' : ''}" src="${src}" alt="${alt}" loading="lazy" decoding="async" width="400" height="400">
+				${!esPendiente ? `
 				<div class="cf-overlay" aria-hidden="true">
 					<span class="cf-pill cf-pill--creatividad">
 						<i class="bi bi-lightbulb"></i>
@@ -65,7 +82,7 @@ function renderMedia(foto, posicionHtml) {
 						<i class="bi bi-bullseye"></i>
 						${formatNumber(foto?.prom_tema ?? foto?.tema ?? 0)}
 					</span>
-				</div>
+				</div>` : ''}
 			</div>
 		`;
 	}
@@ -73,6 +90,7 @@ function renderMedia(foto, posicionHtml) {
 	return `
 		<div class="cf-img-wrapper">
 			${posicionHtml}
+			${pendienteBadgeHtml}
 			<div class="cf-img cf-img-placeholder" aria-label="Sin imagen">
 				<i class="bi bi-image"></i>
 			</div>
@@ -146,7 +164,11 @@ function gridFotos(fotos = [], contenedor, opciones = {}) {
 			}
 
 			if (foto?.id) {
-				await abrirModalFoto(foto.id);
+				// Si es propia y está pendiente, usar endpoint de owner para que el
+				// backend permita el acceso aunque no esté aprobada
+				await abrirModalFoto(foto.id, {
+					esPropiaEnRevision: Boolean(foto.es_propia && foto.foto_estado === 'revision'),
+				});
 			}
 		});
 
@@ -162,7 +184,9 @@ function gridFotos(fotos = [], contenedor, opciones = {}) {
 			}
 
 			if (foto?.id) {
-				await abrirModalFoto(foto.id);
+				await abrirModalFoto(foto.id, {
+					esPropiaEnRevision: Boolean(foto.es_propia && foto.foto_estado === 'revision'),
+				});
 			}
 		});
 	});

@@ -158,6 +158,16 @@ function renderModalContent(state) {
 			</section>
 
 			<section class="mf-modal-right">
+				${foto?.estado === 'revision' ? `
+					<div class="mf-pending-notice" role="status" aria-live="polite">
+						<i class="bi bi-clock-history" aria-hidden="true"></i>
+						<div>
+							<strong>Foto en revisión</strong>
+							<p>Solo tú puedes ver esta imagen. Los demás usuarios no la verán hasta que un administrador la apruebe.</p>
+						</div>
+					</div>
+				` : ''}
+
 				<div class="mf-modal-panel">
 					<div class="mf-user-row">
 						${avatar
@@ -425,10 +435,20 @@ async function abrirModalFoto(fotografiaId, options = {}) {
 	}
 
 	const useAdminEndpoint = Boolean(options?.useAdminEndpoint && auth.esAdmin());
-	const detailEndpoint = useAdminEndpoint
-		? `/admin/fotografias/${encodeURIComponent(fotografiaId)}`
-		: `/fotografias/${encodeURIComponent(fotografiaId)}`;
 
+	// Si la foto es del usuario autenticado y está en revisión, usar el endpoint
+	// de owner que el backend permite para ver la propia foto sin importar su estado.
+	// El endpoint /fotografias/:id/owner devuelve la foto al autor aunque no esté aprobada.
+	const esPropiaEnRevision = Boolean(options?.esPropiaEnRevision && auth.estaAutenticado());
+
+	let detailEndpoint;
+	if (useAdminEndpoint) {
+		detailEndpoint = `/admin/fotografias/${encodeURIComponent(fotografiaId)}`;
+	} else if (esPropiaEnRevision) {
+		detailEndpoint = `/fotografias/${encodeURIComponent(fotografiaId)}/mia`;
+	} else {
+		detailEndpoint = `/fotografias/${encodeURIComponent(fotografiaId)}`;
+	}
 	const state = {
 		fotografiaId,
 		detailEndpoint,
@@ -477,4 +497,3 @@ export { abrirModalFoto };
 export default {
 	abrirModalFoto,
 };
-
