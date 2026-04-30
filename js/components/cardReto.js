@@ -57,6 +57,7 @@ function getEstadoBadge(estadoRaw) {
 }
 
 function renderMedia(reto) {
+	const badge = getEstadoBadge(reto.estado);
 	const imagenUrl = reto?.imagen_url ? escapeHtml(reto.imagen_url) : '';
 	const alt = escapeHtml(reto?.titulo || 'Reto fotografico');
 	const src = reto?.imagen_public_id
@@ -66,6 +67,7 @@ function renderMedia(reto) {
 	if (src) {
 		return `
 			<div class="cr-img-wrapper">
+				<div class="bd-badge ${badge.className}">${escapeHtml(badge.label)}</div>
 				<img src="${src}" alt="${alt}" class="cr-img" loading="lazy" decoding="async" width="600" height="338">
 			</div>
 		`;
@@ -73,6 +75,7 @@ function renderMedia(reto) {
 
 	return `
 		<div class="cr-img-wrapper">
+			<div class="bd-badge ${badge.className}">${escapeHtml(badge.label)}</div>
 			<div class="cr-img-placeholder" aria-label="Sin imagen">
 				<i class="bi bi-image"></i>
 			</div>
@@ -81,7 +84,6 @@ function renderMedia(reto) {
 }
 
 function cardReto(reto = {}) {
-	const badge = getEstadoBadge(reto.estado);
 	const titulo = escapeHtml(reto.titulo || 'Reto sin titulo');
 	const descripcion = escapeHtml(reto.descripcion || 'Sin descripcion disponible.');
 	const rangoFechas = escapeHtml(construirRangoFechas(reto));
@@ -93,20 +95,19 @@ function cardReto(reto = {}) {
 		<article class="cr-card" data-reto-id="${id}" role="button" tabindex="0">
 			${renderMedia(reto)}
 			<div class="cr-body">
-				<div class="bd-badge ${badge.className}">${escapeHtml(badge.label)}</div>
 				<h3 class="cr-titulo">${titulo}</h3>
 				<p class="cr-descripcion">${descripcion}</p>
 				<div class="cr-meta">
 					<span class="cr-meta__item">
-						<i class="bi bi-calendar3"></i>
+						<i class="bi bi-calendar4-week"></i>
 						${rangoFechas}
 					</span>
 					<span class="cr-meta__item">
-						<i class="bi bi-people"></i>
+						<i class="bi bi-people-fill"></i>
 						${participantes}
 					</span>
 					<span class="cr-meta__item">
-						<i class="bi bi-image"></i>
+						<i class="bi bi-images"></i>
 						${fotos}
 					</span>
 				</div>

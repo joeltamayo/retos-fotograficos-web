@@ -18,8 +18,8 @@
 
 /* Estado activo: usado para retos o elementos habilitados. */
 .bd-badge--activo {
-  background: var(--color-success-bg);
-  color: #16A34A;
+  background: var(--color-active);
+  color: var(--color-text-on-gradient);
 }
 
 /* Estado finalizado: indica contenido cerrado o completado. */

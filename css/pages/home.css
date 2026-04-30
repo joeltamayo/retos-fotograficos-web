@@ -13,7 +13,7 @@
 /* Título principal del saludo en home. */
 .hm-greeting-title {
     margin: 0;
-    font-size: 28px;
+    font-size: 20px;
     font-weight: 600;
     color: var(--color-text);
 }
@@ -21,7 +21,7 @@
 /* Subtítulo de bienvenida y contexto. */
 .hm-greeting-subtitle {
     margin: 4px 0 0;
-    font-size: 16px;
+    font-size: 15px;
     color: var(--color-text-secondary);
 }
 
@@ -42,8 +42,8 @@
 /* Título de sección: nombre del bloque destacado. */
 .hm-section-title {
     margin: 0;
-    font-size: 28px;
-    font-weight: 700;
+    font-size: 15px;
+    font-weight: 500;
     color: var(--color-text);
 }
 
