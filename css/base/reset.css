@@ -21,6 +21,11 @@ body {
   color: var(--color-text);
   background: var(--color-bg);
   -webkit-font-smoothing: antialiased;
+  /* ← Chrome/Safari macOS */
+  -moz-osx-font-smoothing: grayscale;
+  /* ← Firefox macOS */
+  text-rendering: optimizeLegibility;
+  /* ← todos los browsers */
 }
 
 /* Compensar navbar fijo */
