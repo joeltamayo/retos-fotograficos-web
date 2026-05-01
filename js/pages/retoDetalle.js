@@ -97,7 +97,9 @@ function renderLayout(contenedor) {
 			<div id="reto-mi-participacion-area"></div>
 
 			<section class="rd-section" aria-label="Top 5 del reto">
-				<h2 class="rd-section-title">🏅 Top 5 del Reto</h2>
+			<h2 class="rd-section-title">
+				<i class="bi bi-award-fill"></i> Top 5 del Reto
+			</h2>
 				<div id="reto-top5-area"></div>
 			</section>
 
@@ -195,7 +197,7 @@ function renderMiParticipacion(refs, participacion) {
 
 	refs.miParticipacion.innerHTML = `
 		<section class="rd-section rd-mi-participacion" aria-label="Mi participación">
-			<h2 class="rd-section-title">📷 Mi Fotografía</h2>
+			<h2 class="rd-section-title"><i class="bi bi-camera-fill"></i> Mi Fotografía</h2>
 			<div class="rd-mi-participacion-grid" id="rd-mi-foto-grid"></div>
 		</section>
 	`;
@@ -317,7 +319,7 @@ function renderStats(refs, reto, participating) {
 		<div class="rd-stats-row">
 			<div class="rd-stats-items">
 				<span class="rd-stat-item">
-					<i class="bi bi-calendar3"></i>
+					<i class="bi bi-calendar2-week"></i>
 					<span>${escapeHtml(rangoFechas)}</span>
 				</span>
 
@@ -327,7 +329,7 @@ function renderStats(refs, reto, participating) {
 				</span>
 
 				<span class="rd-stat-item">
-					<i class="bi bi-image"></i>
+					<i class="bi bi-images"></i>
 					<span>${fotografias} Fotografías</span>
 				</span>
 			</div>
