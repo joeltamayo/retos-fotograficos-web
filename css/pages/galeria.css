@@ -19,8 +19,8 @@
 /* Título: identifica la galería de fotos. */
 .gl-title {
     margin: 0;
-    font-size: 34px;
-    font-weight: 700;
+    font-size: 16px;
+    font-weight: 200;
     color: var(--color-text);
     display: inline-flex;
     align-items: center;
@@ -35,7 +35,7 @@
 /* Subtítulo: aclara el propósito del listado. */
 .gl-subtitle {
     margin: 8px 0 0;
-    font-size: 16px;
+    font-size: 14px;
     color: var(--color-text-secondary);
 }
 
@@ -50,7 +50,7 @@
 
 /* Etiqueta de orden: explica el control de selección. */
 .gl-order-label {
-    font-size: 16px;
+    font-size: 14px;
     color: var(--color-text-secondary);
 }
 
@@ -60,7 +60,7 @@
     border-radius: var(--radius-md);
     background: #F9FAFB;
     padding: 10px 14px;
-    font-size: 15px;
+    font-size: 14px;
     color: var(--color-text);
     min-width: 180px;
 }
