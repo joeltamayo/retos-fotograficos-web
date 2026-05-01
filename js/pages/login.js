@@ -53,7 +53,7 @@ function renderLoginForm() {
 		<h1 class="lg-title">Iniciar Sesión</h1>
 
 		<form id="login-form" novalidate>
-			<label class="lg-label" for="login-correo">Usuario</label>
+			<label class="lg-label" for="login-correo">Correo</label>
 			<input id="login-correo" name="correo" type="email" class="lg-input" placeholder="tu@email.com" autocomplete="email">
 			<p class="lg-error" data-error="correo"></p>
 
@@ -70,7 +70,7 @@ function renderLoginForm() {
 
 function renderLoginPromo() {
 	return `
-		<h2 class="lg-right-title">¡Bienvenido a PhotoChallenge!</h2>
+		<h2 class="lg-right-title">¡Bienvenido a Retos fotográficos!</h2>
 		<p>¿No tienes una cuenta?</p>
 		<button type="button" class="lg-btn-outline" data-switch-view="registro">Regístrate</button>
 	`;
@@ -111,27 +111,30 @@ function renderRegistroForm() {
 function renderRegistroPromo() {
 	return `
 		<h2 class="lg-right-title">Únete a la comunidad</h2>
-		<div class="lg-benefit">
-			<i class="bi bi-bullseye lg-benefit__icon"></i>
-			<div>
-				<p class="lg-benefit__title">Participa en retos</p>
-				<p class="lg-benefit__desc">Desafíos semanales y mensuales.</p>
+		<div class="lg-benefits">
+			<div class="lg-benefit">
+				<i class="bi bi-bullseye lg-benefit__icon"></i>
+				<div>
+					<p class="lg-benefit__title">Participa en retos</p>
+					<p class="lg-benefit__desc">Desafíos semanales y mensuales.</p>
+				</div>
+			</div>
+			<div class="lg-benefit">
+				<i class="bi bi-star lg-benefit__icon"></i>
+				<div>
+					<p class="lg-benefit__title">Gana reconocimiento</p>
+					<p class="lg-benefit__desc">Recibe valoraciones e insignias.</p>
+				</div>
+			</div>
+			<div class="lg-benefit">
+				<i class="bi bi-camera lg-benefit__icon"></i>
+				<div>
+					<p class="lg-benefit__title">Mejora tus habilidades</p>
+					<p class="lg-benefit__desc">Comparte y aprende de otros fotógrafos.</p>
+				</div>
 			</div>
 		</div>
-		<div class="lg-benefit">
-			<i class="bi bi-star lg-benefit__icon"></i>
-			<div>
-				<p class="lg-benefit__title">Gana reconocimiento</p>
-				<p class="lg-benefit__desc">Recibe valoraciones e insignias.</p>
-			</div>
-		</div>
-		<div class="lg-benefit">
-			<i class="bi bi-camera lg-benefit__icon"></i>
-			<div>
-				<p class="lg-benefit__title">Mejora tus habilidades</p>
-				<p class="lg-benefit__desc">Comparte y aprende de otros fotógrafos.</p>
-			</div>
-		</div>
+		<p>Ya tienes una cuenta?</p>
 		<button type="button" class="lg-btn-outline" data-switch-view="login">Inicia Sesión</button>
 	`;
 }

@@ -73,6 +73,7 @@
   color: var(--color-text);
   transition: border-color 0.2s, box-shadow 0.2s;
   font-family: inherit;
+  margin-bottom: -10px;
 }
 
 /* Focus del input: deja claro el campo activo. */
@@ -150,16 +151,23 @@
 
 /* Beneficio: bloque con icono y texto explicativo. */
 .lg-benefit {
-  display: flex;
-  gap: 14px;
+  margin: 24px 0;
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  align-items: center;
+  column-gap: 14px;
   text-align: left;
+  width: min(100%, 340px);
 }
 
 /* Icono del beneficio: marca visual del item. */
 .lg-benefit__icon {
   font-size: 20px;
-  flex-shrink: 0;
-  margin-top: 2px;
+  width: 22px;
+  min-width: 22px;
+  text-align: center;
+  line-height: 1;
+  justify-self: center;
 }
 
 /* Título del beneficio: resume la propuesta de valor. */
