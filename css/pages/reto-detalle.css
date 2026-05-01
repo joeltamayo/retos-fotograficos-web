@@ -237,3 +237,17 @@
         grid-template-columns: repeat(1, minmax(0, 1fr));
     }
 }
+
+/* ── Sección "Mi fotografía" — visible solo para el dueño ────────
+   Se muestra entre los stats del reto y el top 5. */
+
+.rd-mi-participacion {
+    background: var(--color-surface-hover);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 20px 24px;
+}
+
+.rd-mi-foto-wrap {
+    max-width: 280px;
+}

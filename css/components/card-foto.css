@@ -67,15 +67,16 @@
   line-height: 1.4;
 }
 
-/* Badge de foto pendiente de aprobación — visible solo al dueño.
-   Se muestra en la esquina superior derecha con fondo ámbar.
-   Al hacer hover revela un tooltip explicativo. */
-.cf-badge-pending {
+/* ── Badges de estado para fotos propias no aprobadas ────────────
+    Solo visibles para el dueño de la foto.
+*/
+
+/* Base compartida entre pendiente y rechazada */
+.cf-badge-pending,
+.cf-badge-rejected {
   position: absolute;
   top: 8px;
   right: 8px;
-  background: var(--color-warning);
-  color: #FFFFFF;
   font-size: 11px;
   font-weight: 700;
   padding: 3px 8px;
@@ -88,14 +89,26 @@
   cursor: help;
 }
 
-/* Tooltip del badge pendiente: aparece al hacer hover sobre el badge.
-   Explica por qué la foto no está visible para otros usuarios. */
-.cf-badge-pending-tooltip {
+/* Pendiente: color ámbar */
+.cf-badge-pending {
+  background: var(--color-warning);
+  color: #FFFFFF;
+}
+
+/* Rechazada: color rojo */
+.cf-badge-rejected {
+  background: var(--color-danger);
+  color: #FFFFFF;
+}
+
+/* Tooltips — aparecen al hacer hover sobre el badge */
+.cf-badge-pending-tooltip,
+.cf-badge-rejected-tooltip {
   display: none;
   position: absolute;
   top: calc(100% + 6px);
   right: 0;
-  background: rgba(17, 24, 39, 0.92);
+  background: rgba(17, 24, 39, 0.93);
   color: #FFFFFF;
   font-size: 12px;
   font-weight: 400;
@@ -110,7 +123,8 @@
 }
 
 /* Flecha del tooltip */
-.cf-badge-pending-tooltip::before {
+.cf-badge-pending-tooltip::before,
+.cf-badge-rejected-tooltip::before {
   content: '';
   position: absolute;
   top: -5px;
@@ -119,17 +133,18 @@
   height: 0;
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;
-  border-bottom: 5px solid rgba(17, 24, 39, 0.92);
+  border-bottom: 5px solid rgba(17, 24, 39, 0.93);
 }
 
-.cf-badge-pending:hover .cf-badge-pending-tooltip {
+.cf-badge-pending:hover .cf-badge-pending-tooltip,
+.cf-badge-rejected:hover .cf-badge-rejected-tooltip {
   display: block;
 }
 
-/* Imagen con opacidad reducida cuando está pendiente de aprobación.
-   Da un feedback visual de que la foto no es completamente pública. */
-.cf-img--pendiente {
-  opacity: 0.75;
+/* Imagen con opacidad reducida cuando no está aprobada:
+   da feedback visual de que la foto no es pública aún */
+.cf-img--no-aprobada {
+  opacity: 0.72;
 }
 
 /* Overlay con desglose de calificacion */

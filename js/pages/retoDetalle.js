@@ -94,6 +94,8 @@ function renderLayout(contenedor) {
 			<div id="reto-banner-area"></div>
 			<div id="reto-stats-area"></div>
 
+			<div id="reto-mi-participacion-area"></div>
+
 			<section class="rd-section" aria-label="Top 5 del reto">
 				<h2 class="rd-section-title">🏅 Top 5 del Reto</h2>
 				<div id="reto-top5-area"></div>
@@ -110,6 +112,7 @@ function renderLayout(contenedor) {
 	return {
 		banner: contenedor.querySelector('#reto-banner-area'),
 		stats: contenedor.querySelector('#reto-stats-area'),
+		miParticipacion: contenedor.querySelector('#reto-mi-participacion-area'),
 		top5: contenedor.querySelector('#reto-top5-area'),
 		fotos: contenedor.querySelector('#reto-fotos-area'),
 		pagination: contenedor.querySelector('#reto-fotos-pagination'),
@@ -122,6 +125,7 @@ function renderLayout(contenedor) {
 function renderSkeletons(refs) {
 	refs.banner.innerHTML = skeletonCard('280px');
 	refs.stats.innerHTML = skeletonCard('66px');
+	refs.miParticipacion.innerHTML = '';
 	refs.top5.innerHTML = `
 		<div class="rd-skeleton-grid rd-skeleton-grid--top5">
 			${Array.from({ length: 5 }, () => skeletonCard('260px')).join('')}
@@ -137,6 +141,7 @@ function renderSkeletons(refs) {
 
 /**
  * Verifica si el usuario autenticado participa en el reto actual.
+ * Devuelve el objeto de participación completo o false.
  */
 async function isParticipatingInReto(retoId) {
 	if (!auth.estaAutenticado()) {
@@ -150,9 +155,61 @@ async function isParticipatingInReto(retoId) {
 		});
 
 		const participaciones = Array.isArray(response?.participaciones) ? response.participaciones : [];
-		return participaciones.some((item) => item?.reto_id === retoId);
+		const participacion = participaciones.find((item) => item?.reto_id === retoId);
+		return participacion || false;
 	} catch {
 		return false;
+	}
+}
+
+/**
+ * Renderiza la sección "Mi participación" solo para el dueño de la foto.
+ * Muestra su foto con badge de estado (pendiente/rechazada/aprobada)
+ * y permite abrirla en el modal aunque no esté aprobada.
+ */
+function renderMiParticipacion(refs, participacion) {
+	if (!participacion || !participacion.fotografia_id) {
+		refs.miParticipacion.innerHTML = '';
+		return;
+	}
+
+	const usuario = auth.getUsuario();
+	const fotoEstado = participacion.foto_estado || 'revision';
+	const esPropiaNoAprobada = fotoEstado !== 'aprobada';
+
+	const fotoObj = {
+		id: participacion.fotografia_id,
+		imagen_url: participacion.foto_url || participacion.foto_imagen_url || '',
+		imagen_public_id: participacion.foto_public_id || '',
+		titulo: participacion.foto_titulo || 'Mi fotografía',
+		nombre_usuario: usuario?.nombre_usuario || '',
+		foto_perfil_url: usuario?.foto_perfil_url || '',
+		total_comentarios: 0,
+		puntuacion_promedio: 0,
+		prom_creatividad: 0,
+		prom_composicion: 0,
+		prom_tema: 0,
+		foto_estado: fotoEstado,
+		es_propia: true,
+	};
+
+	refs.miParticipacion.innerHTML = `
+		<section class="rd-section rd-mi-participacion" aria-label="Mi participación">
+			<h2 class="rd-section-title">📷 Mi Fotografía</h2>
+			<div class="rd-mi-participacion-grid" id="rd-mi-foto-grid"></div>
+		</section>
+	`;
+
+	const gridEl = refs.miParticipacion.querySelector('#rd-mi-foto-grid');
+	if (!gridEl) return;
+
+	gridEl.innerHTML = `<div class="rd-mi-foto-wrap">${cardFoto(fotoObj)}</div>`;
+
+	const card = gridEl.querySelector('.cf-card');
+	if (card) {
+		card.addEventListener('click', async () => {
+			await abrirModalFoto(participacion.fotografia_id, { esPropiaNoAprobada });
+		});
 	}
 }
 
@@ -169,8 +226,8 @@ function renderBanner(refs, reto) {
 	refs.banner.innerHTML = `
 		<article class="rd-banner">
 			${imagen
-				? `<img class="rd-banner__image" src="${imagen}" alt="${escapeHtml(reto?.titulo || 'Reto')}">`
-				: '<div class="u-center-content u-w-full u-h-full u-text-muted"><i class="bi bi-image u-icon-3xl"></i></div>'}
+			? `<img class="rd-banner__image" src="${imagen}" alt="${escapeHtml(reto?.titulo || 'Reto')}">`
+			: '<div class="u-center-content u-w-full u-h-full u-text-muted"><i class="bi bi-image u-icon-3xl"></i></div>'}
 
 			<div class="rd-banner__overlay">
 				<div class="rd-banner__badges">
@@ -207,7 +264,7 @@ function resolveCtaAction(reto, participating) {
 			icon: 'bi-person-check',
 			disabled: true,
 			tooltip: 'Ya estás participando en este reto',
-			action: async () => {},
+			action: async () => { },
 		};
 	}
 
@@ -253,10 +310,10 @@ function renderStats(refs, reto, participating) {
 	const fotografias = toSafeNumber(reto?.total_fotografias, 0);
 	const cta = resolveCtaAction(reto, participating);
 
-		const disabledAttr = cta?.disabled ? ' disabled aria-disabled="true"' : '';
-		const titleAttr = cta?.tooltip ? ` title="${escapeHtml(cta.tooltip)}"` : '';
+	const disabledAttr = cta?.disabled ? ' disabled aria-disabled="true"' : '';
+	const titleAttr = cta?.tooltip ? ` title="${escapeHtml(cta.tooltip)}"` : '';
 
-		refs.stats.innerHTML = `
+	refs.stats.innerHTML = `
 		<div class="rd-stats-row">
 			<div class="rd-stats-items">
 				<span class="rd-stat-item">
@@ -276,22 +333,22 @@ function renderStats(refs, reto, participating) {
 			</div>
 
 			${cta
-				? `
+			? `
 					<button type="button" class="rd-cta-btn" id="reto-cta-btn"${disabledAttr}${titleAttr}>
 						<i class="bi ${cta.icon}"></i>
 						<span>${escapeHtml(cta.label)}</span>
 					</button>
 				`
-				: ''}
+			: ''}
 		</div>
 	`;
 
-    if (cta && !cta.disabled) {
-        const btn = refs.stats.querySelector('#reto-cta-btn');
-        btn?.addEventListener('click', async () => {
-            await cta.action();
-        });
-    }
+	if (cta && !cta.disabled) {
+		const btn = refs.stats.querySelector('#reto-cta-btn');
+		btn?.addEventListener('click', async () => {
+			await cta.action();
+		});
+	}
 }
 
 /**
@@ -322,7 +379,11 @@ function renderFotosGrid(contenedor, fotos = [], columnsClass = 'rd-fotos-grid')
 
 		card.addEventListener('click', async () => {
 			if (foto?.id) {
-				await abrirModalFoto(foto.id);
+				const esPropiaNoAprobada = Boolean(
+					foto.es_propia
+					&& (foto.foto_estado === 'revision' || foto.foto_estado === 'desaprobada'),
+				);
+				await abrirModalFoto(foto.id, { esPropiaNoAprobada });
 			}
 		});
 	});
@@ -416,13 +477,17 @@ async function render(contenedor, params = {}) {
 	renderSkeletons(refs);
 
 	try {
-		const [detalle, participating] = await Promise.all([
+		const [detalle, participacion] = await Promise.all([
 			fetchDetalleReto(retoId, 1),
 			isParticipatingInReto(retoId),
 		]);
 
+		// participacion es el objeto completo o false
+		const participating = Boolean(participacion);
+
 		renderBanner(refs, detalle?.reto || {});
 		renderStats(refs, detalle?.reto || {}, participating);
+		renderMiParticipacion(refs, participacion || null);
 		renderTop5(refs, detalle?.top5 || []);
 
 		const state = {
@@ -440,6 +505,9 @@ async function render(contenedor, params = {}) {
 			if (event.detail?.retoId === retoId) {
 				state.participating = true;
 				renderStats(refs, detalle?.reto || {}, true);
+				// Recargar participación para mostrar la foto recién subida
+				const nuevaParticipacion = await isParticipatingInReto(retoId);
+				renderMiParticipacion(refs, nuevaParticipacion || null);
 			}
 		};
 

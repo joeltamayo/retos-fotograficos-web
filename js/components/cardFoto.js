@@ -47,11 +47,15 @@ function renderMedia(foto, posicionHtml) {
 		? cloudinaryUrl(foto.imagen_public_id, { width: 400, height: 400, crop: 'fill' })
 		: imagenUrl;
 
-	// Badge de revisión: solo visible para el dueño cuando la foto aún no está aprobada.
-	// Los demás usuarios no pueden ver la foto todavía (el backend devuelve 404 para ellos).
+	// Badge de estado para fotos no aprobadas del dueño.
+	// revision → ámbar (pendiente), desaprobada → rojo (rechazada)
 	const esPendiente = foto?.es_propia && foto?.foto_estado === 'revision';
-	const pendienteBadgeHtml = esPendiente
-		? `
+	const esRechazada = foto?.es_propia && foto?.foto_estado === 'desaprobada';
+	const esPropiaNoAprobada = esPendiente || esRechazada;
+
+	let pendienteBadgeHtml = '';
+	if (esPendiente) {
+		pendienteBadgeHtml = `
 			<div class="cf-badge-pending" role="status" aria-label="Foto pendiente de aprobación">
 				<i class="bi bi-clock" aria-hidden="true"></i>
 				<span>Pendiente</span>
@@ -59,16 +63,34 @@ function renderMedia(foto, posicionHtml) {
 					Solo tú puedes verla. Está esperando que un administrador la apruebe.
 				</div>
 			</div>
-		`
-		: '';
+		`;
+	} else if (esRechazada) {
+		pendienteBadgeHtml = `
+			<div class="cf-badge-rejected" role="status" aria-label="Foto rechazada">
+				<i class="bi bi-x-circle" aria-hidden="true"></i>
+				<span>Rechazada</span>
+				<div class="cf-badge-rejected-tooltip" role="tooltip">
+					Esta foto fue rechazada por un administrador. Solo tú puedes verla.
+				</div>
+			</div>
+		`;
+	}
 
 	if (src) {
 		return `
 			<div class="cf-img-wrapper">
 				${posicionHtml}
 				${pendienteBadgeHtml}
-				<img class="cf-img${esPendiente ? ' cf-img--pendiente' : ''}" src="${src}" alt="${alt}" loading="lazy" decoding="async" width="400" height="400">
-				${!esPendiente ? `
+				<img
+					class="cf-img${esPropiaNoAprobada ? ' cf-img--no-aprobada' : ''}"
+					src="${src}"
+					alt="${alt}"
+					loading="lazy"
+					decoding="async"
+					width="400"
+					height="400"
+				>
+				${!esPropiaNoAprobada ? `
 				<div class="cf-overlay" aria-hidden="true">
 					<span class="cf-pill cf-pill--creatividad">
 						<i class="bi bi-lightbulb"></i>
@@ -116,8 +138,8 @@ function cardFoto(foto = {}, opciones = {}) {
 			<div class="cf-body">
 				<div class="cf-user">
 					${avatarUrl
-						? `<img class="avatar avatar--sm" src="${escapeHtml(avatarUrl)}" alt="Avatar de ${usuario}">`
-						: `<span class="avatar avatar--sm"><i class="bi bi-person-square"></i></span>`}
+			? `<img class="avatar avatar--sm" src="${escapeHtml(avatarUrl)}" alt="Avatar de ${usuario}">`
+			: `<span class="avatar avatar--sm"><i class="bi bi-person-square"></i></span>`}
 					<span class="cf-username">@${usuario}</span>
 				</div>
 				${retoHtml}
@@ -164,11 +186,13 @@ function gridFotos(fotos = [], contenedor, opciones = {}) {
 			}
 
 			if (foto?.id) {
-				// Si es propia y está pendiente, usar endpoint de owner para que el
-				// backend permita el acceso aunque no esté aprobada
-				await abrirModalFoto(foto.id, {
-					esPropiaEnRevision: Boolean(foto.es_propia && foto.foto_estado === 'revision'),
-				});
+				// Pasar flag para que modalFoto use el endpoint /mia y permita
+				// ver la foto propia aunque esté en revisión o rechazada
+				const esPropiaNoAprobada = Boolean(
+					foto.es_propia
+					&& (foto.foto_estado === 'revision' || foto.foto_estado === 'desaprobada'),
+				);
+				await abrirModalFoto(foto.id, { esPropiaNoAprobada });
 			}
 		});
 
@@ -184,9 +208,11 @@ function gridFotos(fotos = [], contenedor, opciones = {}) {
 			}
 
 			if (foto?.id) {
-				await abrirModalFoto(foto.id, {
-					esPropiaEnRevision: Boolean(foto.es_propia && foto.foto_estado === 'revision'),
-				});
+				const esPropiaNoAprobada = Boolean(
+					foto.es_propia
+					&& (foto.foto_estado === 'revision' || foto.foto_estado === 'desaprobada'),
+				);
+				await abrirModalFoto(foto.id, { esPropiaNoAprobada });
 			}
 		});
 	});

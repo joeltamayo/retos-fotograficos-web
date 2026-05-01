@@ -69,17 +69,17 @@ function renderComentarios(comentarios) {
 	return `
 		<div class="mf-comments-list">
 			${comentarios
-				.map((comentario) => {
-					const nombre = escapeHtml(comentario?.nombre_usuario || 'usuario');
-					const fecha = escapeHtml(formatearFechaHora(comentario?.created_at || ''));
-					const texto = escapeHtml(comentario?.contenido || '');
-					const avatar = comentario?.foto_perfil_url ? escapeHtml(comentario.foto_perfil_url) : '';
+			.map((comentario) => {
+				const nombre = escapeHtml(comentario?.nombre_usuario || 'usuario');
+				const fecha = escapeHtml(formatearFechaHora(comentario?.created_at || ''));
+				const texto = escapeHtml(comentario?.contenido || '');
+				const avatar = comentario?.foto_perfil_url ? escapeHtml(comentario.foto_perfil_url) : '';
 
-					return `
+				return `
 						<article class="mf-comment">
 							${avatar
-								? `<img class="mf-comment-avatar" src="${avatar}" alt="Avatar de ${nombre}">`
-								: '<span class="mf-comment-avatar u-center-content u-text-muted"><i class="bi bi-person"></i></span>'}
+						? `<img class="mf-comment-avatar" src="${avatar}" alt="Avatar de ${nombre}">`
+						: '<span class="mf-comment-avatar u-center-content u-text-muted"><i class="bi bi-person"></i></span>'}
 
 							<div>
 								<div class="mf-comment-top">
@@ -90,8 +90,8 @@ function renderComentarios(comentarios) {
 							</div>
 						</article>
 					`;
-				})
-				.join('')}
+			})
+			.join('')}
 		</div>
 	`;
 }
@@ -153,13 +153,13 @@ function renderModalContent(state) {
 		<div class="mf-modal-layout">
 			<section class="mf-modal-left">
 				${imagen
-					? `<img class="mf-modal-image" src="${imagen}" alt="${titulo}">`
-					: '<div class="u-center-content u-w-full u-h-full u-text-muted"><i class="bi bi-image u-icon-3xl"></i></div>'}
+			? `<img class="mf-modal-image" src="${imagen}" alt="${titulo}">`
+			: '<div class="u-center-content u-w-full u-h-full u-text-muted"><i class="bi bi-image u-icon-3xl"></i></div>'}
 			</section>
 
 			<section class="mf-modal-right">
 				${foto?.estado === 'revision' ? `
-					<div class="mf-pending-notice" role="status" aria-live="polite">
+					<div class="mf-pending-notice mf-pending-notice--revision" role="status" aria-live="polite">
 						<i class="bi bi-clock-history" aria-hidden="true"></i>
 						<div>
 							<strong>Foto en revisión</strong>
@@ -167,12 +167,21 @@ function renderModalContent(state) {
 						</div>
 					</div>
 				` : ''}
+				${foto?.estado === 'desaprobada' ? `
+					<div class="mf-pending-notice mf-pending-notice--rechazada" role="alert" aria-live="polite">
+						<i class="bi bi-x-circle" aria-hidden="true"></i>
+						<div>
+							<strong>Foto rechazada</strong>
+							<p>Esta foto fue rechazada por un administrador y no es visible para otros usuarios.</p>
+						</div>
+					</div>
+				` : ''}
 
 				<div class="mf-modal-panel">
 					<div class="mf-user-row">
 						${avatar
-							? `<img class="mf-user-avatar" src="${avatar}" alt="Avatar de ${nombreUsuario}">`
-							: '<span class="mf-user-avatar u-center-content u-text-muted"><i class="bi bi-person"></i></span>'}
+			? `<img class="mf-user-avatar" src="${avatar}" alt="Avatar de ${nombreUsuario}">`
+			: '<span class="mf-user-avatar u-center-content u-text-muted"><i class="bi bi-person"></i></span>'}
 						<div>
 							<a class="mf-user-name" href="${perfilHash}">@${nombreUsuario}</a>
 							<div class="mf-user-date">${fecha}</div>
@@ -240,7 +249,7 @@ function renderModalContent(state) {
 					</div>
 
 					${state.autenticado
-						? `
+			? `
 							<form class="mf-comment-form" id="pc-comment-form">
 								<input class="mf-comment-input" id="pc-comment-input" type="text" placeholder="Escribe un comentario..." maxlength="280">
 								<button class="mf-send-btn" type="submit" aria-label="Enviar comentario">
@@ -248,7 +257,7 @@ function renderModalContent(state) {
 								</button>
 							</form>
 						`
-						: '<p class="mf-login-hint">Inicia sesion para comentar. <a href="#/login">Ir a login</a></p>'}
+			: '<p class="mf-login-hint">Inicia sesion para comentar. <a href="#/login">Ir a login</a></p>'}
 				</div>
 			</section>
 		</div>
@@ -436,15 +445,15 @@ async function abrirModalFoto(fotografiaId, options = {}) {
 
 	const useAdminEndpoint = Boolean(options?.useAdminEndpoint && auth.esAdmin());
 
-	// Si la foto es del usuario autenticado y está en revisión, usar el endpoint
-	// de owner que el backend permite para ver la propia foto sin importar su estado.
-	// El endpoint /fotografias/:id/owner devuelve la foto al autor aunque no esté aprobada.
-	const esPropiaEnRevision = Boolean(options?.esPropiaEnRevision && auth.estaAutenticado());
+	// esPropiaNoAprobada: la foto es del usuario autenticado y está en revision
+	// o desaprobada. Se usa el endpoint /mia para que el backend devuelva la foto
+	// aunque no esté aprobada, sin exponer fotos ajenas no aprobadas.
+	const esPropiaNoAprobada = Boolean(options?.esPropiaNoAprobada && auth.estaAutenticado());
 
 	let detailEndpoint;
 	if (useAdminEndpoint) {
 		detailEndpoint = `/admin/fotografias/${encodeURIComponent(fotografiaId)}`;
-	} else if (esPropiaEnRevision) {
+	} else if (esPropiaNoAprobada) {
 		detailEndpoint = `/fotografias/${encodeURIComponent(fotografiaId)}/mia`;
 	} else {
 		detailEndpoint = `/fotografias/${encodeURIComponent(fotografiaId)}`;

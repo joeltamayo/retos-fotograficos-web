@@ -125,7 +125,7 @@ function mapParticipacionesToFotos(participaciones, usuarioActual) {
 		.filter((item) => item?.fotografia_id)
 		.map((item) => ({
 			id: item.fotografia_id,
-			imagen_url: item.foto_imagen_url || item.foto_url || item.imagen_url || '',
+			imagen_url: item.foto_url || item.foto_imagen_url || item.imagen_url || '',
 			imagen_public_id: item.foto_public_id || item.imagen_public_id || '',
 			titulo: item.foto_titulo || item.reto_titulo || 'Sin título',
 			nombre_usuario: usuarioActual?.nombre_usuario || 'usuario',
@@ -136,11 +136,9 @@ function mapParticipacionesToFotos(participaciones, usuarioActual) {
 			prom_composicion: item.prom_composicion || 0,
 			prom_tema: item.prom_tema || 0,
 			reto_titulo: item.reto_titulo || '',
-			// Estado de moderación — necesario para mostrar el badge de pendiente al dueño
+			// Estado de moderación y propiedad — permiten mostrar badge y abrir modal
+			// aunque la foto no esté aprobada, solo para el dueño
 			foto_estado: item.foto_estado || 'aprobada',
-			// Marca que esta foto pertenece al usuario autenticado
-			// Permite que cardFoto muestre el badge de revisión y que modalFoto
-			// sepa que debe usar el endpoint /fotografias/:id/owner
 			es_propia: true,
 		}));
 }

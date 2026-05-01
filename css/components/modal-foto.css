@@ -60,25 +60,24 @@
     margin: 0;
 }
 
-/* Aviso de foto en revisión — visible solo al autor de la foto.
-   Se muestra en la parte superior del panel derecho con fondo ámbar claro,
-   antes del contenido de calificaciones y comentarios. */
+/* ── Avisos de estado para fotos no aprobadas del dueño ──────────
+   Se muestran en la parte superior del panel derecho del modal.
+   Solo visibles cuando el autor abre su propia foto. */
+
 .mf-pending-notice {
     display: flex;
     align-items: flex-start;
     gap: 12px;
-    background: var(--color-warning-bg);
-    border-left: 3px solid var(--color-warning);
     padding: 12px 16px;
     font-size: 13px;
-    color: #92400E;
+    border-left-width: 3px;
+    border-left-style: solid;
 }
 
 .mf-pending-notice i {
     font-size: 18px;
     flex-shrink: 0;
     margin-top: 1px;
-    color: var(--color-warning);
 }
 
 .mf-pending-notice strong {
@@ -86,13 +85,41 @@
     font-weight: 700;
     font-size: 13px;
     margin-bottom: 3px;
-    color: #78350F;
 }
 
 .mf-pending-notice p {
     margin: 0;
     line-height: 1.4;
+}
+
+/* Variante revisión: ámbar */
+.mf-pending-notice--revision {
+    background: var(--color-warning-bg);
+    border-color: var(--color-warning);
     color: #92400E;
+}
+
+.mf-pending-notice--revision i {
+    color: var(--color-warning);
+}
+
+.mf-pending-notice--revision strong {
+    color: #78350F;
+}
+
+/* Variante rechazada: rojo */
+.mf-pending-notice--rechazada {
+    background: var(--color-danger-bg);
+    border-color: var(--color-danger);
+    color: #991B1B;
+}
+
+.mf-pending-notice--rechazada i {
+    color: var(--color-danger);
+}
+
+.mf-pending-notice--rechazada strong {
+    color: #7F1D1D;
 }
 
 /* Fila de usuario: avatar, nombre y acciones. */

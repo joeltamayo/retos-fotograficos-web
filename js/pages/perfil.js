@@ -109,13 +109,13 @@ function renderLayout(contenedor, perfil, esPerfilPropio, ordenActivo) {
 					</div>
 
 					${esPerfilPropio
-						? `
+			? `
 							<button type="button" id="perfil-editar-btn" class="pf-edit-btn">
 								<i class="bi bi-pencil-square"></i>
 								<span>Editar Perfil</span>
 							</button>
 						`
-						: ''}
+			: ''}
 				</header>
 
 				<div class="pf-divider"></div>
@@ -254,6 +254,7 @@ function renderFotosSkeleton(contenedor) {
 
 /**
  * Renderiza grid con cardFoto y click para abrir detalle.
+ * Para fotos propias en revisión o rechazadas, usa endpoint /mia.
  */
 function renderFotosGrid(contenedor, fotos) {
 	if (!(contenedor instanceof HTMLElement)) {
@@ -284,15 +285,20 @@ function renderFotosGrid(contenedor, fotos) {
 
 		card.addEventListener('click', async () => {
 			if (foto?.id) {
-				await abrirModalFoto(foto.id);
+				const esPropiaNoAprobada = Boolean(
+					foto.es_propia
+					&& (foto.foto_estado === 'revision' || foto.foto_estado === 'desaprobada'),
+				);
+				await abrirModalFoto(foto.id, { esPropiaNoAprobada });
 			}
 		});
 	});
 }
 
 /**
- * Carga fotos por orden y renderiza resultado.
- * Para el perfil propio también incluye fotos en revisión al inicio del grid.
+ * Carga fotos por orden. Para perfil propio incluye fotos en revisión
+ * y rechazadas (no aprobadas) al inicio del grid para que el dueño
+ * siempre sepa el estado de lo que subió.
  */
 async function loadFotos(state, refs) {
 	renderFotosSkeleton(refs.fotosWrap);
@@ -303,18 +309,16 @@ async function loadFotos(state, refs) {
 	}
 
 	try {
-		// Cargar fotos aprobadas siempre
 		const fotosPromise = api.get(`/usuarios/${encodeURIComponent(state.usuario)}/fotos`, {
 			orden: state.ordenActivo,
 			pagina: 1,
 			limite: 12,
 		});
 
-		// Para perfil propio y solo en la vista "recientes", cargar también las
-		// fotos pendientes de aprobación (en revisión o desaprobadas).
-		// Esto evita que el dueño crea que su foto no se subió porque no la ve.
+		// Para perfil propio en tab recientes: cargar también fotos no aprobadas
+		// para que el dueño vea su foto aunque esté en revisión o rechazada
 		const pendientesPromise = (state.esPerfilPropio && state.ordenActivo === 'recientes')
-			? api.get('/usuarios/me/participaciones', { limite: 20 }).catch(() => null)
+			? api.get('/usuarios/me/participaciones', { limite: 30 }).catch(() => null)
 			: Promise.resolve(null);
 
 		const [fotosResult, participacionesResult] = await Promise.allSettled([
@@ -326,17 +330,21 @@ async function loadFotos(state, refs) {
 			? (Array.isArray(fotosResult.value?.fotos) ? fotosResult.value.fotos : [])
 			: [];
 
-		// Extraer fotos pendientes (en revisión o desaprobadas) que no estén ya en la lista
-		let fotosPendientes = [];
-		if (participacionesResult.status === 'fulfilled' && participacionesResult.value?.participaciones) {
+		// Extraer fotos no aprobadas del usuario (revision o desaprobada)
+		let fotasNoAprobadas = [];
+		if (
+			participacionesResult.status === 'fulfilled'
+			&& participacionesResult.value?.participaciones
+		) {
 			const aprobadosIds = new Set(fotosAprobadas.map((f) => f.id));
 			const usuarioSesion = auth.getUsuario();
 
-			fotosPendientes = participacionesResult.value.participaciones
-				.filter((item) =>
-					item?.fotografia_id
-					&& item.foto_estado !== 'aprobada'
-					&& !aprobadosIds.has(item.fotografia_id),
+			fotasNoAprobadas = participacionesResult.value.participaciones
+				.filter(
+					(item) =>
+						item?.fotografia_id
+						&& item.foto_estado !== 'aprobada'
+						&& !aprobadosIds.has(item.fotografia_id),
 				)
 				.map((item) => ({
 					id: item.fotografia_id,
@@ -356,9 +364,8 @@ async function loadFotos(state, refs) {
 				}));
 		}
 
-		// Las fotos pendientes van primero para que el dueño las vea de inmediato
-		const todasLasFotos = [...fotosPendientes, ...fotosAprobadas];
-
+		// Las no aprobadas van primero para que el dueño las vea de inmediato
+		const todasLasFotos = [...fotasNoAprobadas, ...fotosAprobadas];
 		state.fotosPorOrden[state.ordenActivo] = todasLasFotos;
 		renderFotosGrid(refs.fotosWrap, todasLasFotos);
 	} catch (error) {
