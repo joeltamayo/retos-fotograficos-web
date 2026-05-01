@@ -157,7 +157,8 @@ async function isParticipatingInReto(retoId) {
 		});
 
 		const participaciones = Array.isArray(response?.participaciones) ? response.participaciones : [];
-		const participacion = participaciones.find((item) => item?.reto_id === retoId);
+		// Consideramos "participando" solo si ya existe fotografia asociada.
+		const participacion = participaciones.find((item) => item?.reto_id === retoId && item?.fotografia_id);
 		return participacion || false;
 	} catch {
 		return false;
@@ -274,29 +275,7 @@ function resolveCtaAction(reto, participating) {
 		label: 'Participar',
 		icon: 'bi-person-plus',
 		action: async () => {
-			try {
-				await api.post(`/retos/${encodeURIComponent(reto.id)}/participar`, {});
-				abrirModalSubirFoto(reto.id, reto.titulo, reto.descripcion || '');
-			} catch (error) {
-				const status = Number(error?.status);
-
-				if (status === 401) {
-					redirectToLoginKeepingRoute();
-					return;
-				}
-
-				if (status === 403) {
-					mostrarToast('Acceso denegado para participar en este reto.', 'warning');
-					return;
-				}
-
-				if (!status && (error instanceof TypeError || String(error?.message || '').toLowerCase().includes('fetch'))) {
-					mostrarToast('Sin conexión. Revisa tu internet e intenta de nuevo.', 'warning');
-					return;
-				}
-
-				mostrarToast(error?.error || error?.message || 'No se pudo completar la participación.', 'warning');
-			}
+			abrirModalSubirFoto(reto.id, reto.titulo, reto.descripcion || '');
 		},
 	};
 }

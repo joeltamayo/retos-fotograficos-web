@@ -118,17 +118,6 @@ function renderModalContent(state) {
 					></textarea>
 				</div>
 
-				<div class="ms-field">
-					<div class="ms-upload-label">O URL de la imagen</div>
-					<input
-						type="url"
-						class="ms-upload-input"
-						id="pc-upload-image-url"
-						placeholder="https://ejemplo.com/imagen.jpg"
-					>
-					<div class="ms-field-error" data-error-for="image_url"></div>
-				</div>
-
 				<div class="ms-modal-error" id="pc-upload-error"></div>
 
 				<div class="ms-actions">
@@ -231,29 +220,14 @@ function validateForm(state) {
 
 	let isValid = true;
 
-	const imageUrlInput = state.modalElement.querySelector('#pc-upload-image-url');
-	const imageUrl = String(imageUrlInput?.value || '').trim();
-
-	if (!state.file && !imageUrl) {
-		setFieldError(state, 'file', 'Selecciona una imagen o usa una URL.');
+	if (!state.file) {
+		setFieldError(state, 'file', 'Selecciona una imagen.');
 		isValid = false;
 	}
 
 	if (state.file && state.file.size > MAX_FILE_SIZE_BYTES) {
 		setFieldError(state, 'file', 'La imagen no puede superar 10MB.');
 		isValid = false;
-	}
-
-	if (imageUrl) {
-		try {
-			const parsed = new URL(imageUrl);
-			if (!['http:', 'https:'].includes(parsed.protocol)) {
-				throw new Error('invalid');
-			}
-		} catch {
-			setFieldError(state, 'image_url', 'Ingresa una URL válida (http/https).');
-			isValid = false;
-		}
 	}
 
 	const titleInput = state.modalElement.querySelector('#pc-upload-title');
@@ -352,17 +326,11 @@ function bindEvents(state) {
 
 		const titleInput = state.modalElement.querySelector('#pc-upload-title');
 		const descriptionInput = state.modalElement.querySelector('#pc-upload-description');
-		const imageUrlInput = state.modalElement.querySelector('#pc-upload-image-url');
 		const formData = new FormData();
 		formData.append('reto_id', state.retoId);
 		formData.append('titulo', titleInput.value.trim());
 		formData.append('descripcion', descriptionInput?.value.trim() || '');
-		if (state.file) {
-			formData.append('imagen', state.file);
-		}
-		if (imageUrlInput?.value?.trim()) {
-			formData.append('imagen_url', imageUrlInput.value.trim());
-		}
+		formData.append('imagen', state.file);
 
 		setSubmittingState(state, true);
 
