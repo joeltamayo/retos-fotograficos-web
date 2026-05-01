@@ -70,7 +70,7 @@
 .pf-name {
   margin: 0;
   font-size: 22px;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.2;
   color: var(--color-text);
 }
@@ -120,6 +120,7 @@
   height: 1px;
   background: var(--color-border);
   margin: 18px 0;
+  margin-left: calc(92px + 18px);
 }
 
 /* Estadísticas: resumen numérico del perfil. */
@@ -127,6 +128,7 @@
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
+  margin-left: calc(92px + 18px);
 }
 
 /* Stat individual: bloque centrado. */
@@ -137,7 +139,7 @@
 /* Valor estadístico: número destacado. */
 .pf-stat-value {
   display: block;
-  font-size: 32px;
+  font-size: 24px;
   font-weight: 700;
   line-height: 1.05;
   color: var(--color-text);
@@ -169,6 +171,11 @@
   margin-top: 10px;
   display: inline-flex;
   gap: 8px;
+}
+
+/* Insignias: se alinea al mismo inicio que nombre/username. */
+.pf-card > section[aria-label="Insignias"] {
+  margin-left: calc(92px + 18px);
 }
 
 /* Badge placeholder: círculo de carga o vacío. */
@@ -337,6 +344,12 @@
 
   .pf-header {
     grid-template-columns: 1fr;
+  }
+
+  .pf-divider,
+  .pf-stats,
+  .pf-card > section[aria-label="Insignias"] {
+    margin-left: 0;
   }
 
   .pf-stats {
