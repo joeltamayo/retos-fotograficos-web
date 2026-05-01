@@ -16,11 +16,31 @@
   margin-bottom: 22px;
 }
 
+.rk-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.rk-user-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  color: var(--color-text);
+}
+
+.rk-user-inline .rk-user-avatar {
+  width: 36px;
+  height: 36px;
+}
+
 /* Título principal: identifica la vista de ranking. */
 .rk-title {
   margin: 0;
-  font-size: 32px;
-  font-weight: 700;
+  font-size: 16px;
+  font-weight: 400;
   color: var(--color-text);
   display: inline-flex;
   align-items: center;
@@ -122,12 +142,18 @@
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-card);
   overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.rk-podium-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-card-hover);
 }
 
 /* Card oro: resalta el primer lugar. */
 .rk-podium-card--oro {
   border: 2px solid rgba(234, 179, 8, 0.75);
-  box-shadow: 0 8px 20px rgba(234, 179, 8, 0.22);
 }
 
 /* Media del podio: contenedor de imagen. */
@@ -139,17 +165,17 @@
 
 /* Media plata: altura del segundo lugar. */
 .rk-podium-media--plata {
-  height: 370px;
+  height: 280px;
 }
 
 /* Media oro: altura del primer lugar. */
 .rk-podium-media--oro {
-  height: 430px;
+  height: 320px;
 }
 
 /* Media bronce: altura del tercer lugar. */
 .rk-podium-media--bronce {
-  height: 345px;
+  height: 240px;
 }
 
 /* Imagen del podio: foto principal destacada. */
@@ -158,6 +184,12 @@
   height: 100%;
   object-fit: cover;
   display: block;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Hover de imagen: efecto sutil de zoom para destacar la foto al pasar el mouse. */
+.rk-podium-image:hover {
+  transform: scale(1.06);
 }
 
 /* Placeholder del podio: fallback cuando no hay imagen. */
@@ -202,6 +234,7 @@
 /* Cuerpo del podio: agrupa nombre, usuario y score. */
 .rk-podium-body {
   padding: 14px;
+  margin: 16px 0;
 }
 
 /* Lugar: número grande de la posición. */
@@ -215,18 +248,43 @@
 
 /* Label de lugar: texto complementario del ranking. */
 .rk-place-label {
-  font-size: 30px;
-  font-weight: 400;
+  font-size: 14px;
+  font-weight: 100;
   color: var(--color-text-secondary);
 }
 
 /* Título de foto: nombre de la imagen destacada. */
 .rk-photo-title {
   margin: 6px 0 8px;
-  font-size: 32px;
-  font-weight: 500;
+  font-size: 16px;
+  font-weight: 400;
   line-height: 1.22;
   color: var(--color-text);
+}
+
+/* Row that groups the medal icon and the vertical stack (place + title) */
+.rk-place-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.rk-place-icon {
+  font-size: 28px;
+  color: var(--color-text-secondary);
+  display: inline-flex;
+  align-items: center;
+}
+
+.rk-place-and-title {
+  display: flex;
+  flex-direction: column;
+    justify-content: center;
+
+}
+
+.rk-place-and-title .rk-photo-title {
+  margin: 4px 0 8px;
 }
 
 /* Fila de usuario: avatar y nombre del participante. */
@@ -235,7 +293,7 @@
   align-items: center;
   gap: 8px;
   margin-bottom: 12px;
-  font-size: 28px;
+  font-size: 14px;
   color: var(--color-text);
 }
 
@@ -271,14 +329,14 @@
 
 /* Valor del score: puntuación principal. */
 .rk-score-value {
-  font-size: 40px;
-  font-weight: 500;
+  font-size: 20px;
+  font-weight: 100;
   line-height: 1;
 }
 
 .rk-score-label {
   margin-top: 4px;
-  font-size: 24px;
+  font-size: 12px;
   line-height: 1;
 }
 
@@ -306,12 +364,20 @@
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-card);
   padding: 22px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
+
+.rk-detail-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-card-hover);
+}
+
 
 .rk-detail-title {
   margin: 0;
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 20px;
   color: var(--color-text);
 }
 
@@ -327,7 +393,7 @@
   align-items: center;
   gap: 12px;
   padding: 6px 0;
-  font-size: 15px;
+  font-size: 14px;
   color: var(--color-text);
 }
 
@@ -379,11 +445,18 @@
   grid-template-columns: auto auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 14px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.rk-other-item:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-card-hover);
 }
 
 .rk-other-position {
-  font-size: 36px;
-  font-weight: 400;
+  font-size: 24px;
+  font-weight: 100;
   color: var(--color-text-secondary);
   width: 40px;
   text-align: center;
@@ -410,15 +483,15 @@
 
 .rk-other-name {
   margin: 0;
-  font-size: 32px;
+  font-size: 16px;
   font-weight: 400;
   line-height: 1.2;
   color: var(--color-text);
 }
 
 .rk-other-user {
-  margin: 4px 0 0;
-  font-size: 28px;
+  margin: 8px 0 0;
+  font-size: 16px;
   font-weight: 400;
   color: var(--color-text-secondary);
   display: inline-flex;
@@ -427,13 +500,19 @@
 }
 
 .rk-other-points {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
   text-align: right;
   min-width: 120px;
+  justify-self: end;
+  margin-left: auto;
 }
 
 .rk-other-points-value {
   display: block;
-  font-size: 40px;
+  font-size: 16px;
   line-height: 1;
   color: var(--color-text);
   font-weight: 400;
@@ -441,7 +520,7 @@
 
 .rk-other-points-label {
   display: block;
-  font-size: 24px;
+  font-size: 12px;
   line-height: 1.2;
   color: var(--color-text-secondary);
 }
@@ -571,8 +650,11 @@
   .rk-other-points {
     grid-column: 1 / -1;
     display: flex;
-    align-items: baseline;
+    flex-direction: column;
+    align-items: flex-end;
     justify-content: flex-end;
-    gap: 8px;
+    text-align: right;
+    margin-left: auto;
+    gap: 2px;
   }
 }

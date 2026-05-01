@@ -204,8 +204,10 @@ async function renderComponenteCalificar(contenedor, fotografiaId) {
 
 				// Refresca solo el bloque de puntuaciones para mantener el modal abierto.
 				const detalle = await api.get(`/fotografias/${encodeURIComponent(fotografiaId)}`);
-				patchBreakdownUI(contenedor, detalle);
-				mostrarToast('¡Calificación guardada!', 'success');
+				patchBreakdownUI(contenedor, detalle);			
+			// Dispara evento global para que el ranking se refresque si está abierto.
+			window.dispatchEvent(new CustomEvent('calificacion-creada', { detail: { fotografiaId } }));
+							mostrarToast('¡Calificación guardada!', 'success');
 			} catch (error) {
 				mostrarToast(error?.error || 'No se pudo guardar la calificación.', 'danger');
 			} finally {
