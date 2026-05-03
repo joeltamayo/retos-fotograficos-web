@@ -1,6 +1,8 @@
 import { abrirModalFoto } from './modalFoto.js';
 import { cloudinaryUrl } from '../utils.js';
 
+let fotoUpdateListenerBound = false;
+
 function escapeHtml(value) {
 	return String(value ?? '')
 		.replaceAll('&', '&amp;')
@@ -121,6 +123,8 @@ function renderMedia(foto, posicionHtml) {
 }
 
 function cardFoto(foto = {}, opciones = {}) {
+	bindFotoUpdateListener();
+
 	const avatarUrl = getAvatarUrl(foto);
 	const usuario = escapeHtml(foto?.nombre_usuario || 'usuario');
 	const titulo = escapeHtml(foto?.titulo || 'Fotografia sin titulo');
@@ -159,11 +163,71 @@ function cardFoto(foto = {}, opciones = {}) {
 	`;
 }
 
+function applyFotoUpdateToCard(card, foto) {
+	if (!(card instanceof HTMLElement) || !foto || typeof foto !== 'object') {
+		return;
+	}
+
+	const creatividad = formatNumber(foto?.prom_creatividad ?? foto?.creatividad ?? 0);
+	const composicion = formatNumber(foto?.prom_composicion ?? foto?.composicion ?? 0);
+	const tema = formatNumber(foto?.prom_tema ?? foto?.tema ?? 0);
+	const puntuacion = formatNumber(foto?.puntuacion_promedio ?? foto?.puntuacion_total ?? foto?.promedio ?? 0);
+	const comentarios = formatCount(foto?.total_comentarios);
+
+	const creatividadEl = card.querySelector('.cf-pill--creatividad');
+	if (creatividadEl) {
+		creatividadEl.innerHTML = `<i class="bi bi-lightbulb"></i>${creatividad}`;
+	}
+
+	const composicionEl = card.querySelector('.cf-pill--composicion');
+	if (composicionEl) {
+		composicionEl.innerHTML = `<i class="bi bi-grid-3x3"></i>${composicion}`;
+	}
+
+	const temaEl = card.querySelector('.cf-pill--tema');
+	if (temaEl) {
+		temaEl.innerHTML = `<i class="bi bi-bullseye"></i>${tema}`;
+	}
+
+	const scoreEl = card.querySelector('.cf-stat--stars span:last-child');
+	if (scoreEl) {
+		scoreEl.textContent = puntuacion;
+	}
+
+	const commentsEl = card.querySelector('.cf-stat:not(.cf-stat--stars) span:last-child');
+	if (commentsEl) {
+		commentsEl.textContent = comentarios;
+	}
+}
+
+function bindFotoUpdateListener() {
+	if (fotoUpdateListenerBound) {
+		return;
+	}
+
+	fotoUpdateListenerBound = true;
+
+	window.addEventListener('fotografia-actualizada', (event) => {
+		const fotografiaId = event?.detail?.fotografiaId;
+		const foto = event?.detail?.foto;
+
+		if (!fotografiaId || !foto || typeof foto !== 'object') {
+			return;
+		}
+
+		document
+			.querySelectorAll(`.cf-card[data-foto-id="${CSS.escape(String(fotografiaId))}"]`)
+			.forEach((card) => applyFotoUpdateToCard(card, foto));
+	});
+}
+
 function gridFotos(fotos = [], contenedor, opciones = {}) {
 	const container = resolveContainer(contenedor);
 	if (!container) {
 		return;
 	}
+
+	bindFotoUpdateListener();
 
 	if (!Array.isArray(fotos) || fotos.length === 0) {
 		container.innerHTML = '<p>No hay fotografias aun</p>';
