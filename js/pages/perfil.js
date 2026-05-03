@@ -430,8 +430,8 @@ async function render(contenedor, params = {}) {
 		return;
 	}
 
-	const usuarioSesion = auth.getUsuario()?.nombre_usuario || '';
-	const usuarioObjetivo = String(params?.usuario || usuarioSesion).trim();
+	// Obtener nombre_usuario actual del auth (se actualiza si cambió en el modal)
+	const usuarioObjetivo = String(params?.usuario || auth.getUsuario()?.nombre_usuario || '').trim();
 
 	if (!usuarioObjetivo) {
 		mostrarErrorPagina(contenedor, '404', 'Perfil no encontrado.');
@@ -458,7 +458,7 @@ async function render(contenedor, params = {}) {
 
 		bindTabs(state, refs);
 		bindEditButton(esPerfilPropio, refs, async () => {
-			await render(contenedor, { usuario: usuarioObjetivo });
+			await render(contenedor, { usuario: auth.getUsuario()?.nombre_usuario || usuarioObjetivo });
 		});
 
 		await loadFotos(state, refs);

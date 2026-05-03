@@ -522,6 +522,10 @@ function bindEvents(state) {
 			actualizarNavbar();
 			mostrarToast('Perfil actualizado correctamente.', 'success');
 			window.bootstrap?.Modal.getInstance(modalElement)?.hide();
+			// Si cambió el nombre_usuario, actualizar URL del navegador
+			if (updatedUsuario?.nombre_usuario && updatedUsuario.nombre_usuario !== state.usuario.nombreUsuario) {
+				window.location.hash = `#/perfil/${encodeURIComponent(updatedUsuario.nombre_usuario)}`;
+			}
 		} catch (error) {
 			setSubmittingState(state, false);
 
