@@ -140,6 +140,9 @@ function renderModalContent(state) {
 	const imagen = foto?.imagen_public_id
 		? cloudinaryUrl(foto.imagen_public_id, { width: 900, quality: 'auto', crop: 'limit' })
 		: (foto?.imagen_url ? escapeHtml(foto.imagen_url) : '');
+	const imagenAlta = foto?.imagen_public_id
+		? cloudinaryUrl(foto.imagen_public_id, { width: 2000, quality: 'auto', crop: 'limit' })
+		: (foto?.imagen_url ? escapeHtml(foto.imagen_url) : '');
 	const totalCalificaciones = Number(foto?.total_calificaciones || 0);
 	const scoreGeneral = toFixedOrZero(foto?.puntuacion_total ?? foto?.puntuacion_promedio ?? 0, 2);
 	const currentRatings = state.currentRatings || {
@@ -161,6 +164,20 @@ function renderModalContent(state) {
 				${imagen
 			? `<img class="mf-modal-image" src="${imagen}" alt="${titulo}">`
 			: '<div class="u-center-content u-w-full u-h-full u-text-muted"><i class="bi bi-image u-icon-3xl"></i></div>'}
+				${imagen
+			? `
+					<button
+						type="button"
+						class="mf-img-action"
+						data-accion="ver-imagen"
+						data-imagen-hi="${imagenAlta}"
+						data-imagen-alt="${titulo}"
+						aria-label="Ver imagen en grande"
+					>
+						<i class="bi bi-arrows-fullscreen"></i>
+					</button>
+				`
+			: ''}
 			</section>
 
 			<section class="mf-modal-right">
@@ -306,6 +323,245 @@ function renderModalContent(state) {
 }
 
 /**
+ * Crea el visor de imagen a pantalla completa si no existe.
+ */
+function getOrCreateImageViewer() {
+	let viewer = document.getElementById('mf-image-viewer');
+	if (viewer) {
+		return viewer;
+	}
+
+	viewer = document.createElement('div');
+	viewer.id = 'mf-image-viewer';
+	viewer.className = 'mf-image-viewer';
+	viewer.innerHTML = `
+		<div class="mf-viewer-backdrop" data-accion="cerrar-visor"></div>
+		<div class="mf-viewer-panel" role="dialog" aria-modal="true" aria-label="Vista ampliada de imagen">
+			<div class="mf-viewer-toolbar">
+				<div class="mf-viewer-zoom">
+					<button type="button" class="mf-viewer-btn" data-zoom="out" aria-label="Alejar">
+						<i class="bi bi-zoom-out"></i>
+					</button>
+					<span class="mf-viewer-zoom-value" data-zoom-value>100%</span>
+					<button type="button" class="mf-viewer-btn" data-zoom="in" aria-label="Acercar">
+						<i class="bi bi-zoom-in"></i>
+					</button>
+					<button type="button" class="mf-viewer-btn" data-zoom="reset" aria-label="Restablecer zoom">
+						<i class="bi bi-arrow-counterclockwise"></i>
+					</button>
+				</div>
+				<button type="button" class="mf-viewer-btn" data-accion="cerrar-visor" aria-label="Cerrar visor">
+					<i class="bi bi-x-lg"></i>
+				</button>
+			</div>
+			<div class="mf-viewer-stage">
+				<img class="mf-viewer-image" src="" alt="">
+			</div>
+		</div>
+	`;
+
+	document.body.appendChild(viewer);
+
+	const stage = viewer.querySelector('.mf-viewer-stage');
+	const img = viewer.querySelector('.mf-viewer-image');
+	const zoomValue = viewer.querySelector('[data-zoom-value]');
+	if (img) {
+		img.setAttribute('draggable', 'false');
+		img.addEventListener('dragstart', (event) => event.preventDefault());
+	}
+	const pan = { x: 0, y: 0 };
+	viewer._pan = pan;
+	let isPanning = false;
+	let lastPointerX = 0;
+	let lastPointerY = 0;
+	let baseWidth = 0;
+	let baseHeight = 0;
+	const panSpeed = 1.6;
+	const minVisibleRatio = 0.2;
+
+	const updateBaseSize = () => {
+		if (!stage || !img) {
+			return;
+		}
+		const rect = img.getBoundingClientRect();
+		baseWidth = rect.width;
+		baseHeight = rect.height;
+	};
+
+	const clampPan = () => {
+		const scale = Number(img.dataset.scale || 1);
+		if (!stage || !baseWidth || !baseHeight) {
+			pan.x = 0;
+			pan.y = 0;
+			return;
+		}
+		if (scale <= 1) {
+			pan.x = 0;
+			pan.y = 0;
+			return;
+		}
+		const stageHalfW = stage.clientWidth / 2;
+		const stageHalfH = stage.clientHeight / 2;
+		const imgHalfW = (baseWidth * scale) / 2;
+		const imgHalfH = (baseHeight * scale) / 2;
+		const minVisibleX = Math.min(stage.clientWidth, baseWidth * scale) * minVisibleRatio;
+		const minVisibleY = Math.min(stage.clientHeight, baseHeight * scale) * minVisibleRatio;
+		const maxPanX = Math.max(0, imgHalfW + stageHalfW - minVisibleX);
+		const maxPanY = Math.max(0, imgHalfH + stageHalfH - minVisibleY);
+		pan.x = Math.max(-maxPanX, Math.min(maxPanX, pan.x));
+		pan.y = Math.max(-maxPanY, Math.min(maxPanY, pan.y));
+	};
+
+	const applyTransform = () => {
+		const scale = Number(img.dataset.scale || 1);
+		clampPan();
+		img.style.transform = `translate(${pan.x}px, ${pan.y}px) scale(${scale})`;
+	};
+
+	viewer._updateBaseSize = updateBaseSize;
+	viewer._applyTransform = applyTransform;
+	const updateScale = (nextScale) => {
+		const scale = Math.min(4, Math.max(1, nextScale));
+		img.dataset.scale = String(scale);
+		clampPan();
+		applyTransform();
+		if (zoomValue) {
+			zoomValue.textContent = `${Math.round(scale * 100)}%`;
+		}
+	};
+
+	viewer.addEventListener('click', (event) => {
+		const target = event.target;
+		if (!(target instanceof HTMLElement)) {
+			return;
+		}
+		if (target.closest('[data-accion="cerrar-visor"]')) {
+			viewer.classList.remove('is-open');
+			document.body.classList.remove('mf-viewer-open');
+		}
+		if (target.closest('[data-zoom="in"]')) {
+			updateScale(Number(img.dataset.scale || 1) + 0.25);
+		}
+		if (target.closest('[data-zoom="out"]')) {
+			updateScale(Number(img.dataset.scale || 1) - 0.25);
+		}
+		if (target.closest('[data-zoom="reset"]')) {
+			updateScale(1);
+		}
+	});
+
+	stage.addEventListener('wheel', (event) => {
+		event.preventDefault();
+		const delta = event.deltaY > 0 ? -0.15 : 0.15;
+		updateScale(Number(img.dataset.scale || 1) + delta);
+	}, { passive: false });
+
+	stage.addEventListener('pointerdown', (event) => {
+		if (Number(img.dataset.scale || 1) <= 1) {
+			return;
+		}
+		event.preventDefault();
+		if (!baseWidth || !baseHeight) {
+			updateBaseSize();
+		}
+		isPanning = true;
+		lastPointerX = event.clientX;
+		lastPointerY = event.clientY;
+		stage.classList.add('is-panning');
+		stage.setPointerCapture(event.pointerId);
+	});
+
+	stage.addEventListener('pointermove', (event) => {
+		if (!isPanning) {
+			return;
+		}
+		const deltaX = event.clientX - lastPointerX;
+		const deltaY = event.clientY - lastPointerY;
+		pan.x += deltaX * panSpeed;
+		pan.y += deltaY * panSpeed;
+		lastPointerX = event.clientX;
+		lastPointerY = event.clientY;
+		applyTransform();
+	});
+
+	const stopPanning = (event) => {
+		if (!isPanning) {
+			return;
+		}
+		isPanning = false;
+		stage.classList.remove('is-panning');
+		if (event && stage.hasPointerCapture(event.pointerId)) {
+			stage.releasePointerCapture(event.pointerId);
+		}
+	};
+
+	stage.addEventListener('pointerup', stopPanning);
+	stage.addEventListener('pointerleave', stopPanning);
+	stage.addEventListener('pointercancel', stopPanning);
+
+	window.addEventListener('keydown', (event) => {
+		if (event.key === 'Escape' && viewer.classList.contains('is-open')) {
+			viewer.classList.remove('is-open');
+			document.body.classList.remove('mf-viewer-open');
+		}
+	});
+
+	window.addEventListener('resize', () => {
+		if (!viewer.classList.contains('is-open')) {
+			return;
+		}
+		updateBaseSize();
+		applyTransform();
+	});
+
+	return viewer;
+}
+
+/**
+ * Abre el visor a pantalla completa con zoom.
+ */
+function openImageViewer(url, altText) {
+	if (!url) {
+		return;
+	}
+	const viewer = getOrCreateImageViewer();
+	const img = viewer.querySelector('.mf-viewer-image');
+	if (img) {
+		img.src = url;
+		img.alt = altText || 'Imagen ampliada';
+		img.dataset.scale = '1';
+		img.style.transform = 'translate(0px, 0px) scale(1)';
+		const panState = viewer._pan;
+		if (panState) {
+			panState.x = 0;
+			panState.y = 0;
+		}
+		img.addEventListener('load', () => {
+			if (viewer._updateBaseSize) {
+				viewer._updateBaseSize();
+			}
+			if (viewer._applyTransform) {
+				viewer._applyTransform();
+			}
+		}, { once: true });
+	}
+	const zoomValue = viewer.querySelector('[data-zoom-value]');
+	if (zoomValue) {
+		zoomValue.textContent = '100%';
+	}
+	viewer.classList.add('is-open');
+	document.body.classList.add('mf-viewer-open');
+	requestAnimationFrame(() => {
+		if (viewer._updateBaseSize) {
+			viewer._updateBaseSize();
+		}
+		if (viewer._applyTransform) {
+			viewer._applyTransform();
+		}
+	});
+}
+
+/**
  * Setea la variable CSS del blur de fondo después de renderizar.
  */
 function setBlurBackground(state) {
@@ -363,6 +619,15 @@ function bindModalEvents(state) {
 	const guardarBtn = state.modalElement.querySelector('[data-accion="guardar-calificacion"]');
 	const form = state.modalElement.querySelector('#pc-comment-form');
 	const input = state.modalElement.querySelector('#pc-comment-input');
+	const viewImageBtn = state.modalElement.querySelector('[data-accion="ver-imagen"]');
+
+	if (viewImageBtn) {
+		viewImageBtn.addEventListener('click', () => {
+			const url = viewImageBtn.getAttribute('data-imagen-hi') || '';
+			const altText = viewImageBtn.getAttribute('data-imagen-alt') || '';
+			openImageViewer(url, altText);
+		});
+	}
 
 	const breakdownToggle = state.modalElement.querySelector('[data-toggle-breakdown]');
 	if (breakdownToggle) {

@@ -36,7 +36,30 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 8px;
+    padding: 0px;
+}
+
+/* Accion para abrir la imagen en grande. */
+.mf-img-action {
+    position: absolute;
+    right: 14px;
+    bottom: 14px;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: var(--radius-md);
+    background: rgba(17, 24, 39, 0.8);
+    color: #FFFFFF;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    cursor: pointer;
+    box-shadow: var(--shadow-card);
+}
+
+.mf-img-action:hover {
+    background: rgba(17, 24, 39, 0.92);
 }
 
 /* Fondo blur — misma imagen como CSS variable */
@@ -318,7 +341,7 @@
 .mf-subtitulo {
     margin: 0;
     font-size: 14px;
-    font-weight:5600;
+    font-weight: 100;
 }
 
 /* Colores temáticos para las etiquetas de criterios */
@@ -675,6 +698,103 @@
     padding: 20px;
 }
 
+/* Visor de imagen a pantalla completa */
+.mf-image-viewer {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.mf-image-viewer.is-open {
+    display: flex;
+}
+
+.mf-viewer-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.82);
+}
+
+.mf-viewer-panel {
+    position: relative;
+    width: min(1200px, 92vw);
+    height: min(82vh, 900px);
+    background: #0B0F1A;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-modal);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    z-index: 1;
+}
+
+.mf-viewer-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: rgba(17, 24, 39, 0.9);
+    color: #FFFFFF;
+}
+
+.mf-viewer-zoom {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.mf-viewer-zoom-value {
+    font-size: 13px;
+    min-width: 48px;
+    text-align: center;
+}
+
+.mf-viewer-btn {
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(15, 23, 42, 0.6);
+    color: #FFFFFF;
+    border-radius: 8px;
+    padding: 6px 10px;
+    cursor: pointer;
+}
+
+.mf-viewer-btn:hover {
+    background: rgba(15, 23, 42, 0.85);
+}
+
+.mf-viewer-stage {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0B0F1A;
+    overflow: hidden;
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
+}
+
+.mf-viewer-stage.is-panning {
+    cursor: grabbing;
+}
+
+.mf-viewer-image {
+    max-width: 100%;
+    max-height: 100%;
+    transform-origin: center;
+    transition: transform 0.12s ease-out;
+    user-select: none;
+    pointer-events: none;
+    -webkit-user-drag: none;
+}
+
+.mf-viewer-open {
+    overflow: hidden;
+}
+
 @media (max-width: 991.98px) {
     .mf-modal-layout {
         flex-direction: column;
@@ -689,5 +809,10 @@
 
     .mf-img-col {
         min-height: 320px;
+    }
+
+    .mf-viewer-panel {
+        width: 94vw;
+        height: 80vh;
     }
 }
