@@ -796,9 +796,22 @@
 }
 
 @media (max-width: 991.98px) {
+    #modal-foto .modal-dialog {
+        height: auto;
+        margin: 16px;
+    }
+
+    #modal-foto .modal-content {
+        max-height: calc(100vh - 32px);
+        height: auto;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
     .mf-modal-layout {
         flex-direction: column;
         min-height: auto;
+        height: auto;
     }
 
     .mf-img-col,
@@ -809,10 +822,106 @@
 
     .mf-img-col {
         min-height: 320px;
+        max-height: 45vh;
+    }
+
+    .mf-modal-image {
+        max-height: 45vh;
     }
 
     .mf-viewer-panel {
         width: 94vw;
         height: 80vh;
+    }
+}
+
+@media (max-width: 767.98px) {
+    #modal-foto .modal-dialog {
+        height: auto;
+        margin: 12px;
+    }
+
+    #modal-foto .modal-content {
+        max-height: calc(100vh - 24px);
+        height: auto;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .mf-modal-layout {
+        max-height: none;
+        height: auto;
+    }
+
+    .mf-img-col {
+        min-height: 240px;
+        max-height: 40vh;
+    }
+
+    .mf-modal-image {
+        max-height: 40vh;
+    }
+
+    .mf-modal-right {
+        flex: 1;
+        max-height: none;
+        overflow: visible;
+        padding-bottom: 12px;
+    }
+    .mf-rating-footer {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .mf-stars-actions {
+        width: 100%;
+    }
+
+    .mf-save-rating-btn {
+        width: 100%;
+    }
+
+    .mf-user-row {
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 8px 10px;
+    }
+
+    .mf-user-name {
+        font-size: 15px;
+        font-weight: 600;
+    }
+
+    .mf-user-date {
+        order: 3;
+        width: 100%;
+        margin-left: 50px;
+        font-size: 12px;
+    }
+
+    .mf-close {
+        margin-left: auto;
+    }
+
+    .mf-rating-head {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .mf-rating-score {
+        flex-wrap: wrap;
+        row-gap: 4px;
+    }
+
+    .mf-evaluar-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .mf-stars-group,
+    .mf-breakdown {
+        max-width: 100%;
     }
 }
