@@ -27,6 +27,10 @@ function formatCount(value) {
 }
 
 function getAvatarUrl(foto) {
+	if (foto?.foto_perfil_public_id) {
+		return cloudinaryUrl(foto.foto_perfil_public_id, { width: 64, height: 64, crop: 'fill' });
+	}
+
 	return foto?.foto_perfil_url || foto?.avatar_url || foto?.avatar || '';
 }
 

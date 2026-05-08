@@ -130,6 +130,7 @@ function mapParticipacionesToFotos(participaciones, usuarioActual) {
 			titulo: item.foto_titulo || item.reto_titulo || 'Sin título',
 			nombre_usuario: usuarioActual?.nombre_usuario || 'usuario',
 			foto_perfil_url: usuarioActual?.foto_perfil_url || '',
+			foto_perfil_public_id: usuarioActual?.foto_perfil_public_id || '',
 			total_comentarios: item.total_comentarios || 0,
 			puntuacion_promedio: item.puntuacion_promedio || 0,
 			prom_creatividad: item.prom_creatividad || 0,
