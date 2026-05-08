@@ -10,30 +10,55 @@
     overflow: hidden;
     box-shadow: var(--shadow-modal);
     max-height: calc(100vh - 2rem);
+    height: 100%;
+}
+
+/* Asegura altura fija del dialog para controlar scroll interno */
+#modal-foto .modal-dialog {
+    height: calc(100vh - 3.5rem);
 }
 
 /* Layout principal: divide imagen y panel informativo. */
 .mf-modal-layout {
     display: flex;
     min-height: 560px;
+    height: 100%;
 }
 
-/* Columna izquierda: área visual de la fotografía. */
-.mf-modal-left {
+/* Columna izquierda: área visual de la fotografía con blur de fondo. */
+.mf-img-col {
+    position: relative;
     flex: 0 0 55%;
     max-width: 55%;
-    background: #000000;
+    overflow: hidden;
+    background: #111;
+    /* fallback mientras carga */
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 8px;
 }
 
-/* Imagen del modal: muestra la foto en tamaño completo. */
+/* Fondo blur — misma imagen como CSS variable */
+.mf-img-col::before {
+    content: '';
+    position: absolute;
+    inset: -12px;
+    /* cubre los bordes del blur */
+    background-image: var(--mf-blur-src);
+    background-size: cover;
+    background-position: center;
+    filter: blur(20px) brightness(0.45) saturate(1.4);
+    z-index: 0;
+}
+
+/* Imagen del modal: muestra la foto en tamaño completo encima del blur. */
 .mf-modal-image {
+    position: relative;
+    z-index: 1;
     width: 100%;
     height: 100%;
-    max-height: 540px;
+    max-height: calc(100vh - 5rem);
     object-fit: contain;
     display: block;
 }
@@ -45,19 +70,36 @@
     background: var(--color-surface);
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
+    overflow: hidden;
+    min-height: 0;
 }
 
 /* Panel interno: separa secciones del modal. */
 .mf-modal-panel {
-    padding: 18px 20px;
+    padding: 10px 20px;
+}
+
+/* Panel que contiene comentarios: usa flex para empujar form al fondo */
+.mf-modal-panel--comments {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+}
+
+/* Wrapper de comentarios: permite que la lista haga scroll */
+#pc-comments-wrapper {
+    flex: 1;
+    min-height: 0;
+    display: flex;
 }
 
 /* Separador: divide bloques de información. */
 .mf-divider {
     height: 1px;
     background: var(--color-border);
-    margin: 0;
+    margin: 0px 0px;
+    width: 100%;
 }
 
 /* ── Avisos de estado para fotos no aprobadas del dueño ──────────
@@ -141,41 +183,44 @@
 /* Nombre del usuario: enlace o texto del autor. */
 .mf-user-name {
     color: var(--color-text);
-    font-size: 24px;
-    font-weight: 700;
+    font-size: 16px;
+    font-weight: 400;
     text-decoration: none;
 }
 
 /* Fecha del usuario: marca temporal de publicación. */
 .mf-user-date {
     color: var(--color-text-muted);
-    font-size: 20px;
+    font-size: 14px;
     line-height: 1.2;
 }
 
 /* Botón cerrar: acción para salir del modal. */
 .mf-close {
     margin-left: auto;
-    border: 0;
-    background: transparent;
-    color: var(--color-text-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 2px 12px;
+    background-color: var(--color-text);
+    color: var(--color-border);
     font-size: 26px;
     line-height: 1;
+
 }
 
 /* Título de la foto: encabezado principal del detalle. */
 .mf-title {
-    margin: 14px 0 8px;
-    font-size: 34px;
+    margin: 10px 0 4px 0;
+    font-size: 16px;
     line-height: 1.15;
-    font-weight: 600;
+    font-weight: 300;
     color: var(--color-text);
 }
 
 /* Descripción: texto explicativo de la fotografía. */
 .mf-description {
     margin: 0;
-    font-size: 30px;
+    font-size: 14px;
     line-height: 1.25;
     color: var(--color-text-secondary);
 }
@@ -186,7 +231,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    margin-bottom: 12px;
+    margin: 4px 0;
 }
 
 /* Score: promedio o resumen de puntuación. */
@@ -195,24 +240,31 @@
     align-items: center;
     gap: 8px;
     font-size: 18px;
-    font-weight: 700;
+    font-weight: 500;
     color: var(--color-text);
+}
+
+/* Subtítulo del score: texto secundario con numero total de estrellas. */
+.mf-span-15 {
+    font-size: 14px;
+    color: var(--color-text-secondary);
 }
 
 /* Icono de score: refuerzo visual de la calificación. */
 .mf-rating-score i {
     color: var(--color-warning);
+    font-size: 12px;
 }
 
 /* Botón evaluar: activa el flujo de calificación. */
 .mf-evaluar-btn {
     border: 1px solid var(--color-border);
-    background: var(--color-surface);
+    background: var(--color-text);
     border-radius: var(--radius-md);
     padding: 6px 12px;
     font-weight: 600;
     font-size: 14px;
-    color: var(--color-text);
+    color: var(--color-border);
 }
 
 /* Fila de estrellas: controles visibles de valoración. */
@@ -220,20 +272,39 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-bottom: 10px;
+    margin-bottom: 2px;
 }
 
 /* Grupo de criterios: organiza las líneas por métrica. */
 .mf-stars-group {
     display: grid;
     gap: 8px;
+    background: var(--color-surface-hover);
+    padding: 16px;
+    border-radius: var(--radius-md);
+    max-height: 600px;
+    max-width: 90%;
+    margin: 0 auto;
+    opacity: 1;
+    transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+        padding 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+}
+
+/* Oculta el grupo de estrellas cuando está colapsado */
+.mf-stars-group.collapsed {
+    max-height: 0;
+    opacity: 0;
+    padding: 0 16px;
+    pointer-events: none;
 }
 
 /* Línea de criterio: etiqueta + estrellas en una sola fila. */
 .mf-stars-line {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     gap: 12px;
 }
 
@@ -244,13 +315,31 @@
     color: var(--color-text-secondary);
     min-width: 92px;
 }
+.mf-subtitulo {
+    margin: 0;
+    font-size: 14px;
+    font-weight:5600;
+}
+
+/* Colores temáticos para las etiquetas de criterios */
+.mf-stars-label--creatividad {
+    color: var(--color-creatividad);
+}
+
+.mf-stars-label--composicion {
+    color: var(--color-composicion);
+}
+
+.mf-stars-label--tema {
+    color: var(--color-tema);
+}
 
 /* Botón estrella: permite seleccionar una puntuación. */
 .mf-star-btn {
     border: 0;
     background: transparent;
     padding: 0;
-    font-size: 28px;
+    font-size: 20px;
     line-height: 1;
     color: #D1D5DB;
     cursor: pointer;
@@ -267,23 +356,94 @@
     opacity: 0.6;
 }
 
-/* Nota de rating: ayuda contextual para el usuario. */
+/* Acciones de rating: alinea el guardado a la derecha. */
+.mf-rating-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 6px;
+}
+
+/* Aumenta margen superior cuando el grupo de estrellas está abierto */
+.mf-stars-group:not(.collapsed){
+    margin-top: 16px;
+}
+
 .mf-rating-note {
-    margin: 0 0 10px;
+    margin: 0;
     font-size: 13px;
     color: var(--color-text-secondary);
+    flex-shrink: 0;
+}
+
+.mf-stars-actions {
+    display: flex;
+    justify-content: flex-end;
+    flex-shrink: 0;
+}
+
+/* Botón guardar calificación: única acción que persiste la nota. */
+.mf-save-rating-btn {
+    border: 1px solid var(--color-primary);
+    background: var(--color-text);
+    border-radius: var(--radius-md);
+    padding: 6px 12px;
+    font-weight: 600;
+    font-size: 14px;
+    color: #FFFFFF;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.mf-save-rating-btn:hover {
+    background: var(--color-text-hover);
+    border-color: var(--color-primary-hover);
+}
+
+.mf-save-rating-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 /* Desglose: lista de métricas y su interpretación. */
 .mf-breakdown {
     display: grid;
     gap: 6px;
-    font-size: 14px;
+    width: 100%;
+    margin: 10px 0 14px 0px;
+    padding: 16px;
+    background-color: var(--color-surface-hover);
+    border-radius: var(--radius-md);
+    max-height: 500px;
+    opacity: 1;
+    overflow: hidden;
+    transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+        padding 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+        margin 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+/* Aumenta margen superior cuando el breakdown está abierto */
+.mf-breakdown:not(.mf-breakdown--collapsed) {
+    margin-top: 16px;
+}
+
+.mf-breakdown--collapsed {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    padding: 0 0;
+    margin: 0;
+    pointer-events: none;
+}
+
+
 
 /* Ítem de desglose: línea con criterio y valor. */
 .mf-breakdown-item {
-    display: flex;
+    display: grid;
+    grid-template-columns: auto 105px 1fr auto;
     align-items: center;
     gap: 8px;
     color: var(--color-text-secondary);
@@ -299,8 +459,16 @@
     color: var(--color-creatividad);
 }
 
+.mf-breakdown-item--creatividad i {
+    color: var(--color-creatividad);
+}
+
 /* Métrica composición: usa color temático. */
 .mf-breakdown-item--composicion strong {
+    color: var(--color-composicion);
+}
+
+.mf-breakdown-item--composicion i {
     color: var(--color-composicion);
 }
 
@@ -309,24 +477,92 @@
     color: var(--color-tema);
 }
 
+.mf-breakdown-item--tema i {
+    color: var(--color-tema);
+}
+
+/* Barra de progreso para cada criterio */
+.mf-breakdown-bar {
+    height: 8px;
+    background: #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.mf-breakdown-bar-fill {
+    height: 100%;
+    width: var(--bar-width, 0%);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+/* Color de la barra según criterio */
+.mf-breakdown-item--creatividad .mf-breakdown-bar-fill {
+    background: var(--color-creatividad);
+}
+
+.mf-breakdown-item--composicion .mf-breakdown-bar-fill {
+    background: var(--color-composicion);
+}
+
+.mf-breakdown-item--tema .mf-breakdown-bar-fill {
+    background: var(--color-tema);
+}
+
+/* Valor numérico a la derecha de las estrellas */
+.mf-breakdown-toggle {
+    background-color: var(--color-text);
+    border: none;
+    color: var(--color-border);
+    cursor: pointer;
+    padding: 4px 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    transition: transform 0.3s ease, color 0.2s ease;
+    border: var(--color-border) solid 1px;
+    border-radius: var(--radius-md);
+}
+
+.mf-breakdown-toggle:hover {
+    color: var(--color-border);
+}
+
+.mf-breakdown-toggle[aria-expanded="true"] {
+    transform: rotate(180deg);
+}
+
+.mf-stars-value {
+    margin: 0;
+    min-width: 28px;
+    text-align: Center;
+    font-weight: 700;
+    color: var(--color-text);
+    font-size: 14px;
+}
+
 /* Encabezado de comentarios: título con iconografía. */
 .mf-comments-head {
     display: inline-flex;
     align-items: center;
     gap: 8px;
     margin-bottom: 12px;
-    font-size: 18px;
+    font-size: 14px;
     font-weight: 600;
     color: var(--color-text);
 }
 
 /* Lista de comentarios: contenedor con scroll interno. */
 .mf-comments-list {
-    max-height: 180px;
-    overflow: auto;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
     display: grid;
     gap: 12px;
-    padding-right: 4px;
+    padding-right: 16px;
+    width: 100%;
 }
 
 /* Comentario: fila con avatar y texto asociado. */
@@ -345,10 +581,18 @@
     background: var(--color-neutral-bg);
 }
 
+/* Cuerpo del comentario: texto con fondo y separación. */
+.mf-comment-body {
+    background: var(--color-surface-hover);
+    border-radius: 0 var(--radius-md) var(--radius-md) var(--radius-md);
+    padding: 4px 12px
+}
+
 /* Cabecera de comentario: nombre y fecha. */
 .mf-comment-top {
     display: flex;
     align-items: baseline;
+    justify-content: space-between;
     gap: 8px;
 }
 
@@ -371,13 +615,18 @@
     line-height: 1.35;
     color: #374151;
     word-break: break-word;
+    border-radius: var(--radius-md);
 }
 
 .mf-comment-form {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-top: 12px;
+    margin-top: auto;
+    position: sticky;
+    bottom: 0;
+    background: var(--color-surface);
+    padding: 8px 0 10px;
 }
 
 .mf-comment-input {
@@ -432,13 +681,13 @@
         min-height: auto;
     }
 
-    .mf-modal-left,
+    .mf-img-col,
     .mf-modal-right {
         flex: 0 0 100%;
         max-width: 100%;
     }
 
-    .mf-modal-left {
+    .mf-img-col {
         min-height: 320px;
     }
 }

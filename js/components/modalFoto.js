@@ -81,7 +81,7 @@ function renderComentarios(comentarios) {
 						? `<img class="mf-comment-avatar" src="${avatar}" alt="Avatar de ${nombre}">`
 						: '<span class="mf-comment-avatar u-center-content u-text-muted"><i class="bi bi-person"></i></span>'}
 
-							<div>
+							<div class="mf-comment-body">
 								<div class="mf-comment-top">
 									<span class="mf-comment-name">${nombre}</span>
 									<span class="mf-comment-date">${fecha}</span>
@@ -100,7 +100,7 @@ function renderComentarios(comentarios) {
  * Renderiza botones de estrellas para calificar.
  */
 function renderStarButtons(selectedStars, disabled, criterion) {
-	return Array.from({ length: 5 }, (_, index) => {
+	const buttons = Array.from({ length: 5 }, (_, index) => {
 		const starValue = index + 1;
 		const activeClass = starValue <= selectedStars ? 'is-active' : '';
 		const disabledAttr = disabled ? 'disabled' : '';
@@ -118,7 +118,10 @@ function renderStarButtons(selectedStars, disabled, criterion) {
 			</button>
 		`;
 	}).join('');
+
+	return `${buttons}<span class="mf-stars-value" aria-hidden="true">${selectedStars}</span>`;
 }
+
 
 /**
  * Renderiza el cuerpo completo del modal con la foto y su informacion.
@@ -144,6 +147,9 @@ function renderModalContent(state) {
 		composicion: Number(state.miCalificacion?.composicion || 0),
 		tema: Number(state.miCalificacion?.tema || 0),
 	};
+
+	const showControls = Boolean(state.showRatingControls);
+	const evaluarLabel = state.miCalificacion ? 'Modificar calificación' : 'Evaluar';
 	const totalCurrent = Number(currentRatings.creatividad || 0) + Number(currentRatings.composicion || 0) + Number(currentRatings.tema || 0);
 	const promedioActual = (totalCurrent / 3) || 0;
 	const esAutor = Boolean(usuarioSesion && foto?.usuario_id && usuarioSesion.id === foto.usuario_id);
@@ -151,7 +157,7 @@ function renderModalContent(state) {
 
 	state.modalElement.querySelector('.modal-content').innerHTML = `
 		<div class="mf-modal-layout">
-			<section class="mf-modal-left">
+<section class="mf-img-col">
 				${imagen
 			? `<img class="mf-modal-image" src="${imagen}" alt="${titulo}">`
 			: '<div class="u-center-content u-w-full u-h-full u-text-muted"><i class="bi bi-image u-icon-3xl"></i></div>'}
@@ -182,66 +188,101 @@ function renderModalContent(state) {
 						${avatar
 			? `<img class="mf-user-avatar" src="${avatar}" alt="Avatar de ${nombreUsuario}">`
 			: '<span class="mf-user-avatar u-center-content u-text-muted"><i class="bi bi-person"></i></span>'}
-						<div>
 							<a class="mf-user-name" href="${perfilHash}">@${nombreUsuario}</a>
 							<div class="mf-user-date">${fecha}</div>
-						</div>
 						<button type="button" class="mf-close" data-bs-dismiss="modal" aria-label="Cerrar">&times;</button>
 					</div>
 
 					<h2 class="mf-title">${titulo}</h2>
 					<p class="mf-description">${descripcion}</p>
+					
+					
 				</div>
+					<hr class="mf-divider">
 
-				<hr class="mf-divider">
 
 				<div class="mf-modal-panel" id="pc-rating-section">
 					<div class="mf-rating-head">
 						<div class="mf-rating-score">
 							<i class="bi bi-star-fill"></i>
-							<span>${scoreGeneral}</span>
-							<span class="u-fs-14 u-fw-500 u-text-secondary">(${totalCalificaciones} calificaciones)</span>
+							<span>${scoreGeneral} <span class="mf-span-15">/ 15</span>
+							<span class="u-fs-14 u-fw-500 u-text-secondary"> - (${totalCalificaciones} calificaciones)</span>
+							<button type="button" class="mf-breakdown-toggle" data-toggle-breakdown aria-expanded="false" aria-label="Mostrar promedio de calificaciones">
+								<i class="bi bi-chevron-down"></i>
+							</button>
 						</div>
-						<button type="button" class="mf-evaluar-btn" data-accion="evaluar">Evaluar</button>
+						<button type="button" class="mf-evaluar-btn" data-accion="evaluar">${escapeHtml(evaluarLabel)}</button>
 					</div>
 
-					<div class="mf-stars-group">
+					<div class="mf-breakdown ${state.showBreakdown ? '' : 'mf-breakdown--collapsed'}" id="pc-breakdown">
+						
+						<p class="mf-subtitulo">Promedio de calificaciones: </p> 
+							<div class="mf-breakdown-item mf-breakdown-item--creatividad">
+								<i class="bi bi-lightbulb-fill"></i>
+								<strong>Creatividad</strong>
+								<div class="mf-breakdown-bar" style="--bar-width: ${Math.min(100, (Number(foto?.prom_creatividad || 0) / 5) * 100)}%;">
+									<div class="mf-breakdown-bar-fill"></div>
+								</div>
+								<span>${toFixedOrZero(foto?.prom_creatividad, 1)}</span>
+							</div>
+							<div class="mf-breakdown-item mf-breakdown-item--composicion">
+								<i class="bi bi-palette-fill"></i>
+								<strong>Composicion</strong>
+								<div class="mf-breakdown-bar" style="--bar-width: ${Math.min(100, (Number(foto?.prom_composicion || 0) / 5) * 100)}%;">
+									<div class="mf-breakdown-bar-fill"></div>
+								</div>
+								<span>${toFixedOrZero(foto?.prom_composicion, 1)}</span>
+							</div>
+							<div class="mf-breakdown-item mf-breakdown-item--tema">
+								<i class="bi bi-ui-checks"></i>
+								<strong>Tema</strong>
+								<div class="mf-breakdown-bar" style="--bar-width: ${Math.min(100, (Number(foto?.prom_tema || 0) / 5) * 100)}%;">
+									<div class="mf-breakdown-bar-fill"></div>
+								</div>
+								<span>${toFixedOrZero(foto?.prom_tema, 1)}</span>
+							</div>
+					</div>
+
+					<div class="mf-stars-group ${showControls ? '' : 'collapsed'}">
+							<p class="mf-subtitulo">Tu calificacion: </p> 
+
 						<div class="mf-stars-line">
-							<span class="mf-stars-label">Creatividad</span>
+							<span class="mf-stars-label mf-stars-label--creatividad">Creatividad</span>
 							<div class="mf-stars-row" data-stars-row="creatividad">
 								${renderStarButtons(currentRatings.creatividad, disabledStars, 'creatividad')}
 							</div>
 						</div>
 						<div class="mf-stars-line">
-							<span class="mf-stars-label">Composición</span>
+							<span class="mf-stars-label mf-stars-label--composicion">Composición</span>
 							<div class="mf-stars-row" data-stars-row="composicion">
 								${renderStarButtons(currentRatings.composicion, disabledStars, 'composicion')}
 							</div>
 						</div>
 						<div class="mf-stars-line">
-							<span class="mf-stars-label">Tema</span>
+							<span class="mf-stars-label mf-stars-label--tema">Tema</span>
 							<div class="mf-stars-row" data-stars-row="tema">
 								${renderStarButtons(currentRatings.tema, disabledStars, 'tema')}
 							</div>
 						</div>
-						<p class="mf-rating-note">Tu selección actual: ${totalCurrent}/15 (${promedioActual.toFixed(1)})</p>
+						<div class="mf-rating-footer">
+							<p class="mf-rating-note">Tu selección actual: ${totalCurrent}/15 (${promedioActual.toFixed(1)})</p>
+							<div class="mf-stars-actions">
+								${state.autenticado && !esAutor ? '<button type="button" class="mf-save-rating-btn" data-accion="guardar-calificacion">Guardar calificación</button>' : ''}
+							</div>
+						</div>
 					</div>
 
 					${esAutor ? '<p class="mf-rating-note">No puedes calificar tu propia foto.</p>' : ''}
 
-					<div class="mf-breakdown" id="pc-breakdown">
-						<div class="mf-breakdown-item mf-breakdown-item--creatividad"><span>💡</span><strong>Creatividad:</strong> <span>${toFixedOrZero(foto?.prom_creatividad, 1)}</span></div>
-						<div class="mf-breakdown-item mf-breakdown-item--composicion"><span>🎨</span><strong>Composicion:</strong> <span>${toFixedOrZero(foto?.prom_composicion, 1)}</span></div>
-						<div class="mf-breakdown-item mf-breakdown-item--tema"><span>🎯</span><strong>Tema:</strong> <span>${toFixedOrZero(foto?.prom_tema, 1)}</span></div>
-					</div>
+					
 				</div>
 
 				<hr class="mf-divider">
 
-				<div class="mf-modal-panel">
+				<div class="mf-modal-panel mf-modal-panel--comments">
 					<div class="mf-comments-head">
-						<i class="bi bi-chat-left"></i>
-						<span>${state.comentarios.length} Comentario(s)</span>
+						<i class="bi bi-chat-dots"></i>
+						<span>${state.comentarios.length} Comentarios</span>
 					</div>
 
 					<div id="pc-comments-wrapper">
@@ -262,6 +303,21 @@ function renderModalContent(state) {
 			</section>
 		</div>
 	`;
+}
+
+/**
+ * Setea la variable CSS del blur de fondo después de renderizar.
+ */
+function setBlurBackground(state) {
+	const imagenUrl = state.foto?.imagen_public_id
+		? cloudinaryUrl(state.foto.imagen_public_id, { width: 900, quality: 'auto', crop: 'limit' })
+		: (state.foto?.imagen_url ? state.foto.imagen_url : '');
+	if (imagenUrl) {
+		const imgCol = state.modalElement.querySelector('.mf-img-col');
+		if (imgCol) {
+			imgCol.style.setProperty('--mf-blur-src', `url("${imagenUrl}")`);
+		}
+	}
 }
 
 /**
@@ -304,11 +360,54 @@ async function loadModalData(state) {
 function bindModalEvents(state) {
 	const ratingSection = state.modalElement.querySelector('#pc-rating-section');
 	const evaluarBtn = state.modalElement.querySelector('[data-accion="evaluar"]');
+	const guardarBtn = state.modalElement.querySelector('[data-accion="guardar-calificacion"]');
 	const form = state.modalElement.querySelector('#pc-comment-form');
 	const input = state.modalElement.querySelector('#pc-comment-input');
 
+	const breakdownToggle = state.modalElement.querySelector('[data-toggle-breakdown]');
+	if (breakdownToggle) {
+		breakdownToggle.addEventListener('click', () => {
+			state.showBreakdown = !state.showBreakdown;
+			const breakdown = state.modalElement.querySelector('#pc-breakdown');
+			if (breakdown) {
+				breakdown.classList.toggle('mf-breakdown--collapsed');
+				breakdownToggle.setAttribute('aria-expanded', state.showBreakdown ? 'true' : 'false');
+			}
+		});
+	}
+
 	if (evaluarBtn && ratingSection) {
 		evaluarBtn.addEventListener('click', async () => {
+			const starsGroup = state.modalElement.querySelector('.mf-stars-group');
+			const isAuthor = Boolean(state.usuario?.id && state.foto?.usuario_id && state.usuario.id === state.foto.usuario_id);
+			const isCollapsed = starsGroup && starsGroup.classList.contains('collapsed');
+
+			if (!state.autenticado) {
+				mostrarToast('Inicia sesión para calificar.', 'warning');
+				return;
+			}
+
+			// El botón solo actúa como switch de despliegue/ocultado.
+			if (isCollapsed) {
+				if (isAuthor) {
+					mostrarToast('No puedes calificar tu propia foto.', 'warning');
+					return;
+				}
+
+				if (starsGroup) starsGroup.classList.remove('collapsed');
+				state.showRatingControls = true;
+				ratingSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+				return;
+			}
+
+			if (starsGroup) starsGroup.classList.add('collapsed');
+			state.showRatingControls = false;
+			ratingSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+		});
+	}
+
+	if (guardarBtn && ratingSection) {
+		guardarBtn.addEventListener('click', async () => {
 			ratingSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
 			if (!state.autenticado) {
@@ -341,8 +440,7 @@ function bindModalEvents(state) {
 					total: payload.creatividad + payload.composicion + payload.tema,
 				};
 				state.foto = await api.get(`/fotografias/${encodeURIComponent(state.fotografiaId)}`);
-				renderModalContent(state);
-				bindModalEvents(state);
+				renderModalContent(state);			setBlurBackground(state);				bindModalEvents(state);
 				window.dispatchEvent(new CustomEvent('fotografia-actualizada', {
 					detail: { fotografiaId: state.fotografiaId, foto: state.foto },
 				}));
@@ -367,6 +465,7 @@ function bindModalEvents(state) {
 			state.currentRatings = state.currentRatings || { creatividad: 0, composicion: 0, tema: 0 };
 			state.currentRatings[criterion] = starValue;
 			renderModalContent(state);
+			setBlurBackground(state);
 			bindModalEvents(state);
 		});
 	});
@@ -392,8 +491,7 @@ function bindModalEvents(state) {
 
 				state.comentarios.unshift(nuevoComentario);
 				state.foto.total_comentarios = (Number(state.foto.total_comentarios) || 0) + 1;
-				renderModalContent(state);
-				bindModalEvents(state);
+				renderModalContent(state);			setBlurBackground(state);				bindModalEvents(state);
 				window.dispatchEvent(new CustomEvent('fotografia-actualizada', {
 					detail: { fotografiaId: state.fotografiaId, foto: state.foto },
 				}));
@@ -467,6 +565,8 @@ async function abrirModalFoto(fotografiaId, options = {}) {
 		comentarios: [],
 		miCalificacion: null,
 		currentRatings: null,
+		showRatingControls: false,
+		showBreakdown: false,
 		modalElement: null,
 	};
 
@@ -495,6 +595,18 @@ async function abrirModalFoto(fotografiaId, options = {}) {
 			tema: Number(state.miCalificacion?.tema || 0),
 		};
 		renderModalContent(state);
+
+		// Setear la imagen para el blur de fondo
+		const imagenUrl = state.foto?.imagen_public_id
+			? cloudinaryUrl(state.foto.imagen_public_id, { width: 900, quality: 'auto', crop: 'limit' })
+			: (state.foto?.imagen_url ? state.foto.imagen_url : '');
+		if (imagenUrl) {
+			const imgCol = state.modalElement.querySelector('.mf-img-col');
+			if (imgCol) {
+				imgCol.style.setProperty('--mf-blur-src', `url("${imagenUrl}")`);
+			}
+		}
+
 		bindModalEvents(state);
 	} catch (error) {
 		renderLoadError(state.modalElement, error?.error || 'No fue posible obtener el detalle de la foto.');
