@@ -12,6 +12,7 @@ const NAVBAR_ID = 'photochallenge-navbar';
 const COLLAPSE_ID = 'photochallenge-navbar-collapse';
 
 let hashListenerRegistrado = false;
+let resizeListenerRegistrado = false;
 
 function getCurrentPathFromHash() {
 	const rawHash = window.location.hash || '#/home';
@@ -160,6 +161,12 @@ function registrarEventosAcciones(usuario) {
 	}
 
 	navbar.addEventListener('click', async (event) => {
+		const navLink = event.target.closest('[data-nav-link]');
+		if (navLink) {
+			cerrarCollapseSiAbierto();
+			return;
+		}
+
 		const boton = event.target.closest('[data-accion]');
 		if (!boton) {
 			return;
@@ -189,6 +196,19 @@ function registrarEventosAcciones(usuario) {
 		if (accion === 'logout') {
 			await auth.logout();
 			actualizarNavbar();
+			cerrarCollapseSiAbierto();
+		}
+	});
+}
+
+function registrarAutoCloseOnResize() {
+	if (resizeListenerRegistrado) {
+		return;
+	}
+
+	resizeListenerRegistrado = true;
+	window.addEventListener('resize', () => {
+		if (window.innerWidth >= 992) {
 			cerrarCollapseSiAbierto();
 		}
 	});
@@ -239,6 +259,7 @@ function renderNavbar() {
 
 	actualizarEstadoActivoLinks();
 	registrarEventosAcciones(usuario);
+	registrarAutoCloseOnResize();
 
 	if (!hashListenerRegistrado) {
 		window.addEventListener('hashchange', actualizarEstadoActivoLinks);

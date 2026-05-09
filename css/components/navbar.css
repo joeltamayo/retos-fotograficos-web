@@ -205,6 +205,10 @@
     display: none;
   }
 
+  .nb-actions {
+    margin-left: auto;
+  }
+
   .nb-toggler {
     display: flex;
   }
