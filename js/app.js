@@ -1,5 +1,5 @@
 import auth from './auth.js';
-import { mostrarErrorPagina, mostrarLoader } from './utils.js';
+import { mostrarErrorPagina, mostrarLoader, mostrarToast } from './utils.js';
 import * as navbarModule from './components/navbar.js';
 
 /**
@@ -27,6 +27,10 @@ const KEY_RUTA_DESTINO = 'rutaDestino';
  * Evita que un render viejo sobreescriba la vista cuando hay navegaciones consecutivas rapidas.
  */
 let navigationToken = 0;
+let revalidationInProgress = false;
+let revalidationTimer = null;
+
+const REVALIDATION_DELAY_MS = 400;
 
 function closeOpenModals() {
 	if (!window.bootstrap?.Modal) {
@@ -250,6 +254,47 @@ async function renderNavbar() {
 	}
 }
 
+function mostrarEstadoOffline() {
+	const appContainer = document.getElementById('app');
+	if (!appContainer) {
+		return;
+	}
+
+	mostrarErrorPagina(appContainer, 'Sin conexión', 'No hay conexión a internet. Reconectando...');
+}
+
+async function revalidarSesionYRender() {
+	if (revalidationInProgress) {
+		return;
+	}
+
+	revalidationInProgress = true;
+
+	try {
+		await auth.verificarSesion();
+		await renderNavbar();
+		await renderCurrentRoute();
+	} finally {
+		revalidationInProgress = false;
+	}
+}
+
+function scheduleRevalidation() {
+	if (revalidationTimer) {
+		clearTimeout(revalidationTimer);
+	}
+
+	revalidationTimer = setTimeout(() => {
+		revalidationTimer = null;
+		if (navigator.onLine) {
+			void revalidarSesionYRender();
+			return;
+		}
+
+		mostrarEstadoOffline();
+	}, REVALIDATION_DELAY_MS);
+}
+
 /**
  * Inicializa sesion, navbar y primera ruta del SPA.
  */
@@ -266,6 +311,20 @@ async function bootstrapApp() {
 
 window.addEventListener('hashchange', renderCurrentRoute);
 window.addEventListener('DOMContentLoaded', bootstrapApp);
+window.addEventListener('focus', scheduleRevalidation);
+window.addEventListener('visibilitychange', () => {
+	if (!document.hidden) {
+		scheduleRevalidation();
+	}
+});
+window.addEventListener('online', () => {
+	mostrarToast('Conexión restaurada.', 'success');
+	scheduleRevalidation();
+});
+window.addEventListener('offline', () => {
+	mostrarToast('Sin conexión a internet.', 'warning');
+	mostrarEstadoOffline();
+});
 
 export { navegarA };
 

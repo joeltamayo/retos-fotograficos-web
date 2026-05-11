@@ -118,7 +118,19 @@ function normalizeRequestOptions(options = {}) {
  */
 async function apiFetch(endpoint, options = {}, hasRetried = false) {
 	const requestOptions = normalizeRequestOptions(options);
-	const response = await fetch(buildUrl(endpoint), requestOptions);
+	let response;
+
+	try {
+		response = await fetch(buildUrl(endpoint), requestOptions);
+	} catch (error) {
+		const offline = typeof navigator !== 'undefined' && !navigator.onLine;
+		if (!hasRetried) {
+			const delayMs = offline ? 1200 : 600;
+			await new Promise((resolve) => setTimeout(resolve, delayMs));
+			return apiFetch(endpoint, options, true);
+		}
+		throw { status: 0, error: offline ? 'SIN_CONEXION' : 'ERROR_RED', detail: error?.message || 'Network error' };
+	}
 
 	if (response.status === 401) {
 		const errorBody = await safeParseJson(response);
