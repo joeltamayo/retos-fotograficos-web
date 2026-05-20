@@ -81,6 +81,32 @@ function getWeekNumber(date) {
 	return Math.ceil((diffDays + 1) / 7);
 }
 
+function parseIsoDate(value) {
+	if (!value) {
+		return null;
+	}
+
+	const parsed = new Date(`${value}T00:00:00`);
+	return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+function formatDateOnly(value) {
+	if (!value) {
+		return null;
+	}
+
+	if (value instanceof Date) {
+		return value.toISOString().slice(0, 10);
+	}
+
+	if (typeof value === 'string' && value.includes('T')) {
+		const parsed = new Date(value);
+		return Number.isNaN(parsed.getTime()) ? value : parsed.toISOString().slice(0, 10);
+	}
+
+	return String(value);
+}
+
 function getPeriodoMeta(periodo) {
 	const now = new Date();
 
@@ -125,6 +151,52 @@ function getPeriodoMeta(periodo) {
 	};
 }
 
+function getPeriodoOptionMeta(periodo, opcion) {
+	if (!opcion?.inicio) {
+		return getPeriodoMeta(periodo);
+	}
+
+	const start = parseIsoDate(opcion.inicio);
+	const end = parseIsoDate(opcion.fin || opcion.inicio);
+	if (!start) {
+		return getPeriodoMeta(periodo);
+	}
+
+	if (periodo === 'diario') {
+		return {
+			label: `Dia ${formatDateLong(start)}`,
+			range: formatDateLong(start),
+		};
+	}
+
+	if (periodo === 'semanal') {
+		const week = getWeekNumber(start);
+		return {
+			label: `Semana ${week} - ${start.getFullYear()}`,
+			range: end ? `${formatDateLong(start)} - ${formatDateLong(end)}` : formatDateLong(start),
+		};
+	}
+
+	if (periodo === 'mensual') {
+		return {
+			label: `Mes ${new Intl.DateTimeFormat('es-MX', { month: 'long', year: 'numeric' }).format(start)}`,
+			range: end ? `${formatDateLong(start)} - ${formatDateLong(end)}` : formatDateLong(start),
+		};
+	}
+
+	if (periodo === 'anual') {
+		return {
+			label: `Ano ${start.getFullYear()}`,
+			range: end ? `${formatDateLong(start)} - ${formatDateLong(end)}` : formatDateLong(start),
+		};
+	}
+
+	return {
+		label: 'Todo el tiempo',
+		range: 'Todo el tiempo',
+	};
+}
+
 /**
  * Convierte a numero decimal seguro con un digito.
  */
@@ -158,18 +230,30 @@ function getPeriodoFromHash() {
 	const queryString = hashWithoutSymbol.includes('?') ? hashWithoutSymbol.split('?')[1] : '';
 	const params = new URLSearchParams(queryString);
 	const periodoRaw = String(params.get('periodo') || 'semanal').toLowerCase();
+	const inicio = params.get('inicio');
 
-	return Object.prototype.hasOwnProperty.call(PERIODOS, periodoRaw) ? periodoRaw : 'semanal';
+	return {
+		periodo: Object.prototype.hasOwnProperty.call(PERIODOS, periodoRaw) ? periodoRaw : 'semanal',
+		inicio: inicio ? String(inicio) : null,
+	};
 }
 
 /**
  * Actualiza el query del hash sin forzar navegacion.
  */
-function updatePeriodoHash(periodo) {
+function updatePeriodoHash(periodo, inicio) {
 	const safePeriodo = Object.prototype.hasOwnProperty.call(PERIODOS, periodo) ? periodo : 'semanal';
 	const currentHash = window.location.hash || '#/ranking';
-	const [path = '/ranking'] = currentHash.replace(/^#/, '').split('?');
-	const nextHash = `#${path}?periodo=${encodeURIComponent(safePeriodo)}`;
+	const [path = '/ranking', rawQuery = ''] = currentHash.replace(/^#/, '').split('?');
+	const params = new URLSearchParams(rawQuery);
+	params.set('periodo', safePeriodo);
+	if (inicio) {
+		params.set('inicio', inicio);
+	} else {
+		params.delete('inicio');
+	}
+	const query = params.toString();
+	const nextHash = `#${path}${query ? `?${query}` : ''}`;
 
 	if (window.location.hash !== nextHash) {
 		history.replaceState(null, '', nextHash);
@@ -187,7 +271,7 @@ function renderLayout(contenedor, periodo) {
 	contenedor.innerHTML = `
 		<section class="rk-page page-enter">
 			<header class="rk-header">
-				<h1 class="rk-title"><i class="bi bi-graph-up-arrow"></i>Ranking ${escapeHtml(periodoLabel)}</h1>
+				<h1 id="ranking-title" class="rk-title"><i class="bi bi-graph-up-arrow"></i>Ranking ${escapeHtml(periodoLabel)}</h1>
 
 				<div class="rk-filters">
 					<select id="ranking-periodo" class="rk-select" aria-label="Seleccionar periodo de ranking">
@@ -196,12 +280,12 @@ function renderLayout(contenedor, periodo) {
 							.join('')}
 					</select>
 
-					<select class="rk-select" aria-label="Periodo actual" disabled>
+					<select id="ranking-periodo-detalle" class="rk-select" aria-label="Periodo actual">
 						<option>${escapeHtml(periodoMeta.label)}</option>
 					</select>
 				</div>
 
-				<p class="rk-range">${escapeHtml(periodoMeta.range)}</p>
+				<p id="ranking-range" class="rk-range">${escapeHtml(periodoMeta.range)}</p>
 				<span class="rk-status">En Curso</span>
 			</header>
 
@@ -211,6 +295,9 @@ function renderLayout(contenedor, periodo) {
 
 	return {
 		periodoSelect: contenedor.querySelector('#ranking-periodo'),
+		periodoDetalleSelect: contenedor.querySelector('#ranking-periodo-detalle'),
+		title: contenedor.querySelector('#ranking-title'),
+		range: contenedor.querySelector('#ranking-range'),
 		content: contenedor.querySelector('#ranking-content'),
 	};
 }
@@ -266,11 +353,74 @@ async function fetchBestPhotoByUser(nombreUsuario) {
 	}
 }
 
+async function fetchRankingPeriodos(periodo) {
+	const response = await api.get('/ranking/periodos', { periodo });
+	return Array.isArray(response?.opciones) ? response.opciones : [];
+}
+
+function normalizePeriodoOpciones(opciones, periodo) {
+	if (periodo === 'historico') {
+		return [{ inicio: null, fin: null }];
+	}
+
+	return opciones
+		.map((opcion) => ({
+			inicio: opcion?.inicio ? formatDateOnly(opcion.inicio) : null,
+			fin: opcion?.fin ? formatDateOnly(opcion.fin) : null,
+		}))
+		.filter((opcion) => opcion.inicio || opcion.fin);
+}
+
+function renderPeriodoOpciones(select, periodo, opciones, selectedInicio) {
+	if (!select) {
+		return;
+	}
+
+	if (!opciones.length) {
+		select.disabled = true;
+		select.innerHTML = '<option value="">Sin periodos</option>';
+		return;
+	}
+
+	select.disabled = false;
+	select.innerHTML = opciones
+		.map((opcion) => {
+			const meta = getPeriodoOptionMeta(periodo, opcion);
+			const value = opcion.inicio || (periodo === 'historico' ? 'historico' : '');
+			return `<option value="${escapeHtml(value)}" ${value === selectedInicio ? 'selected' : ''}>${escapeHtml(meta.label)}</option>`;
+		})
+		.join('');
+}
+
+function updatePeriodoHeader(titleEl, periodo) {
+	if (!titleEl) {
+		return;
+	}
+
+	const label = PERIODOS[periodo] ?? PERIODOS.semanal;
+	titleEl.innerHTML = `<i class="bi bi-graph-up-arrow"></i>Ranking ${escapeHtml(label)}`;
+}
+
+function updatePeriodoRange(rangeEl, periodo, opcion) {
+	if (!rangeEl) {
+		return;
+	}
+
+	const meta = getPeriodoOptionMeta(periodo, opcion);
+	rangeEl.textContent = meta.range;
+}
+
 /**
  * Obtiene ranking de fotos (ahora devuelve fotos directamente, sin enriquecimiento).
  */
-async function fetchRankingData(periodo) {
-	const response = await api.get('/ranking', { periodo });
+async function fetchRankingData(periodo, rango) {
+	const params = { periodo };
+	if (rango?.inicio && rango?.fin) {
+		params.inicio = rango.inicio;
+		params.fin = rango.fin;
+	}
+
+	const response = await api.get('/ranking', params);
 	const ranking = Array.isArray(response?.ranking)
 		? response.ranking.map((item) => ({
 			...item,
@@ -521,11 +671,11 @@ async function applyFade(contenedor, callback) {
 /**
  * Carga datos de ranking y los renderiza.
  */
-async function loadRanking(contenedor, periodo) {
+async function loadRanking(contenedor, periodo, rango) {
 	renderSkeleton(contenedor);
 
 	try {
-		const ranking = await fetchRankingData(periodo);
+		const ranking = await fetchRankingData(periodo, rango);
 		renderRankingContent(contenedor, ranking);
 	} catch (error) {
 		manejarErrorDePagina(contenedor, error, {
@@ -534,6 +684,24 @@ async function loadRanking(contenedor, periodo) {
 			fallbackMessage: 'No se pudo cargar el ranking en este momento.',
 		});
 	}
+}
+
+async function refreshPeriodoOpciones(state, refs) {
+	const opcionesRaw = await fetchRankingPeriodos(state.periodo);
+	const opciones = normalizePeriodoOpciones(opcionesRaw, state.periodo);
+	const seleccion = opciones.find((opcion) => opcion.inicio === state.inicio) || opciones[0] || null;
+
+	state.opciones = opciones;
+	state.inicio = seleccion?.inicio || null;
+	state.fin = seleccion?.fin || null;
+
+	const selectedValue = state.inicio || (state.periodo === 'historico' ? 'historico' : '');
+	renderPeriodoOpciones(refs.periodoDetalleSelect, state.periodo, opciones, selectedValue);
+	updatePeriodoHeader(refs.title, state.periodo);
+	updatePeriodoRange(refs.range, state.periodo, seleccion);
+	updatePeriodoHash(state.periodo, state.inicio);
+
+	return seleccion;
 }
 
 /**
@@ -546,8 +714,12 @@ async function render(contenedor, params = {}) {
 
 	void params;
 
+	const hashState = getPeriodoFromHash();
 	const state = {
-		periodo: getPeriodoFromHash(),
+		periodo: hashState.periodo,
+		inicio: hashState.inicio,
+		fin: null,
+		opciones: [],
 	};
 
 	const refs = renderLayout(contenedor, state.periodo);
@@ -589,7 +761,8 @@ async function render(contenedor, params = {}) {
 		await abrirModalFoto(fotografiaId);
 	});
 
-	await loadRanking(refs.content, state.periodo);
+	const seleccionInicial = await refreshPeriodoOpciones(state, refs);
+	await loadRanking(refs.content, state.periodo, seleccionInicial);
 
 	refs.periodoSelect?.addEventListener('change', async (event) => {
 		const nextPeriodo = String(event.target.value || 'semanal').toLowerCase();
@@ -598,17 +771,47 @@ async function render(contenedor, params = {}) {
 		}
 
 		state.periodo = nextPeriodo;
-		updatePeriodoHash(nextPeriodo);
+		state.inicio = null;
+		state.fin = null;
+
+		const seleccion = await refreshPeriodoOpciones(state, refs);
+		await applyFade(refs.content, async () => {
+			await loadRanking(refs.content, nextPeriodo, seleccion);
+		});
+	});
+
+	refs.periodoDetalleSelect?.addEventListener('change', async (event) => {
+		const nextValue = String(event.target.value || '');
+		if (!nextValue) {
+			return;
+		}
+
+		const seleccion = nextValue === 'historico'
+			? state.opciones[0] || null
+			: state.opciones.find((opcion) => opcion.inicio === nextValue) || null;
+		if (!seleccion) {
+			return;
+		}
+
+		if (nextValue !== 'historico' && nextValue === state.inicio) {
+			return;
+		}
+
+		state.inicio = seleccion.inicio;
+		state.fin = seleccion.fin;
+		updatePeriodoRange(refs.range, state.periodo, seleccion);
+		updatePeriodoHash(state.periodo, state.inicio);
 
 		await applyFade(refs.content, async () => {
-			await loadRanking(refs.content, nextPeriodo);
+			await loadRanking(refs.content, state.periodo, seleccion);
 		});
 	});
 
 	// Refresca el ranking cuando se crea una calificación nueva en otra página
 	window.addEventListener('calificacion-creada', async () => {
+		const seleccion = state.opciones.find((opcion) => opcion.inicio === state.inicio) || null;
 		await applyFade(refs.content, async () => {
-			await loadRanking(refs.content, state.periodo);
+			await loadRanking(refs.content, state.periodo, seleccion);
 		});
 	});
 }
