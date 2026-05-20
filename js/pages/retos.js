@@ -161,27 +161,6 @@ function renderFinalizadosSection(state) {
 			state.finalizados.total = toSafeNumber(response?.total, 0);
 			state.finalizados.paginaActual = nuevaPagina;
 			renderFinalizadosSection(state);
-
-			// Auto-refresh when a reto is created or edited
-			window.addEventListener('reto-creado-o-editado', async () => {
-				try {
-					const activosResp = await api.get('/retos/activos');
-					const activosList = Array.isArray(activosResp?.retos) ? activosResp.retos.slice(0, LIMITE_ACTIVOS) : [];
-					if (activosList.length === 0) {
-						showEmpty(state.refs.activos, 'No hay retos activos en este momento.');
-					} else {
-						gridRetos(activosList, state.refs.activos);
-					}
-
-					const finalizadosResp = await api.get('/retos/finalizados', { pagina: 1, limite: LIMITE_FINALIZADOS });
-					state.finalizados.items = Array.isArray(finalizadosResp?.retos) ? finalizadosResp.retos : [];
-					state.finalizados.total = toSafeNumber(finalizadosResp?.total, 0);
-					state.finalizados.paginaActual = 1;
-					renderFinalizadosSection(state);
-				} catch {
-					// ignore errors during background refresh
-				}
-			});
 		} catch (error) {
 			manejarErrorDePagina(state.refs.finalizados, error, {
 				notFoundMessage: 'No encontramos los retos finalizados solicitados.',
@@ -192,6 +171,24 @@ function renderFinalizadosSection(state) {
 			state.finalizados.loading = false;
 		}
 	});
+}
+
+async function refreshActivos(state) {
+	const activosResp = await api.get('/retos/activos');
+	const activosList = Array.isArray(activosResp?.retos) ? activosResp.retos.slice(0, LIMITE_ACTIVOS) : [];
+	if (activosList.length === 0) {
+		showEmpty(state.refs.activos, 'No hay retos activos en este momento.');
+	} else {
+		gridRetos(activosList, state.refs.activos);
+	}
+}
+
+async function refreshFinalizados(state, pagina = 1) {
+	const finalizadosResp = await api.get('/retos/finalizados', { pagina, limite: LIMITE_FINALIZADOS });
+	state.finalizados.items = Array.isArray(finalizadosResp?.retos) ? finalizadosResp.retos : [];
+	state.finalizados.total = toSafeNumber(finalizadosResp?.total, 0);
+	state.finalizados.paginaActual = pagina;
+	renderFinalizadosSection(state);
 }
 
 /**
@@ -268,6 +265,18 @@ async function render(contenedor, params = {}) {
 	};
 
 	renderFinalizadosSection(state);
+
+	window.addEventListener('reto-creado-o-editado', async () => {
+		try {
+			showSectionSkeleton(refs.activos, 3);
+			showSectionSkeleton(refs.finalizados, 3);
+			refs.paginacion.innerHTML = '';
+			await refreshActivos(state);
+			await refreshFinalizados(state, 1);
+		} catch {
+			// ignore errors during background refresh
+		}
+	});
 
 
 }

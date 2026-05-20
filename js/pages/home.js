@@ -217,6 +217,17 @@ async function render(contenedor, params = {}) {
 			showSectionError(refs.participaciones, participacionesResult.reason?.error || 'No se pudieron cargar tus participaciones.');
 		}
 	}
+
+	window.addEventListener('reto-creado-o-editado', async () => {
+		try {
+			showRetosSkeleton(refs.retos);
+			const response = await api.get('/home');
+			const retosActivos = Array.isArray(response?.retos_activos) ? response.retos_activos.slice(0, 3) : [];
+			gridRetos(retosActivos, refs.retos);
+		} catch {
+			// ignore background refresh errors
+		}
+	});
 }
 
 export { render };
