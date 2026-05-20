@@ -270,24 +270,35 @@ function clearModal() {
 function bindEvents(state) {
 	const fileInput = state.modalElement.querySelector('#pc-upload-file');
 	const form = state.modalElement.querySelector('#pc-upload-form');
+	const modalRoot = state.modalElement;
 
-	state.modalElement.querySelector('[data-accion="abrir-file"]')?.addEventListener('click', () => {
-		fileInput?.click();
-	});
-
-	state.modalElement.querySelector('[data-accion="quitar-imagen"]')?.addEventListener('click', (event) => {
-		event.preventDefault();
-		if (fileInput) {
-			fileInput.value = '';
+	modalRoot.addEventListener('click', (event) => {
+		const target = event.target instanceof Element ? event.target.closest('[data-accion]') : null;
+		if (!target) {
+			return;
 		}
-		setPreviewFile(state, null);
-		clearErrors(state);
-	});
 
-	state.modalElement.querySelector('[data-accion="cancelar"]')?.addEventListener('click', () => {
-		const modal = window.bootstrap?.Modal.getInstance(state.modalElement);
-		if (modal) {
-			modal.hide();
+		const action = target.getAttribute('data-accion');
+		if (action === 'abrir-file') {
+			fileInput?.click();
+			return;
+		}
+
+		if (action === 'quitar-imagen') {
+			event.preventDefault();
+			if (fileInput) {
+				fileInput.value = '';
+			}
+			setPreviewFile(state, null);
+			clearErrors(state);
+			return;
+		}
+
+		if (action === 'cancelar') {
+			const modal = window.bootstrap?.Modal.getInstance(state.modalElement);
+			if (modal) {
+				modal.hide();
+			}
 		}
 	});
 
