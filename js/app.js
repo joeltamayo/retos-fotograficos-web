@@ -46,6 +46,10 @@ function closeOpenModals() {
 	document.body.classList.remove('modal-open');
 }
 
+function hasOpenModal() {
+	return Boolean(document.querySelector('.modal.show'));
+}
+
 /**
  * Normaliza el hash actual a una ruta usable por el matcher.
  */
@@ -280,6 +284,10 @@ async function revalidarSesionYRender() {
 }
 
 function scheduleRevalidation() {
+	if (hasOpenModal()) {
+		return;
+	}
+
 	if (revalidationTimer) {
 		clearTimeout(revalidationTimer);
 	}
