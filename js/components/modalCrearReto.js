@@ -165,6 +165,9 @@ function validateForm(values) {
         if (values.fecha_fin && values.fecha_fin < today) {
             errors.fecha_fin = 'La fecha de fin no puede estar en el pasado.';
         }
+        if (!values.imagen_file) {
+            errors.imagen_file = 'Carga una imagen de portada.';
+        }
     }
     return errors;
 }
@@ -245,7 +248,7 @@ function renderModalContent(state) {
                     </div>
                 </div>
                 <div class="mcr-section">
-                    <div class="mcr-label">Imagen de Portada</div>
+                    <div class="mcr-label">Imagen de Portada ${state.isEditing ? '' : '*'}</div>
                     <input id="mcr-imagen-file" name="imagen_file" type="file" accept="image/jpeg,image/png,image/webp" hidden>
                     <div id="mcr-upload-zone"></div>
                     <p class="mcr-error" data-error="imagen_file"></p>
