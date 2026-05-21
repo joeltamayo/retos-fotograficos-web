@@ -16,24 +16,27 @@
   margin-bottom: 22px;
 }
 
-.rk-top-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-
 .rk-user-inline {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   margin-left: auto;
   color: var(--color-text);
+  max-width: 140px;
+  min-width: 0;
 }
 
 .rk-user-inline .rk-user-avatar {
   width: 36px;
   height: 36px;
+  flex-shrink: 0;
+}
+
+.rk-user-inline span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
 }
 
 /* Título principal: identifica la vista de ranking. */
@@ -267,6 +270,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  width: 100%;
 }
 
 .rk-place-icon {
@@ -274,6 +278,18 @@
   color: var(--color-text-secondary);
   display: inline-flex;
   align-items: center;
+}
+
+.rk-place-icon--oro {
+  color: #FACC15;
+}
+
+.rk-place-icon--plata {
+  color: #94A3B8;
+}
+
+.rk-place-icon--bronce {
+  color: #EA580C;
 }
 
 .rk-place-and-title {
@@ -292,9 +308,11 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  margin-top: 12px;
   margin-bottom: 12px;
   font-size: 14px;
   color: var(--color-text);
+  width: 100%;
 }
 
 /* Avatar de usuario: imagen circular. */

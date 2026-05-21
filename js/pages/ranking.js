@@ -508,22 +508,20 @@ function renderPodiumCard(entry, medalla) {
 			</div>
 
 			<div class="rk-podium-body">
-				<div class="rk-top-row">
-					<div class="rk-place-row">
-						<i class="bi ${badge.placeIcon} rk-place-icon"></i>
-						<div class="rk-place-and-title">
-							<div class="rk-place"><span class="rk-place-label">${badge.placeLabel}</span></div>
-							<h3 class="rk-photo-title">${escapeHtml(tituloFoto)}</h3>
-						</div>
-					</div>
-
-					<div class="rk-user-inline">
-						${renderAvatar(item?.foto_perfil_public_id ? cloudinaryUrl(item.foto_perfil_public_id, { width: 64, height: 64, crop: 'fill' }) : item?.foto_perfil_url, usuario)}
-						<span>${escapeHtml(usuario)}</span>
+				<div class="rk-place-row">
+					<i class="bi ${badge.placeIcon} rk-place-icon rk-place-icon--${medalla}"></i>
+					<div class="rk-place-and-title">
+						<div class="rk-place"><span class="rk-place-label">${badge.placeLabel}</span></div>
+						<h3 class="rk-photo-title">${escapeHtml(tituloFoto)}</h3>
 					</div>
 				</div>
 
-					<div class="rk-score-box ${badge.scoreClass}">
+				<div class="rk-user-row">
+					${renderAvatar(item?.foto_perfil_public_id ? cloudinaryUrl(item.foto_perfil_public_id, { width: 28, height: 28, crop: 'fill' }) : item?.foto_perfil_url, usuario)}
+					<span>${escapeHtml(usuario)}</span>
+				</div>
+
+				<div class="rk-score-box ${badge.scoreClass}">
 					<div class="rk-score-value">${scoreValue}</div>
 					<div class="rk-score-label">Promedio Total</div>
 				</div>
