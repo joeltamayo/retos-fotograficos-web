@@ -86,7 +86,7 @@ function renderRegistroForm() {
 			<p class="lg-error" data-error="nombreCompleto"></p>
 
 			<label class="lg-label" for="registro-nombre-usuario">Nombre de Usuario</label>
-			<input id="registro-nombre-usuario" name="nombreUsuario" type="text" class="lg-input" placeholder="juanperez" autocomplete="username">
+			<input id="registro-nombre-usuario" name="nombreUsuario" type="text" class="lg-input" placeholder="juanperez" autocomplete="username" maxlength="20">
 			<p class="lg-error" data-error="nombreUsuario"></p>
 
 			<label class="lg-label" for="registro-correo">Email</label>
@@ -207,6 +207,8 @@ function validateRegistro(values) {
 
 	if (!values.nombreUsuario) {
 		errors.nombreUsuario = 'Ingresa un nombre de usuario.';
+	} else if (values.nombreUsuario.length > 20) {
+		errors.nombreUsuario = 'El nombre de usuario no puede exceder 20 caracteres.';
 	}
 
 	if (!values.correo) {
@@ -344,7 +346,12 @@ function bindRegistroSubmit(contenedor, state) {
 					setInlineError(form, 'correo', error.error || 'Ya existe una cuenta con esos datos.');
 				}
 			} else if (error?.status === 400) {
-				setInlineError(form, 'correo', error?.error || 'Hay datos inválidos.');
+				const texto = String(error?.error || '').toLowerCase();
+				if (texto.includes('character varying')) {
+					setInlineError(form, 'nombreUsuario', 'El nombre de usuario es demasiado largo.');
+				} else {
+					setInlineError(form, 'correo', error?.error || 'Hay datos inválidos.');
+				}
 			} else {
 				setInlineError(form, 'correo', error?.error || 'No se pudo crear la cuenta.');
 			}
