@@ -107,6 +107,28 @@ function formatDateOnly(value) {
 	return String(value);
 }
 
+function isCurrentRange(periodo, inicio, fin) {
+	if (periodo === 'historico' || !inicio || !fin) return false;
+	const today = new Date();
+	const todayStr = formatDateOnly(today);
+	const inicioStr = formatDateOnly(inicio);
+	const finStr = formatDateOnly(fin);
+	if (!inicioStr || !finStr) return false;
+	return inicioStr <= todayStr && todayStr <= finStr;
+}
+
+/**
+ * Actualiza la visibilidad del badge "En Curso" basado en el rango seleccionado.
+ */
+function updateEnCursoStatus(statusElement, periodo, seleccion) {
+	if (!statusElement || !seleccion || !seleccion.inicio || !seleccion.fin) {
+		if (statusElement) statusElement.style.display = 'none';
+		return;
+	}
+	const isCurrent = isCurrentRange(periodo, seleccion.inicio, seleccion.fin);
+	statusElement.style.display = isCurrent ? '' : 'none';
+}
+
 function getPeriodoMeta(periodo) {
 	const now = new Date();
 
@@ -229,11 +251,11 @@ function getPeriodoFromHash() {
 	const hashWithoutSymbol = rawHash.startsWith('#') ? rawHash.slice(1) : rawHash;
 	const queryString = hashWithoutSymbol.includes('?') ? hashWithoutSymbol.split('?')[1] : '';
 	const params = new URLSearchParams(queryString);
-	const periodoRaw = String(params.get('periodo') || 'semanal').toLowerCase();
+	const periodoRaw = String(params.get('periodo') || 'historico').toLowerCase();
 	const inicio = params.get('inicio');
 
 	return {
-		periodo: Object.prototype.hasOwnProperty.call(PERIODOS, periodoRaw) ? periodoRaw : 'semanal',
+		periodo: Object.prototype.hasOwnProperty.call(PERIODOS, periodoRaw) ? periodoRaw : 'historico',
 		inicio: inicio ? String(inicio) : null,
 	};
 }
@@ -286,7 +308,7 @@ function renderLayout(contenedor, periodo) {
 				</div>
 
 				<p id="ranking-range" class="rk-range">${escapeHtml(periodoMeta.range)}</p>
-				<span class="rk-status">En Curso</span>
+				<span id="ranking-status" class="rk-status" style="display: none;">En Curso</span>
 			</header>
 
 			<div id="ranking-content" class="rk-content"></div>
@@ -298,6 +320,7 @@ function renderLayout(contenedor, periodo) {
 		periodoDetalleSelect: contenedor.querySelector('#ranking-periodo-detalle'),
 		title: contenedor.querySelector('#ranking-title'),
 		range: contenedor.querySelector('#ranking-range'),
+		status: contenedor.querySelector('#ranking-status'),
 		content: contenedor.querySelector('#ranking-content'),
 	};
 }
@@ -761,9 +784,10 @@ async function render(contenedor, params = {}) {
 
 	const seleccionInicial = await refreshPeriodoOpciones(state, refs);
 	await loadRanking(refs.content, state.periodo, seleccionInicial);
+	updateEnCursoStatus(refs.status, state.periodo, seleccionInicial);
 
 	refs.periodoSelect?.addEventListener('change', async (event) => {
-		const nextPeriodo = String(event.target.value || 'semanal').toLowerCase();
+		const nextPeriodo = String(event.target.value || 'historico').toLowerCase();
 		if (nextPeriodo === state.periodo) {
 			return;
 		}
@@ -776,6 +800,7 @@ async function render(contenedor, params = {}) {
 		await applyFade(refs.content, async () => {
 			await loadRanking(refs.content, nextPeriodo, seleccion);
 		});
+		updateEnCursoStatus(refs.status, nextPeriodo, seleccion);
 	});
 
 	refs.periodoDetalleSelect?.addEventListener('change', async (event) => {
@@ -803,6 +828,7 @@ async function render(contenedor, params = {}) {
 		await applyFade(refs.content, async () => {
 			await loadRanking(refs.content, state.periodo, seleccion);
 		});
+		updateEnCursoStatus(refs.status, state.periodo, seleccion);
 	});
 
 	// Refresca el ranking cuando se crea una calificación nueva en otra página
