@@ -18,8 +18,8 @@
 /* Título: identifica el área administrativa actual. */
 .admin-title {
     margin: 0;
-    font-size: 30px;
-    font-weight: 700;
+    font-size: 20px;
+    font-weight: 600;
     color: var(--color-text);
     display: inline-flex;
     align-items: center;
