@@ -83,6 +83,27 @@ async function getCategorias() {
     }
 }
 
+function normalizeText(value) {
+    return String(value || '').trim();
+}
+
+async function fetchCategoriaSuggestions(query) {
+    const clean = normalizeText(query);
+    if (clean.length < 2) return [];
+    try {
+        const response = await api.get(`/catalogos/categorias?search=${encodeURIComponent(clean)}`);
+        return Array.isArray(response?.categorias) ? response.categorias : [];
+    } catch {
+        return [];
+    }
+}
+
+async function createCategoria(nombre) {
+    const clean = normalizeText(nombre);
+    if (!clean) throw new Error('Nombre requerido.');
+    return api.post('/catalogos/categorias', { nombre: clean });
+}
+
 function setCategoriaOptions(selectElement, categorias = [], selectedId = '') {
     if (!selectElement) return;
 
@@ -220,7 +241,17 @@ function renderModalContent(state) {
                 </div>
                 <div class="mcr-section">
                     <label class="mcr-label" for="mcr-categoria">Categoría *</label>
-                    <select id="mcr-categoria" name="categoria_id" class="mcr-select">
+                    <div class="mcr-category-picker">
+                        <div class="mcr-category-field">
+                            <input id="mcr-categoria-search" class="mcr-input" type="text" placeholder="Buscar o seleccionar categoría">
+                            <button type="button" class="mcr-btn mcr-btn--outline" id="mcr-create-categoria" hidden>Crear</button>
+                        </div>
+                        <div id="mcr-categoria-dropdown" class="mcr-category-dropdown" hidden>
+                            <div id="mcr-categoria-sugerencias" class="mcr-suggestions"></div>
+                            <p class="mcr-error" data-error="categoria_nueva"></p>
+                        </div>
+                    </div>
+                    <select id="mcr-categoria" name="categoria_id" class="mcr-select mcr-hidden" aria-hidden="true">
                         <option value="">Cargando categorías...</option>
                     </select>
                     <p class="mcr-error" data-error="categoria_id"></p>
@@ -302,6 +333,16 @@ async function abrirModalCrearReto(onSaved = null, reto = null) {
     const durationSelect = form.querySelector('#mcr-duracion');
     const fileInput = form.querySelector('#mcr-imagen-file');
     const uploadZone = form.querySelector('#mcr-upload-zone');
+    const categoriaPicker = form.querySelector('.mcr-category-picker');
+    const categoriaDropdown = form.querySelector('#mcr-categoria-dropdown');
+    const categoriaSearch = form.querySelector('#mcr-categoria-search');
+    const categoriaSugerencias = form.querySelector('#mcr-categoria-sugerencias');
+    const categoriaHelper = form.querySelector('#mcr-categoria-helper');
+    const createCategoriaBtn = form.querySelector('#mcr-create-categoria');
+
+    if (createCategoriaBtn) {
+        createCategoriaBtn.hidden = true;
+    }
 
     const today = getTodayDateString();
     if (!state.isEditing) {
@@ -373,6 +414,159 @@ async function abrirModalCrearReto(onSaved = null, reto = null) {
             </div>
         `;
     };
+
+    const renderCategoriaSugerencias = (items, query = '') => {
+        if (!categoriaSugerencias) return;
+        if (!items.length) {
+            categoriaSugerencias.innerHTML = query
+                ? '<p class="mcr-helper">Sin coincidencias.</p>'
+                : '';
+            return;
+        }
+
+        categoriaSugerencias.innerHTML = `
+            <ul>
+                ${items
+                    .map((item) => `<li data-id="${escapeHtml(item.id)}" data-nombre="${escapeHtml(item.nombre)}">${escapeHtml(item.nombre)}</li>`)
+                    .join('')}
+            </ul>
+        `;
+    };
+
+    const refreshCategorias = async (selectedId) => {
+        categoriasCache = null;
+        const categorias = await getCategorias();
+        setCategoriaOptions(form.categoria_id, categorias, selectedId || form.categoria_id?.value);
+        const selected = String(selectedId || form.categoria_id?.value || '').trim();
+        if (categoriaSearch) {
+            const match = categorias.find((categoria) => String(categoria?.id ?? '') === selected);
+            categoriaSearch.value = match?.nombre || '';
+        }
+    };
+
+    const isExactMatch = (value, items) => {
+        const lowerValue = String(value || '').trim().toLowerCase();
+        if (!lowerValue) return false;
+        return items.some((item) => String(item?.nombre || '').toLowerCase() === lowerValue);
+    };
+
+    const updateCreateButton = (value, items) => {
+        if (!createCategoriaBtn) return;
+        const text = String(value || '').trim();
+        const exactMatch = isExactMatch(text, items || []);
+        const isOpen = !categoriaDropdown?.hidden;
+        createCategoriaBtn.hidden = !isOpen || text.length < 3 || exactMatch;
+    };
+
+    if (categoriaSearch && categorias.length) {
+        const selected = String(form.categoria_id?.value || '').trim();
+        const match = categorias.find((categoria) => String(categoria?.id ?? '') === selected);
+        categoriaSearch.value = match?.nombre || '';
+    }
+
+    updateCreateButton('', categoriasCache || []);
+
+    const toggleCategoriaDropdown = (open) => {
+        if (!categoriaDropdown) return;
+        categoriaDropdown.hidden = !open;
+        if (categoriaPicker) {
+            categoriaPicker.classList.toggle('is-open', open);
+        }
+        if (open) {
+            if (categoriaSearch) {
+                categoriaSearch.focus();
+            }
+            renderCategoriaSugerencias(categoriasCache || []);
+            updateCreateButton(categoriaSearch?.value || '', categoriasCache || []);
+        } else {
+            if (categoriaSearch && !String(form.categoria_id?.value || '').trim()) {
+                categoriaSearch.value = '';
+            }
+            renderCategoriaSugerencias([]);
+            if (createCategoriaBtn) {
+                createCategoriaBtn.hidden = true;
+            }
+        }
+    };
+
+    categoriaSearch?.addEventListener('focus', () => {
+        toggleCategoriaDropdown(true);
+    });
+
+    if (categoriaSearch) {
+        let sugerenciasTimeout;
+        categoriaSearch.addEventListener('input', () => {
+            const value = normalizeText(categoriaSearch.value);
+            if (sugerenciasTimeout) clearTimeout(sugerenciasTimeout);
+
+            if (value.length < 2) {
+                renderCategoriaSugerencias(categoriasCache || []);
+                updateCreateButton(value, categoriasCache || []);
+                return;
+            }
+
+            updateCreateButton(value, categoriasCache || []);
+            sugerenciasTimeout = window.setTimeout(async () => {
+                const sugerencias = await fetchCategoriaSuggestions(value);
+                renderCategoriaSugerencias(sugerencias, value);
+                const sourceItems = [...(categoriasCache || []), ...sugerencias];
+                updateCreateButton(value, sourceItems);
+            }, 250);
+        });
+    }
+
+    if (categoriaSugerencias) {
+        categoriaSugerencias.addEventListener('click', (event) => {
+            const target = event.target instanceof Element ? event.target.closest('li[data-id]') : null;
+            if (!target) return;
+            const id = String(target.getAttribute('data-id') || '').trim();
+            if (!id) return;
+            const nombre = String(target.getAttribute('data-nombre') || '').trim();
+            form.categoria_id.value = id;
+            if (categoriaSearch) categoriaSearch.value = nombre;
+            setError(form, 'categoria_id', '');
+            toggleCategoriaDropdown(false);
+        });
+    }
+
+    if (createCategoriaBtn) {
+        createCategoriaBtn.addEventListener('click', async () => {
+            clearErrors(form);
+            const nombre = normalizeText(categoriaSearch?.value || '');
+            if (!nombre) {
+                setError(form, 'categoria_nueva', 'Ingresa un nombre de categoría.');
+                return;
+            }
+
+            try {
+                createCategoriaBtn.disabled = true;
+                const response = await createCategoria(nombre);
+                const categoria = response?.categoria;
+                if (!categoria?.id) {
+                    setError(form, 'categoria_nueva', 'No se pudo crear la categoría.');
+                    return;
+                }
+                form.categoria_id.value = String(categoria.id);
+                await refreshCategorias(String(categoria.id));
+                if (categoriaSearch) categoriaSearch.value = categoria.nombre || nombre;
+                renderCategoriaSugerencias([]);
+                toggleCategoriaDropdown(false);
+                mostrarToast('Categoría creada y seleccionada.', 'success');
+            } catch (error) {
+                setError(form, 'categoria_nueva', error?.error || 'No se pudo crear la categoría.');
+            } finally {
+                updateCreateButton(categoriaSearch?.value || '', categoriasCache || []);
+            }
+        });
+    }
+
+    document.addEventListener('click', (event) => {
+        if (!categoriaDropdown || categoriaDropdown.hidden) return;
+        const target = event.target instanceof Element ? event.target : null;
+        if (!target) return;
+        if (target.closest('.mcr-category-picker')) return;
+        toggleCategoriaDropdown(false);
+    });
 
     const setPreviewFile = (file) => {
         if (state.previewUrl) {

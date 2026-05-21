@@ -198,6 +198,82 @@
     margin-top: 20px;
 }
 
+.mcr-hidden {
+    display: none;
+}
+
+.mcr-category-picker {
+    display: grid;
+    gap: 8px;
+}
+
+.mcr-category-picker:not(.is-open) {
+    gap: 0;
+}
+
+.mcr-category-field {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px;
+    align-items: center;
+}
+
+.mcr-category-dropdown {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: #FFFFFF;
+    padding: 10px;
+    display: grid;
+    gap: 10px;
+}
+
+.mcr-category-dropdown[hidden] {
+    display: none;
+}
+
+
+.mcr-category-create {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.mcr-suggestions {
+    margin-top: 2px;
+}
+
+.mcr-suggestions ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 6px;
+    max-height: 184px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.mcr-suggestions li {
+    background: var(--color-neutral-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 8px 10px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--color-text);
+}
+
+.mcr-suggestions li:hover {
+    background: var(--color-surface);
+}
+
+.mcr-helper {
+    margin: 0;
+    font-size: 12px;
+    color: var(--color-text-secondary);
+}
+
 /* Botón base: estilo común para todas las acciones. */
 .mcr-btn {
     border-radius: var(--radius-md);
@@ -212,6 +288,10 @@
     transition: opacity 0.2s;
     border: 0;
     font-family: inherit;
+}
+
+.mcr-btn[hidden] {
+    display: none !important;
 }
 
 /* Botón primario: confirma el guardado del reto. */
