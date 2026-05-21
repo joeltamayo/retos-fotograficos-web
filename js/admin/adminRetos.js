@@ -35,7 +35,13 @@ function formatDate(iso) {
 		return '—';
 	}
 
-	const date = new Date(iso);
+	const dateStr = String(iso).slice(0, 10);
+	const [year, month, day] = dateStr.split('-');
+	if (!year || !month || !day) {
+		return '—';
+	}
+
+	const date = new Date(Number(year), Number(month) - 1, Number(day));
 	if (Number.isNaN(date.getTime())) {
 		return '—';
 	}
@@ -159,14 +165,23 @@ function buildDateRange(reto) {
 	return inicio || fin || '—';
 }
 
+function parseDateLocal(iso) {
+	if (!iso) return null;
+	const dateStr = String(iso).slice(0, 10);
+	const [year, month, day] = dateStr.split('-');
+	if (!year || !month || !day) return null;
+	const date = new Date(Number(year), Number(month) - 1, Number(day));
+	return Number.isNaN(date.getTime()) ? null : date;
+}
+
 function normalizeDuration(reto) {
 	if (reto?.duracion) {
 		return String(reto.duracion);
 	}
 
-	const inicio = reto?.fecha_inicio ? new Date(reto.fecha_inicio) : null;
-	const fin = reto?.fecha_fin ? new Date(reto.fecha_fin) : null;
-	if (!inicio || !fin || Number.isNaN(inicio.getTime()) || Number.isNaN(fin.getTime())) {
+	const inicio = parseDateLocal(reto?.fecha_inicio);
+	const fin = parseDateLocal(reto?.fecha_fin);
+	if (!inicio || !fin) {
 		return '—';
 	}
 

@@ -79,7 +79,11 @@ const MILISEGUNDOS_DIA = 1000 * 60 * 60 * 24;
  * Convierte una entrada ISO en Date valida o null.
  */
 function parsearFecha(iso) {
-	const fecha = new Date(iso);
+	if (!iso) return null;
+	const dateStr = String(iso).slice(0, 10);
+	const [year, month, day] = dateStr.split('-');
+	if (!year || !month || !day) return null;
+	const fecha = new Date(Number(year), Number(month) - 1, Number(day));
 	return Number.isNaN(fecha.getTime()) ? null : fecha;
 }
 

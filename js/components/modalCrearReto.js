@@ -30,7 +30,10 @@ function getTodayDateString() {
 
 function parseDateInput(value) {
     if (!value) return null;
-    const parsed = new Date(`${value}T00:00:00`);
+    const dateStr = String(value).slice(0, 10);
+    const [year, month, day] = dateStr.split('-');
+    if (!year || !month || !day) return null;
+    const parsed = new Date(Number(year), Number(month) - 1, Number(day));
     return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
@@ -211,10 +214,32 @@ function fillForm(form, reto) {
     form.titulo.value = reto?.titulo || '';
     form.descripcion.value = reto?.descripcion || '';
     if (form.categoria_id) form.categoria_id.value = reto?.categoria_id ? String(reto.categoria_id) : '';
-    form.duracion.value = reto?.duracion || '1 Semana';
+    
+    const duracion = reto?.duracion || calculateDurationFromDates(reto?.fecha_inicio, reto?.fecha_fin);
+    form.duracion.value = duracion;
+    
     form.fecha_inicio.value = reto?.fecha_inicio ? String(reto.fecha_inicio).slice(0, 10) : '';
     form.fecha_fin.value = reto?.fecha_fin ? String(reto.fecha_fin).slice(0, 10) : '';
     if (form.imagen_file) form.imagen_file.value = '';
+}
+
+function calculateDurationFromDates(fechaInicio, fechaFin) {
+    if (!fechaInicio || !fechaFin) return '1 Semana';
+    
+    const inicio = parseDateInput(String(fechaInicio).slice(0, 10));
+    const fin = parseDateInput(String(fechaFin).slice(0, 10));
+    
+    if (!inicio || !fin) return '1 Semana';
+    
+    const diffMs = fin.getTime() - inicio.getTime();
+    const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 1) return '24h';
+    if (diffDays <= 7) return '1 Semana';
+    if (diffDays <= 30) return '1 Mes';
+    if (diffDays <= 365) return '1 Año';
+    
+    return '1 Semana';
 }
 
 function renderModalContent(state) {
@@ -259,8 +284,8 @@ function renderModalContent(state) {
                 <div class="mcr-section">
                     <label class="mcr-label" for="mcr-duracion">Duración *</label>
                     <select id="mcr-duracion" name="duracion" class="mcr-select">
-                        <option value="24h">24h</option>
-                        <option value="1 Semana" selected>1 Semana</option>
+                        <option value="24h" selected>24h</option>
+                        <option value="1 Semana" >1 Semana</option>
                         <option value="1 Mes">1 Mes</option>
                         <option value="Personalizado">Personalizado</option>
                     </select>
@@ -397,8 +422,11 @@ async function abrirModalCrearReto(onSaved = null, reto = null) {
 
         if (state.imageUrl) {
             uploadZone.innerHTML = `
-                <div class="mcr-upload-preview" data-accion="abrir-imagen-file">
+                <div class="mcr-upload-preview">
                     <img src="${escapeHtml(state.imageUrl)}" alt="Imagen actual del reto">
+                    <button type="button" class="mcr-upload-remove" data-accion="quitar-imagen" aria-label="Quitar imagen">
+                        <i class="bi bi-x"></i>
+                    </button>
                 </div>
             `;
             return;
@@ -591,6 +619,7 @@ async function abrirModalCrearReto(onSaved = null, reto = null) {
         if (action === 'quitar-imagen') {
             event.preventDefault();
             if (fileInput) fileInput.value = '';
+            state.imageUrl = '';
             setPreviewFile(null);
         }
     });

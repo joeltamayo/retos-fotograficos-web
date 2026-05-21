@@ -25,7 +25,13 @@ function formatearFechaDiaMes(iso) {
 		return '';
 	}
 
-	const fecha = new Date(iso);
+	const dateStr = String(iso).slice(0, 10);
+	const [year, month, day] = dateStr.split('-');
+	if (!year || !month || !day) {
+		return '';
+	}
+
+	const fecha = new Date(Number(year), Number(month) - 1, Number(day));
 	if (Number.isNaN(fecha.getTime())) {
 		return '';
 	}
