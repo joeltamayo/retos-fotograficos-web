@@ -1,6 +1,6 @@
 import api from '../api.js';
 import { renderPaginacion } from '../components/paginacion.js';
-import { mostrarToast, skeletonCard } from '../utils.js';
+import { mostrarToast, skeletonCard, animateUpdateOn } from '../utils.js';
 
 const DELETE_MODAL_ID = 'admin-usuario-delete-modal';
 const LIMITE = 10;
@@ -413,7 +413,7 @@ async function loadAndRender(state, refs) {
 				searchTimer = window.setTimeout(async () => {
 					state.query = searchInput.value.trim();
 					state.page = 1;
-					await loadAndRender(state, refs);
+					await refreshUsuariosTable(state, { content: refs.content });
 				}, 250);
 			});
 		}
@@ -434,7 +434,8 @@ async function loadAndRender(state, refs) {
 			});
 		}
 
-		renderTable(tableArea, usuarios, {
+		if (tableArea) tableArea.classList.add('pc-update-prep');
+			renderTable(tableArea, usuarios, {
 			onChangeRole: async (id, rol) => {
 				try {
 					await api.patch(`/admin/usuarios/${encodeURIComponent(id)}/rol`, { rol });
@@ -515,14 +516,19 @@ async function loadAndRender(state, refs) {
 				});
 			},
 		});
+		// Animacion visual al actualizar tabla
+		try { animateUpdateOn(tableArea); } catch (e) { /* ignore */ }
 
-		renderPaginacion(pagination, state.page, totalPages, async (page) => {
+			// Animacion visual al actualizar tabla (quita clase prep y anima)
+			try { animateUpdateOn(tableArea); } catch (e) { /* ignore */ }
+
+			renderPaginacion(pagination, state.page, totalPages, async (page) => {
 			if (page === state.page) {
 				return;
 			}
 
 			state.page = page;
-			await loadAndRender(state, refs);
+			await refreshUsuariosTable(state, { content: refs.content });
 		});
 
 		setState(refs.content, state);
@@ -530,6 +536,84 @@ async function loadAndRender(state, refs) {
 		refs.content.innerHTML = `<p class="admin-usuarios-error">${escapeHtml(error?.error || 'No se pudieron cargar los usuarios.')}</p>`;
 	}
 }
+
+	async function refreshUsuariosTable(state, refs) {
+		const content = refs?.content;
+		if (!(content instanceof HTMLElement)) return;
+
+		const tableArea = content.querySelector('#admin-usuarios-table-area');
+		const pagination = content.querySelector('#admin-usuarios-pagination');
+		const title = content.querySelector('.admin-usuarios-table-title');
+
+		if (tableArea) renderSkeleton(tableArea);
+
+		try {
+			const params = {
+				pagina: state.page,
+				limite: LIMITE,
+				buscar: state.query || undefined,
+				rol: state.rol && state.rol !== 'todos' ? state.rol : undefined,
+				estado: state.estado && state.estado !== 'todos' ? state.estado : undefined,
+			};
+
+			const response = await api.get('/admin/usuarios', params);
+			const usuarios = Array.isArray(response?.usuarios) ? response.usuarios : [];
+			const total = toInt(response?.total, usuarios.length);
+			const totalPages = Math.max(1, Math.ceil(total / LIMITE));
+
+			if (title) title.textContent = `Usuarios Registrados (${total})`;
+
+			if (tableArea) tableArea.classList.add('pc-update-prep');
+			renderTable(tableArea, usuarios, {
+				onChangeRole: async (id, rol) => {
+					try {
+						await api.patch(`/admin/usuarios/${encodeURIComponent(id)}/rol`, { rol });
+						mostrarToast('Rol actualizado correctamente.', 'success');
+					} catch (error) {
+						mostrarToast(error?.error || 'No se pudo actualizar el rol.', 'warning');
+					}
+				},
+				onToggleStatus: async (id) => {
+					const usuario = usuarios.find((item) => String(item.id) === String(id));
+					if (!usuario) return;
+
+					const nuevoEstado = String(usuario.estado || '').toLowerCase() === 'suspendido' ? 'activo' : 'suspendido';
+
+					try {
+						await api.patch(`/admin/usuarios/${encodeURIComponent(id)}/estado`, { estado: nuevoEstado });
+						mostrarToast(nuevoEstado === 'suspendido' ? 'Usuario suspendido correctamente.' : 'Usuario activado correctamente.', 'success');
+						await refreshUsuariosTable(state, { content });
+					} catch (error) {
+						mostrarToast(error?.error || 'No se pudo actualizar el estado.', 'warning');
+					}
+				},
+				onDelete: async (id) => {
+					const usuario = usuarios.find((item) => String(item.id) === String(id));
+					if (!usuario) return;
+
+					openDeleteModal(usuario, async () => {
+						try {
+							await api.delete(`/admin/usuarios/${encodeURIComponent(id)}`);
+							mostrarToast('Usuario eliminado correctamente.', 'success');
+							await refreshUsuariosTable(state, { content });
+						} catch (error) {
+							mostrarToast(error?.error || 'No se pudo eliminar el usuario.', 'warning');
+						}
+					});
+				},
+			});
+
+			renderPaginacion(pagination, state.page, totalPages, async (page) => {
+				if (page === state.page) return;
+				state.page = page;
+				await refreshUsuariosTable(state, { content });
+			});
+
+			setState(content, state);
+		} catch (error) {
+			if (tableArea) tableArea.innerHTML = `<p class="admin-usuarios-error">${escapeHtml(error?.error || 'No se pudieron cargar los usuarios.')}</p>`;
+		}
+	}
 
 /**
  * Entrada pública del módulo para el shell admin.

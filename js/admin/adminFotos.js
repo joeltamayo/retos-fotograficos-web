@@ -1,7 +1,7 @@
 import api from '../api.js';
 import { abrirModalFoto } from '../components/modalFoto.js';
 import { renderPaginacion } from '../components/paginacion.js';
-import { mostrarToast, skeletonCard, cloudinaryUrl } from '../utils.js';
+import { mostrarToast, skeletonCard, cloudinaryUrl, animateUpdateOn } from '../utils.js';
 
 const DELETE_MODAL_ID = 'admin-foto-delete-modal';
 const LIMITE = 10;
@@ -421,8 +421,8 @@ async function loadAndRender(state, refs) {
 				window.clearTimeout(state.searchTimer);
 				state.query = searchInput.value.trim();
 				state.page = 1;
-				state.searchTimer = window.setTimeout(() => {
-					loadAndRender(state, refs);
+				state.searchTimer = window.setTimeout(async () => {
+					await refreshFotosTable(state, { content: refs.content });
 				}, 250);
 			});
 		}
@@ -435,7 +435,8 @@ async function loadAndRender(state, refs) {
 			});
 		}
 
-		renderTable(tableArea, visibleFotos, {
+		if (tableArea) tableArea.classList.add('pc-update-prep');
+			renderTable(tableArea, visibleFotos, {
 			onView: async (id) => {
 				await abrirModalFoto(id, { useAdminEndpoint: true });
 			},
@@ -465,14 +466,19 @@ async function loadAndRender(state, refs) {
 				});
 			},
 		});
+		// Animacion visual al actualizar tabla
+		try { animateUpdateOn(tableArea); } catch (e) { /* ignore */ }
 
-		renderPaginacion(pagination, state.page, totalPages, async (page) => {
+			// Animacion visual al actualizar tabla (quita clase prep y anima)
+			try { animateUpdateOn(tableArea); } catch (e) { /* ignore */ }
+
+			renderPaginacion(pagination, state.page, totalPages, async (page) => {
 			if (page === state.page) {
 				return;
 			}
 
 			state.page = page;
-			await loadAndRender(state, refs);
+			await refreshFotosTable(state, { content: refs.content });
 		});
 
 		setState(refs.content, state);
@@ -480,6 +486,75 @@ async function loadAndRender(state, refs) {
 		refs.content.innerHTML = `<p class="admin-fotos-error">${escapeHtml(error?.error || 'No se pudieron cargar las fotografías.')}</p>`;
 	}
 }
+
+	async function refreshFotosTable(state, refs) {
+		const content = refs?.content;
+		if (!(content instanceof HTMLElement)) return;
+
+		const tableArea = content.querySelector('#admin-fotos-table-area');
+		const pagination = content.querySelector('#admin-fotos-pagination');
+		const title = content.querySelector('.admin-fotos-table-title');
+
+		if (tableArea) renderSkeleton(tableArea);
+
+		try {
+			const params = {
+				pagina: state.page,
+				limite: LIMITE,
+				buscar: state.query || undefined,
+				estado: state.estado !== 'todos' ? state.estado : undefined,
+			};
+
+			const response = await api.get('/admin/fotografias', params);
+			const rawFotos = Array.isArray(response?.fotografias) ? response.fotografias : [];
+			const orderedFotos = sortFotos(rawFotos, state.estado);
+			const visibleFotos = applySearchFilter(orderedFotos, state.query);
+			const total = toInt(response?.total, visibleFotos.length);
+			const totalPages = Math.max(1, Math.ceil(total / LIMITE));
+
+			if (title) title.textContent = `Fotografías Enviadas (${total})`;
+
+			if (tableArea) tableArea.classList.add('pc-update-prep');
+			renderTable(tableArea, visibleFotos, {
+				onView: async (id) => {
+					await abrirModalFoto(id, { useAdminEndpoint: true });
+				},
+				onModerate: async (id, estado) => {
+					try {
+						await api.patch(`/admin/fotografias/${encodeURIComponent(id)}/estado`, { estado });
+						mostrarToast(estado === 'aprobada' ? 'Fotografía aprobada correctamente.' : 'Fotografía rechazada correctamente.', 'success');
+						await loadAndRender(state, { content });
+					} catch (error) {
+						mostrarToast(error?.error || 'No se pudo actualizar el estado de la fotografía.', 'warning');
+					}
+				},
+				onDelete: async (id) => {
+					const foto = orderedFotos.find((item) => String(item.id) === String(id));
+					if (!foto) return;
+
+					openDeleteModal(foto, async () => {
+						try {
+							await api.delete(`/admin/fotografias/${encodeURIComponent(id)}`);
+							mostrarToast('Fotografía eliminada correctamente.', 'success');
+							await loadAndRender(state, { content });
+						} catch (error) {
+							mostrarToast(error?.error || 'No se pudo eliminar la fotografía.', 'warning');
+						}
+					});
+				},
+			});
+
+			renderPaginacion(pagination, state.page, totalPages, async (page) => {
+				if (page === state.page) return;
+				state.page = page;
+				await refreshFotosTable(state, { content });
+			});
+
+			setState(content, state);
+		} catch (error) {
+			if (tableArea) tableArea.innerHTML = `<p class="admin-fotos-error">${escapeHtml(error?.error || 'No se pudieron cargar las fotografías.')}</p>`;
+		}
+	}
 
 /**
  * Render principal.

@@ -263,6 +263,47 @@ function mostrarToast(mensaje, tipo = 'success') {
 }
 
 /**
+ * Inyecta estilos de animacion para actualizaciones una sola vez.
+ */
+function ensureUpdateAnimationStyles() {
+	if (document.getElementById('pc-update-animation-styles')) return;
+	const style = document.createElement('style');
+	style.id = 'pc-update-animation-styles';
+	style.textContent = `
+	.pc-update-prep { opacity: 0.18; transform: translateY(-6px) scale(0.995); }
+
+	.pc-update-animate {
+		animation: pc-update-fade 380ms cubic-bezier(.2,.9,.3,1) both;
+	}
+
+	@keyframes pc-update-fade {
+		0% { opacity: 0.18; transform: translateY(-6px) scale(0.995); }
+		60% { opacity: 0.92; transform: translateY(2px) scale(1.002); }
+		100% { opacity: 1; transform: translateY(0) scale(1); }
+	}
+
+	/* Evita que el elemento parpadee cuando se reemplaza el innerHTML */
+	.pc-update-animate * { will-change: opacity, transform; }
+	`;
+	document.head.appendChild(style);
+}
+
+/**
+ * Añade la clase de animación al elemento para disparar la transición.
+ */
+function animateUpdateOn(element) {
+	if (!(element instanceof HTMLElement)) return;
+	ensureUpdateAnimationStyles();
+	// Quitamos clase de animacion si existe y la clase prep
+	element.classList.remove('pc-update-animate');
+	element.classList.remove('pc-update-prep');
+	// Forzar reflow para reiniciar la animación
+	// eslint-disable-next-line no-unused-expressions
+	void element.offsetWidth;
+	element.classList.add('pc-update-animate');
+}
+
+/**
  * Inyecta un loader visual en el contenedor indicado.
  */
 function mostrarLoader(contenedor) {
@@ -474,6 +515,8 @@ export {
 	mostrarErrorPagina,
 	manejarErrorDePagina,
 	cloudinaryUrl,
+	ensureUpdateAnimationStyles,
+	animateUpdateOn,
 };
 
 export default {
@@ -492,4 +535,6 @@ export default {
 	mostrarErrorPagina,
 	manejarErrorDePagina,
 	cloudinaryUrl,
+	ensureUpdateAnimationStyles,
+	animateUpdateOn,
 };

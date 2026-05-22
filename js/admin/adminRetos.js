@@ -1,6 +1,6 @@
 import api from '../api.js';
 import { renderPaginacion } from '../components/paginacion.js';
-import { mostrarToast, skeletonCard, cloudinaryUrl } from '../utils.js';
+import { mostrarToast, skeletonCard, cloudinaryUrl, animateUpdateOn } from '../utils.js';
 import { abrirModalCrearReto } from '../components/modalCrearReto.js';
 
 const MODAL_ID = 'admin-reto-modal';
@@ -23,6 +23,89 @@ function escapeHtml(value) {
 		.replaceAll('>', '&gt;')
 		.replaceAll('"', '&quot;')
 		.replaceAll("'", '&#39;');
+}
+
+async function refreshRetosTable(state, refs) {
+	const content = refs?.content;
+	if (!(content instanceof HTMLElement)) return;
+
+	const tableArea = content.querySelector('#admin-retos-table-area');
+	const pagination = content.querySelector('#admin-retos-pagination');
+	const title = content.querySelector('.admin-retos-table-title');
+
+		if (tableArea) {
+			renderSkeleton(tableArea);
+			// Preparar contenedor para reemplazo sin parpadeo
+			tableArea.classList.add('pc-update-prep');
+		}
+
+	try {
+		const response = await api.get('/admin/retos', {
+			pagina: state.page,
+			limite: LIMITE,
+			buscar: state.query || undefined,
+			estado: state.estado !== 'todos' ? state.estado : undefined,
+		});
+
+		const retos = Array.isArray(response?.retos) ? response.retos : [];
+		const total = toInt(response?.total, retos.length);
+		const totalPages = Math.max(1, Math.ceil(total / LIMITE));
+
+		if (title) {
+			title.textContent = `Listado de Retos (${total})`;
+		}
+
+		if (tableArea) tableArea.classList.add('pc-update-prep');
+		renderTable(tableArea, retos, {
+			onEdit: async (id) => {
+				try {
+					const reto = await api.get(`/admin/retos/${encodeURIComponent(id)}`);
+					await openRetoModal(async () => {
+						await loadAndRender(state, { content });
+					}, reto?.reto || reto);
+				} catch (error) {
+					mostrarToast(error?.error || 'No se pudo cargar el reto.', 'warning');
+				}
+			},
+			onModerate: async (id, estado) => {
+				try {
+					await api.patch(`/admin/retos/${encodeURIComponent(id)}/estado`, { estado });
+					mostrarToast('Estado actualizado correctamente.', 'success');
+					await loadAndRender(state, { content });
+				} catch (error) {
+					mostrarToast(error?.error || 'No se pudo actualizar el estado.', 'warning');
+				}
+			},
+			onDelete: async (id) => {
+				const reto = retos.find((item) => String(item.id) === String(id));
+				if (!reto) return;
+
+				openDeleteModal(reto, async () => {
+					try {
+						await api.delete(`/admin/retos/${encodeURIComponent(id)}`);
+						mostrarToast('Reto eliminado correctamente.', 'success');
+						await loadAndRender(state, { content });
+					} catch (error) {
+						mostrarToast(error?.error || 'No se pudo eliminar el reto.', 'warning');
+					}
+				});
+			},
+		});
+		// Animacion visual al actualizar tabla (quita clase prep y anima)
+		try { animateUpdateOn(tableArea); } catch (e) { /* ignore */ }
+
+		renderPaginacion(pagination, state.page, totalPages, async (page) => {
+			if (page === state.page) return;
+			state.page = page;
+			await refreshRetosTable(state, { content });
+		});
+
+		setState(content, state);
+	} catch (error) {
+		if (tableArea) {
+			tableArea.innerHTML = `<p class="admin-retos-error">${escapeHtml(error?.error || 'No se pudieron cargar los retos.')}</p>`;
+		}
+	}
 }
 
 function toInt(value, fallback = 0) {
@@ -419,7 +502,7 @@ async function loadAndRender(state, refs) {
 				searchTimer = window.setTimeout(async () => {
 					state.query = searchInput.value.trim();
 					state.page = 1;
-					await loadAndRender(state, refs);
+					await refreshRetosTable(state, { content: refs.content });
 				}, 250);
 			});
 		}
@@ -484,7 +567,7 @@ async function loadAndRender(state, refs) {
 			}
 
 			state.page = page;
-			await loadAndRender(state, refs);
+			await refreshRetosTable(state, { content: refs.content });
 		});
 
 		setState(refs.content, state);
