@@ -18,7 +18,6 @@ const ESTADO_META = {
  */
 const ROL_OPTIONS = [
 	{ value: 'usuario', label: 'Usuario' },
-	{ value: 'moderador', label: 'Moderador' },
 	{ value: 'administrador', label: 'Admin' },
 ];
 
@@ -102,7 +101,6 @@ function renderSummaryCards(resumen = {}) {
 		{ label: 'Total Usuarios', meta: 'Registrados', value: toInt(resumen.total), icon: 'bi-people', iconClass: 'admin-usuarios-icon--info' },
 		{ label: 'Activos', meta: 'En la plataforma', value: toInt(resumen.activos), icon: 'bi-person-check', iconClass: 'admin-usuarios-icon--success' },
 		{ label: 'Suspendidos', meta: 'Bloqueados', value: toInt(resumen.suspendidos), icon: 'bi-person-slash', iconClass: 'admin-usuarios-icon--danger' },
-		{ label: 'Moderadores', meta: 'Con permisos', value: toInt(resumen.moderadores), icon: 'bi-shield-lock', iconClass: 'admin-usuarios-icon--primary' },
 	];
 
 	return `
