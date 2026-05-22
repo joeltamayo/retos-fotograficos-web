@@ -201,8 +201,23 @@ function buildApiBody(values, isEditing = false) {
     formData.append('titulo', values.titulo);
     formData.append('descripcion', values.descripcion);
     formData.append('categoria_id', values.categoria_id);
-    formData.append('fecha_inicio', values.fecha_inicio);
-    formData.append('fecha_fin', values.fecha_fin);
+    // Convert local YYYY-MM-DD to explicit UTC timestamps:
+    // - fecha_inicio => start of day UTC (00:00:00.000Z)
+    // - fecha_fin    => end of day UTC (23:59:59.999Z)
+    const toStartOfDayUTC = (dateStr) => {
+        if (!dateStr) return '';
+        const [y, m, d] = String(dateStr).slice(0, 10).split('-').map((s) => Number(s));
+        return new Date(Date.UTC(y, m - 1, d, 0, 0, 0, 0)).toISOString();
+    };
+
+    const toEndOfDayUTC = (dateStr) => {
+        if (!dateStr) return '';
+        const [y, m, d] = String(dateStr).slice(0, 10).split('-').map((s) => Number(s));
+        return new Date(Date.UTC(y, m - 1, d, 23, 59, 59, 999)).toISOString();
+    };
+
+    formData.append('fecha_inicio', toStartOfDayUTC(values.fecha_inicio));
+    formData.append('fecha_fin', toEndOfDayUTC(values.fecha_fin));
     if (!isEditing) formData.append('estado', 'activo');
     formData.append('duracion', values.duracion);
     if (values.imagen_file) formData.append('imagen', values.imagen_file);
