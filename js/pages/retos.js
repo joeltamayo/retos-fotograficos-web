@@ -87,6 +87,55 @@ function showSectionSkeleton(contenedor, cantidad = 3) {
 	`;
 }
 
+/* Helpers de animación para transiciones de sección (paginación) */
+function animateOut(contenedor) {
+	if (!(contenedor instanceof HTMLElement)) return Promise.resolve();
+
+	return new Promise((resolve) => {
+		const onEnd = () => resolve();
+		contenedor.classList.add('rt-anim-exit');
+
+		// fallback en caso de que no haya transitionend
+		const t = setTimeout(() => {
+			contenedor.removeEventListener('transitionend', onEnd);
+			clearTimeout(t);
+			resolve();
+		}, 300);
+
+		contenedor.addEventListener('transitionend', function handler(e) {
+			if (e.target !== contenedor) return;
+			contenedor.removeEventListener('transitionend', handler);
+			clearTimeout(t);
+			onEnd();
+		});
+	});
+}
+
+function animateIn(contenedor) {
+	if (!(contenedor instanceof HTMLElement)) return Promise.resolve();
+
+	return new Promise((resolve) => {
+		// prepare initial state
+		contenedor.classList.add('rt-anim-enter');
+
+		// force reflow then remove the enter class so transition runs
+		requestAnimationFrame(() => {
+			// remove exit if present
+			contenedor.classList.remove('rt-anim-exit');
+			// trigger the enter -> normal transition
+			contenedor.classList.remove('rt-anim-enter');
+
+			const t = setTimeout(() => resolve(), 300);
+			contenedor.addEventListener('transitionend', function handler(e) {
+				if (e.target !== contenedor) return;
+				contenedor.removeEventListener('transitionend', handler);
+				clearTimeout(t);
+				resolve();
+			});
+		});
+	});
+}
+
 /**
  * Renderiza estado de error dentro de una sección.
  */
@@ -151,6 +200,8 @@ function renderFinalizadosSection(state) {
 		}
 
 		state.finalizados.loading = true;
+		// animate out current content, then show skeleton while fetching
+		await animateOut(state.refs.finalizados);
 		showSectionSkeleton(state.refs.finalizados, 3);
 
 		try {
@@ -163,6 +214,8 @@ function renderFinalizadosSection(state) {
 			state.finalizados.total = toSafeNumber(response?.total, 0);
 			state.finalizados.paginaActual = nuevaPagina;
 			renderFinalizadosSection(state);
+			// animate new content in
+			await animateIn(state.refs.finalizados);
 		} catch (error) {
 			manejarErrorDePagina(state.refs.finalizados, error, {
 				notFoundMessage: 'No encontramos los retos finalizados solicitados.',
@@ -195,6 +248,8 @@ function renderActivosSection(state) {
 		}
 
 		state.activos.loading = true;
+		// animate out current content, then show skeleton while fetching
+		await animateOut(state.refs.activos);
 		showSectionSkeleton(state.refs.activos, 3);
 
 		try {
@@ -207,6 +262,8 @@ function renderActivosSection(state) {
 			state.activos.total = toSafeNumber(response?.total, 0);
 			state.activos.paginaActual = nuevaPagina;
 			renderActivosSection(state);
+			// animate new content in
+			await animateIn(state.refs.activos);
 		} catch (error) {
 			manejarErrorDePagina(state.refs.activos, error, {
 				notFoundMessage: 'No encontramos los retos activos solicitados.',

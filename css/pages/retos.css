@@ -131,3 +131,21 @@
 		grid-template-columns: repeat(1, minmax(0, 1fr));
 	}
 }
+
+/* Animaciones de paginación: salida / entrada suave de secciones */
+#retos-activos-contenido,
+#retos-finalizados-contenido {
+	transition: opacity 1200ms ease, transform 1020ms ease;
+	will-change: opacity, transform;
+}
+
+.rt-anim-exit {
+	opacity: 0 !important;
+	transform: translateY(-8px) !important;
+	pointer-events: none;
+}
+
+.rt-anim-enter {
+	opacity: 0;
+	transform: translateY(8px);
+}
