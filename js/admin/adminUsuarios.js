@@ -1,6 +1,6 @@
 import api from '../api.js';
 import { renderPaginacion } from '../components/paginacion.js';
-import { mostrarToast, skeletonCard, animateUpdateOn } from '../utils.js';
+import { mostrarToast, skeletonCard, animateUpdateOn, cloudinaryUrl } from '../utils.js';
 
 const DELETE_MODAL_ID = 'admin-usuario-delete-modal';
 const LIMITE = 10;
@@ -94,11 +94,12 @@ function setState(contenedor, state) {
 }
 
 /**
- * Renderiza las 4 tarjetas de resumen del dashboard.
+ * Renderiza las tarjetas de resumen del dashboard.
  */
 function renderSummaryCards(resumen = {}) {
 	const cards = [
 		{ label: 'Total Usuarios', meta: 'Registrados', value: toInt(resumen.total), icon: 'bi-people', iconClass: 'admin-usuarios-icon--info' },
+		{ label: 'Administradores', meta: 'Cuentas admin', value: toInt(resumen.administradores), icon: 'bi-shield-lock', iconClass: 'admin-usuarios-icon--primary' },
 		{ label: 'Activos', meta: 'En la plataforma', value: toInt(resumen.activos), icon: 'bi-person-check', iconClass: 'admin-usuarios-icon--success' },
 		{ label: 'Suspendidos', meta: 'Bloqueados', value: toInt(resumen.suspendidos), icon: 'bi-person-slash', iconClass: 'admin-usuarios-icon--danger' },
 	];
@@ -123,7 +124,7 @@ function renderSummaryCards(resumen = {}) {
 function renderSkeleton(contenedor) {
 	contenedor.innerHTML = `
 		<div class="admin-usuarios-skeleton-grid">
-			${Array.from({ length: 4 }, () => skeletonCard('138px')).join('')}
+			${Array.from({ length: 5 }, () => skeletonCard('138px')).join('')}
 		</div>
 
 		<div class="admin-usuarios-filter admin-mt-1">
@@ -376,7 +377,9 @@ async function loadAndRender(state, refs) {
 		const totalPages = Math.max(1, Math.ceil(total / LIMITE));
 
 		refs.content.innerHTML = `
-			${renderSummaryCards(resumen)}
+			<div id="admin-usuarios-summary-area">
+				${renderSummaryCards(resumen)}
+			</div>
 
 			<div class="admin-usuarios-filter">
 				<input type="search" id="admin-usuarios-search" class="admin-usuarios-search" placeholder="Buscar por nombre, usuario o email..." value="${escapeHtml(state.query)}">
@@ -403,6 +406,7 @@ async function loadAndRender(state, refs) {
 		const statusFilter = refs.content.querySelector('#admin-usuarios-status-filter');
 		const tableArea = refs.content.querySelector('#admin-usuarios-table-area');
 		const pagination = refs.content.querySelector('#admin-usuarios-pagination');
+		const summaryArea = refs.content.querySelector('#admin-usuarios-summary-area');
 
 		let searchTimer = null;
 		if (searchInput) {
@@ -420,7 +424,7 @@ async function loadAndRender(state, refs) {
 			roleFilter.addEventListener('change', async () => {
 				state.rol = roleFilter.value;
 				state.page = 1;
-				await loadAndRender(state, refs);
+				await refreshUsuariosTable(state, { content: refs.content });
 			});
 		}
 
@@ -428,7 +432,7 @@ async function loadAndRender(state, refs) {
 			statusFilter.addEventListener('change', async () => {
 				state.estado = statusFilter.value;
 				state.page = 1;
-				await loadAndRender(state, refs);
+				await refreshUsuariosTable(state, { content: refs.content });
 			});
 		}
 
@@ -438,6 +442,7 @@ async function loadAndRender(state, refs) {
 				try {
 					await api.patch(`/admin/usuarios/${encodeURIComponent(id)}/rol`, { rol });
 					mostrarToast('Rol actualizado correctamente.', 'success');
+					await refreshUsuariosTable(state, { content: refs.content });
 				} catch (error) {
 					mostrarToast(error?.error || 'No se pudo actualizar el rol.', 'warning');
 				}
@@ -493,6 +498,7 @@ async function loadAndRender(state, refs) {
 					}
 
 					mostrarToast(nuevoEstado === 'suspendido' ? 'Usuario suspendido correctamente.' : 'Usuario activado correctamente.', 'success');
+					await refreshUsuariosTable(state, { content: refs.content });
 				} catch (error) {
 					mostrarToast(error?.error || 'No se pudo actualizar el estado.', 'warning');
 				}
@@ -507,7 +513,7 @@ async function loadAndRender(state, refs) {
 					try {
 						await api.delete(`/admin/usuarios/${encodeURIComponent(id)}`);
 						mostrarToast('Usuario eliminado correctamente.', 'success');
-						await loadAndRender(state, refs);
+						await refreshUsuariosTable(state, { content: refs.content });
 					} catch (error) {
 						mostrarToast(error?.error || 'No se pudo eliminar el usuario.', 'warning');
 					}
@@ -555,9 +561,14 @@ async function loadAndRender(state, refs) {
 			};
 
 			const response = await api.get('/admin/usuarios', params);
+			const resumen = response?.resumen || {};
 			const usuarios = Array.isArray(response?.usuarios) ? response.usuarios : [];
 			const total = toInt(response?.total, usuarios.length);
 			const totalPages = Math.max(1, Math.ceil(total / LIMITE));
+
+			if (summaryArea) {
+				summaryArea.innerHTML = renderSummaryCards(resumen);
+			}
 
 			if (title) title.textContent = `Usuarios Registrados (${total})`;
 
@@ -567,6 +578,7 @@ async function loadAndRender(state, refs) {
 					try {
 						await api.patch(`/admin/usuarios/${encodeURIComponent(id)}/rol`, { rol });
 						mostrarToast('Rol actualizado correctamente.', 'success');
+						await refreshUsuariosTable(state, { content });
 					} catch (error) {
 						mostrarToast(error?.error || 'No se pudo actualizar el rol.', 'warning');
 					}
