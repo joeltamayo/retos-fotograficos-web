@@ -1081,12 +1081,13 @@
 }
 
 .admin-fotos-table-wrap {
+    width: 100%;
     overflow-x: auto;
 }
 
 .admin-fotos-table {
     width: 100%;
-    min-width: 1300px;
+    min-width: 1180px;
     border-collapse: collapse;
 }
 
@@ -1237,13 +1238,13 @@
 .admin-fotos-actions {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
+    gap: 6px;
+    flex-wrap: nowrap;
 }
 
 .admin-fotos-action-btn {
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     border-radius: var(--radius-md);
     border: 1px solid var(--color-border);
     background: var(--color-surface);

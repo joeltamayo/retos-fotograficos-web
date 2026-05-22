@@ -4,6 +4,7 @@ import { renderPaginacion } from '../components/paginacion.js';
 import { mostrarToast, skeletonCard, cloudinaryUrl, animateUpdateOn } from '../utils.js';
 
 const DELETE_MODAL_ID = 'admin-foto-delete-modal';
+const MODERATE_MODAL_ID = 'admin-foto-moderate-modal';
 const LIMITE = 10;
 
 const ESTADO_META = {
@@ -56,6 +57,21 @@ function getEstadoMeta(estadoRaw) {
 		label: estado || '—',
 		badgeClass: 'admin-fotos-badge--default',
 	};
+}
+
+function getModerationSuccessMessage(estado) {
+	const normalized = String(estado || '').toLowerCase();
+	if (normalized === 'aprobada') {
+		return 'Fotografía aprobada correctamente.';
+	}
+	if (normalized === 'desaprobada') {
+		return 'Fotografía rechazada correctamente.';
+	}
+	if (normalized === 'revision') {
+		return 'Fotografía enviada a revisión correctamente.';
+	}
+
+	return 'Estado de la fotografía actualizado correctamente.';
 }
 
 // Devuelve estado persistido en el contenedor.
@@ -223,7 +239,10 @@ function renderTable(contenedor, fotos, handlers) {
 				<tbody>
 					${fotos.map((foto) => {
 						const estadoMeta = getEstadoMeta(foto.estado);
-						const isRevision = String(foto.estado || '').toLowerCase() === 'revision';
+						const estadoActual = String(foto.estado || '').toLowerCase();
+						const isRevision = estadoActual === 'revision';
+						const isRejected = estadoActual === 'desaprobada';
+						const isApproved = estadoActual === 'aprobada';
 						const puntuacion = Number.isFinite(Number(foto.puntuacion_total))
 							? Number(foto.puntuacion_total).toFixed(1)
 							: '0.0';
@@ -258,6 +277,22 @@ function renderTable(contenedor, fotos, handlers) {
 												<i class="bi bi-x-lg"></i>
 											</button>
 										` : ''}
+										${isRejected ? `
+											<button type="button" class="admin-fotos-action-btn admin-fotos-action-btn--success" data-action="approve" data-id="${escapeHtml(foto.id)}" aria-label="Aprobar fotografía">
+												<i class="bi bi-check-lg"></i>
+											</button>
+											<button type="button" class="admin-fotos-action-btn" data-action="to-review" data-id="${escapeHtml(foto.id)}" aria-label="Enviar fotografía a revisión">
+												<i class="bi bi-arrow-counterclockwise"></i>
+											</button>
+										` : ''}
+										${isApproved ? `
+											<button type="button" class="admin-fotos-action-btn admin-fotos-action-btn--warning" data-action="reject" data-id="${escapeHtml(foto.id)}" aria-label="Rechazar fotografía">
+												<i class="bi bi-x-lg"></i>
+											</button>
+											<button type="button" class="admin-fotos-action-btn" data-action="to-review" data-id="${escapeHtml(foto.id)}" aria-label="Enviar fotografía a revisión">
+												<i class="bi bi-arrow-counterclockwise"></i>
+											</button>
+										` : ''}
 										<button type="button" class="admin-fotos-action-btn admin-fotos-action-btn--danger" data-action="delete" data-id="${escapeHtml(foto.id)}" aria-label="Eliminar fotografía">
 											<i class="bi bi-trash"></i>
 										</button>
@@ -281,6 +316,10 @@ function renderTable(contenedor, fotos, handlers) {
 
 	contenedor.querySelectorAll('[data-action="reject"]').forEach((button) => {
 		button.addEventListener('click', () => handlers.onModerate(button.dataset.id || '', 'desaprobada'));
+	});
+
+	contenedor.querySelectorAll('[data-action="to-review"]').forEach((button) => {
+		button.addEventListener('click', () => handlers.onModerate(button.dataset.id || '', 'revision'));
 	});
 
 	contenedor.querySelectorAll('[data-action="delete"]').forEach((button) => {
@@ -327,6 +366,85 @@ function ensureDeleteModal() {
 	}
 
 	return modal;
+}
+
+function ensureModerateModal() {
+	let container = document.getElementById('modal-container');
+	if (!container) {
+		container = document.createElement('div');
+		container.id = 'modal-container';
+		document.body.appendChild(container);
+	}
+
+	let modal = document.getElementById(MODERATE_MODAL_ID);
+	if (!modal) {
+		container.insertAdjacentHTML('beforeend', `
+			<div class="modal fade" id="${MODERATE_MODAL_ID}" tabindex="-1" aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered">
+					<div class="modal-content">
+						<div class="admin-modal-header">
+							<div>
+								<h3 class="admin-modal-title">Confirmar cambio de estado</h3>
+								<p class="admin-modal-subtitle">Se actualizará el estado de moderación de esta fotografía.</p>
+							</div>
+							<button type="button" class="admin-modal-close" data-bs-dismiss="modal" aria-label="Cerrar">&times;</button>
+						</div>
+						<div class="admin-modal-body">
+							<p class="admin-modal-confirm" id="admin-foto-moderate-message"></p>
+							<div class="admin-modal-actions">
+								<button type="button" class="admin-modal-btn admin-modal-btn--outline" data-bs-dismiss="modal">Cancelar</button>
+								<button type="button" class="admin-modal-btn admin-modal-btn--dark" id="admin-foto-moderate-confirm">Confirmar</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		`);
+		modal = document.getElementById(MODERATE_MODAL_ID);
+	}
+
+	return modal;
+}
+
+function getModerationTargetLabel(estado) {
+	const normalized = String(estado || '').toLowerCase();
+	if (normalized === 'aprobada') {
+		return 'aprobada';
+	}
+	if (normalized === 'desaprobada') {
+		return 'rechazada';
+	}
+	if (normalized === 'revision') {
+		return 'en revisión';
+	}
+
+	return normalized || 'actualizado';
+}
+
+function openModerationModal(foto, estadoObjetivo, onConfirm) {
+	const modal = ensureModerateModal();
+	const message = modal.querySelector('#admin-foto-moderate-message');
+	const confirmBtn = modal.querySelector('#admin-foto-moderate-confirm');
+	const estadoLabel = getModerationTargetLabel(estadoObjetivo);
+
+	if (message) {
+		message.textContent = `Vas a cambiar “${foto?.titulo || 'esta fotografía'}” de @${foto?.nombre_usuario || 'usuario'} a estado ${estadoLabel}.`;
+	}
+
+	if (confirmBtn) {
+		confirmBtn.onclick = async () => {
+			confirmBtn.disabled = true;
+			try {
+				await onConfirm();
+				window.bootstrap?.Modal.getInstance(modal)?.hide();
+			} finally {
+				confirmBtn.disabled = false;
+			}
+		};
+	}
+
+	const instance = window.bootstrap?.Modal ? new window.bootstrap.Modal(modal) : null;
+	instance?.show();
 }
 
 /**
@@ -441,13 +559,20 @@ async function loadAndRender(state, refs) {
 				await abrirModalFoto(id, { useAdminEndpoint: true });
 			},
 			onModerate: async (id, estado) => {
-				try {
-					await api.patch(`/admin/fotografias/${encodeURIComponent(id)}/estado`, { estado });
-					mostrarToast(estado === 'aprobada' ? 'Fotografía aprobada correctamente.' : 'Fotografía rechazada correctamente.', 'success');
-					await loadAndRender(state, refs);
-				} catch (error) {
-					mostrarToast(error?.error || 'No se pudo actualizar el estado de la fotografía.', 'warning');
+				const foto = orderedFotos.find((item) => String(item.id) === String(id));
+				if (!foto) {
+					return;
 				}
+
+				openModerationModal(foto, estado, async () => {
+					try {
+						await api.patch(`/admin/fotografias/${encodeURIComponent(id)}/estado`, { estado });
+						mostrarToast(getModerationSuccessMessage(estado), 'success');
+						await loadAndRender(state, refs);
+					} catch (error) {
+						mostrarToast(error?.error || 'No se pudo actualizar el estado de la fotografía.', 'warning');
+					}
+				});
 			},
 			onDelete: async (id) => {
 				const foto = orderedFotos.find((item) => String(item.id) === String(id));
@@ -520,13 +645,20 @@ async function loadAndRender(state, refs) {
 					await abrirModalFoto(id, { useAdminEndpoint: true });
 				},
 				onModerate: async (id, estado) => {
-					try {
-						await api.patch(`/admin/fotografias/${encodeURIComponent(id)}/estado`, { estado });
-						mostrarToast(estado === 'aprobada' ? 'Fotografía aprobada correctamente.' : 'Fotografía rechazada correctamente.', 'success');
-						await loadAndRender(state, { content });
-					} catch (error) {
-						mostrarToast(error?.error || 'No se pudo actualizar el estado de la fotografía.', 'warning');
+					const foto = orderedFotos.find((item) => String(item.id) === String(id));
+					if (!foto) {
+						return;
 					}
+
+					openModerationModal(foto, estado, async () => {
+						try {
+							await api.patch(`/admin/fotografias/${encodeURIComponent(id)}/estado`, { estado });
+							mostrarToast(getModerationSuccessMessage(estado), 'success');
+							await loadAndRender(state, { content });
+						} catch (error) {
+							mostrarToast(error?.error || 'No se pudo actualizar el estado de la fotografía.', 'warning');
+						}
+					});
 				},
 				onDelete: async (id) => {
 					const foto = orderedFotos.find((item) => String(item.id) === String(id));
