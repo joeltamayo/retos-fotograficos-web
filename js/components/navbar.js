@@ -226,9 +226,18 @@ function renderNavbar() {
 		<nav id="${NAVBAR_ID}" class="nb-nav">
 			<div class="nb-inner">
 				<a class="nb-brand" href="#/home">
-					<i class="bi bi-camera nb-brand__icon"></i>
-					<span class="nb-brand__text">Retos fotográficos</span>
-				</a>
+					<img
+						src="${cloudinaryUrl('logo-header_zumvhb', {
+							width: 320,
+							height: 80,
+							crop: 'fit',
+							quality: 'auto',
+							format: 'auto',
+						})}"
+						alt="Retos fotográficos"
+						class="nb-brand__logo"
+					>
+					</a>
 
 				<div class="nb-links">
 					${NAV_LINKS.map((link) => renderNavLink(link)).join('')}

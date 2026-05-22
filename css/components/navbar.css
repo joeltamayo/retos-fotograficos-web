@@ -38,6 +38,14 @@
   min-width: 0;
 }
 
+/* Logo de la marca (imagen) */
+.nb-brand__logo {
+  height: 44px;
+  width: auto;
+  display: block;
+  object-fit: contain;
+}
+
 /* Icono de marca: refuerzo visual del branding. */
 .nb-brand__icon {
   font-size: 1rem;
@@ -45,7 +53,7 @@
 
 /* Texto de marca: nombre legible del sitio. */
 .nb-brand__text {
-  font-size: 1rem;
+  font-size: 1.6rem;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -245,6 +253,10 @@
   .nb-avatar {
     width: 32px;
     height: 32px;
+  }
+
+  .nb-brand__logo {
+    height: 34px;
   }
 
   .nb-toggler {
