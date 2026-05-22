@@ -473,11 +473,9 @@ async function loadAndRender(state, refs) {
 				<input type="search" id="admin-retos-search" class="admin-retos-search" placeholder="Buscar por título o categoría..." value="${escapeHtml(state.query)}">
 				<select id="admin-retos-status" class="admin-retos-select">
 					<option value="todos" ${state.estado === 'todos' ? 'selected' : ''}>Todos los estados</option>
-					<option value="revision" ${state.estado === 'revision' ? 'selected' : ''}>Pendiente</option>
 					<option value="activo" ${state.estado === 'activo' ? 'selected' : ''}>Activo</option>
 					<option value="finalizado" ${state.estado === 'finalizado' ? 'selected' : ''}>Finalizado</option>
 					<option value="programado" ${state.estado === 'programado' ? 'selected' : ''}>Programado</option>
-					<option value="archivado" ${state.estado === 'archivado' ? 'selected' : ''}>Archivado</option>
 				</select>
 				<button type="button" class="admin-retos-btn admin-retos-btn--dark" id="admin-retos-create-btn"><i class="bi bi-plus"></i> Crear</button>
 			</div>
