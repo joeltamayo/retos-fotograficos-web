@@ -34,7 +34,8 @@
   font-weight: 700;
   color: var(--color-text);
   white-space: nowrap;
-  flex-shrink: 0;
+  flex-shrink: 1;
+  min-width: 0;
 }
 
 /* Icono de marca: refuerzo visual del branding. */
@@ -45,6 +46,8 @@
 /* Texto de marca: nombre legible del sitio. */
 .nb-brand__text {
   font-size: 1rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Enlaces: navegación principal entre vistas. */
@@ -189,7 +192,7 @@
   right: 0;
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
-  padding: 12px var(--page-padding-x);
+  padding: 12px clamp(16px, 3vw, var(--page-padding-x));
   flex-direction: column;
   gap: 4px;
   z-index: 99;
@@ -216,5 +219,35 @@
   .nb-collapse .nb-link {
     padding: 10px 14px;
     width: 100%;
+  }
+}
+
+@media (max-width: 479.98px) {
+  .nb-inner {
+    gap: 10px;
+    padding-inline: 14px;
+  }
+
+  .nb-brand {
+    gap: 6px;
+  }
+
+  .nb-brand__text {
+    font-size: 0.95rem;
+  }
+
+  .nb-actions {
+    gap: 6px;
+  }
+
+  .nb-btn,
+  .nb-avatar-btn,
+  .nb-avatar {
+    width: 32px;
+    height: 32px;
+  }
+
+  .nb-toggler {
+    padding: 5px 8px;
   }
 }

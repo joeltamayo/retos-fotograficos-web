@@ -5,14 +5,26 @@
 
 /* Página admin: contenedor principal con padding y ancho máximo. */
 .admin-page {
+    --admin-gutter: clamp(16px, 3vw, var(--page-padding-x));
     max-width: var(--content-max-width);
+    width: 100%;
     margin: 0 auto;
-    padding: 24px var(--page-padding-x) 42px;
+    padding: 24px var(--admin-gutter) 42px;
+    min-width: 0;
+    overflow-x: visible;
 }
 
 /* Encabezado: separa el título de los controles. */
 .admin-head {
     margin-bottom: 14px;
+}
+
+.admin-head,
+.admin-tabs-wrap,
+.admin-content {
+    width: 100%;
+    max-width: calc(var(--content-max-width) - (var(--admin-gutter) * 2));
+    margin-inline: auto;
 }
 
 /* Título: identifica el área administrativa actual. */
@@ -38,6 +50,8 @@
     margin-top: 18px;
     overflow-x: auto;
     padding-bottom: 4px;
+    max-width: 100%;
+    -webkit-overflow-scrolling: touch;
 }
 
 /* Lista de tabs: cambia entre módulos administrativos. */
@@ -76,6 +90,35 @@
 /* Contenido: separa el módulo elegido del encabezado. */
 .admin-content {
     margin-top: 14px;
+    min-width: 0;
+}
+
+.admin-content > *,
+.admin-usuarios,
+.admin-retos,
+.admin-fotos,
+.admin-usuarios-summary,
+.admin-retos-summary,
+.admin-fotos-summary,
+.admin-usuarios-filter,
+.admin-retos-toolbar,
+.admin-fotos-filter,
+.admin-usuarios-table-card,
+.admin-retos-table-card,
+.admin-fotos-table-card {
+    max-width: 100%;
+    min-width: 0;
+}
+
+#admin-usuarios-root,
+#admin-retos-root,
+#admin-fotos-root,
+#admin-usuarios-table-area,
+#admin-retos-table-area,
+#admin-fotos-table-area {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
 }
 
 /* Bloques de filtros/tablas: espaciado uniforme entre módulos. */
@@ -86,6 +129,7 @@
 .admin-fotos-filter,
 .admin-fotos-table-card {
     margin-top: 14px;
+    min-width: 0;
 }
 
 /* Bloque informativo: placeholder para futuras secciones. */
@@ -306,12 +350,13 @@
 .admin-usuarios {
     display: grid;
     gap: 24px;
+    min-width: 0;
 }
 
 /* Resumen de usuarios: muestra estadísticas clave en cards. */
 .admin-usuarios-summary {
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(210px, 100%), 1fr));
     gap: 16px;
 }
 
@@ -382,6 +427,7 @@
     grid-template-columns: minmax(0, 1fr) 170px 170px;
     gap: 12px;
     align-items: center;
+    min-width: 0;
 }
 
 .admin-usuarios-search,
@@ -425,6 +471,7 @@
 
 .admin-usuarios-table-card {
     padding: 18px;
+    overflow: hidden;
 }
 
 .admin-usuarios-table-title {
@@ -435,11 +482,19 @@
 }
 
 .admin-usuarios-table-wrap {
+    width: 100%;
+    max-width: 100%;
     overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    padding-bottom: 4px;
+    scrollbar-width: thin;
+    scrollbar-color: #CBD5E1 transparent;
 }
 
 .admin-usuarios-table {
-    width: 100%;
+    width: max-content;
     min-width: 1180px;
     border-collapse: collapse;
 }
@@ -592,7 +647,7 @@
 
 .admin-usuarios-skeleton-grid {
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(210px, 100%), 1fr));
     gap: 16px;
 }
 
@@ -608,11 +663,12 @@
 .admin-retos {
     display: grid;
     gap: 24px;
+    min-width: 0;
 }
 
 .admin-retos-summary {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(230px, 100%), 1fr));
     gap: 16px;
 }
 
@@ -685,6 +741,7 @@
     grid-template-columns: minmax(0, 1fr) 220px auto;
     gap: 12px;
     align-items: center;
+    min-width: 0;
 }
 
 .admin-retos-search,
@@ -747,6 +804,7 @@
 
 .admin-retos-table-card {
     padding: 18px;
+    overflow: hidden;
 }
 
 .admin-retos-table-title {
@@ -757,11 +815,19 @@
 }
 
 .admin-retos-table-wrap {
+    width: 100%;
+    max-width: 100%;
     overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    padding-bottom: 4px;
+    scrollbar-width: thin;
+    scrollbar-color: #CBD5E1 transparent;
 }
 
 .admin-retos-table {
-    width: 100%;
+    width: max-content;
     min-width: 1120px;
     border-collapse: collapse;
 }
@@ -938,7 +1004,7 @@
 
 .admin-retos-skeleton-grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(230px, 100%), 1fr));
     gap: 16px;
 }
 
@@ -954,11 +1020,12 @@
 .admin-fotos {
     display: grid;
     gap: 24px;
+    min-width: 0;
 }
 
 .admin-fotos-summary {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(230px, 100%), 1fr));
     gap: 16px;
 }
 
@@ -1028,6 +1095,7 @@
     grid-template-columns: minmax(0, 1fr) 220px;
     gap: 12px;
     align-items: center;
+    min-width: 0;
 }
 
 .admin-fotos-search,
@@ -1071,6 +1139,7 @@
 
 .admin-fotos-table-card {
     padding: 18px;
+    overflow: hidden;
 }
 
 .admin-fotos-table-title {
@@ -1082,11 +1151,37 @@
 
 .admin-fotos-table-wrap {
     width: 100%;
+    max-width: 100%;
     overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    padding-bottom: 4px;
+    scrollbar-width: thin;
+    scrollbar-color: #CBD5E1 transparent;
+}
+
+.admin-usuarios-table-wrap::-webkit-scrollbar,
+.admin-retos-table-wrap::-webkit-scrollbar,
+.admin-fotos-table-wrap::-webkit-scrollbar {
+    height: 8px;
+}
+
+.admin-usuarios-table-wrap::-webkit-scrollbar-track,
+.admin-retos-table-wrap::-webkit-scrollbar-track,
+.admin-fotos-table-wrap::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.admin-usuarios-table-wrap::-webkit-scrollbar-thumb,
+.admin-retos-table-wrap::-webkit-scrollbar-thumb,
+.admin-fotos-table-wrap::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border-radius: var(--radius-full);
 }
 
 .admin-fotos-table {
-    width: 100%;
+    width: max-content;
     min-width: 1180px;
     border-collapse: collapse;
 }
@@ -1311,7 +1406,7 @@
 
 .admin-fotos-skeleton-grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(230px, 100%), 1fr));
     gap: 16px;
 }
 
@@ -1328,17 +1423,36 @@
     .admin-retos-skeleton-grid,
     .admin-fotos-summary,
     .admin-fotos-skeleton-grid {
+        grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+    }
+}
+
+@media (max-width: 899.98px) {
+
+    .admin-usuarios-summary,
+    .admin-usuarios-skeleton-grid,
+    .admin-retos-summary,
+    .admin-retos-skeleton-grid,
+    .admin-fotos-summary,
+    .admin-fotos-skeleton-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
 @media (max-width: 991.98px) {
     .admin-page {
-        padding: 18px 16px 36px;
+        --admin-gutter: clamp(16px, 4vw, 24px);
+        padding-block: 18px 36px;
     }
 
     .admin-title {
-        font-size: 24px;
+        font-size: 22px;
+        line-height: 1.2;
+    }
+
+    .admin-subtitle {
+        font-size: 15px;
+        line-height: 1.45;
     }
 
     .admin-tabs {
@@ -1350,9 +1464,26 @@
     .admin-fotos-filter {
         grid-template-columns: 1fr;
     }
+
+    .admin-retos-btn {
+        width: 100%;
+    }
 }
 
 @media (max-width: 767.98px) {
+
+    .admin-page {
+        --admin-gutter: 16px;
+    }
+
+    .admin-head {
+        margin-bottom: 12px;
+    }
+
+    .admin-tabs-wrap {
+        margin-inline: -2px;
+        padding-inline: 2px;
+    }
 
     .admin-usuarios-summary,
     .admin-usuarios-skeleton-grid,
@@ -1365,5 +1496,61 @@
 
     .admin-form-row {
         grid-template-columns: 1fr;
+    }
+
+    .admin-usuarios-card,
+    .admin-retos-card,
+    .admin-fotos-summary-card {
+        min-height: 128px;
+        padding: 16px;
+    }
+
+    .admin-usuarios-card-value,
+    .admin-retos-card-value,
+    .admin-fotos-summary-value {
+        margin-top: 28px;
+        font-size: 30px;
+    }
+
+    .admin-usuarios-filter,
+    .admin-retos-toolbar,
+    .admin-fotos-filter,
+    .admin-usuarios-table-card,
+    .admin-retos-table-card,
+    .admin-fotos-table-card {
+        padding: 12px;
+        border-radius: 12px;
+    }
+}
+
+@media (max-width: 479.98px) {
+    .admin-page {
+        --admin-gutter: 14px;
+        padding-block: 16px 32px;
+    }
+
+    .admin-title {
+        font-size: 20px;
+    }
+
+    .admin-subtitle {
+        font-size: 14px;
+    }
+
+    .admin-tab-btn {
+        padding: 8px 10px;
+        gap: 6px;
+        font-size: 13px;
+    }
+
+    .admin-usuarios-search,
+    .admin-usuarios-select,
+    .admin-usuarios-role,
+    .admin-retos-search,
+    .admin-retos-select,
+    .admin-fotos-search,
+    .admin-fotos-select {
+        font-size: 13px;
+        padding: 10px 12px;
     }
 }
