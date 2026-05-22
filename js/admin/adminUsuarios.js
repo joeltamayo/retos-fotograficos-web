@@ -105,7 +105,7 @@ function renderSummaryCards(resumen = {}) {
 	];
 
 	return `
-		<div class="admin-usuarios-summary">
+		<div class="admin-usuarios-summary" id="admin-usuarios-summary">
 			${cards.map((card) => `
 				<article class="admin-usuarios-card">
 					<i class="bi ${card.icon} ${card.iconClass}"></i>
@@ -542,6 +542,7 @@ async function loadAndRender(state, refs) {
 		const content = refs?.content;
 		if (!(content instanceof HTMLElement)) return;
 
+		const summaryArea = content.querySelector('#admin-usuarios-summary');
 		const tableArea = content.querySelector('#admin-usuarios-table-area');
 		const pagination = content.querySelector('#admin-usuarios-pagination');
 		const title = content.querySelector('.admin-usuarios-table-title');
@@ -558,9 +559,14 @@ async function loadAndRender(state, refs) {
 			};
 
 			const response = await api.get('/admin/usuarios', params);
+			const resumen = response?.resumen || {};
 			const usuarios = Array.isArray(response?.usuarios) ? response.usuarios : [];
 			const total = toInt(response?.total, usuarios.length);
 			const totalPages = Math.max(1, Math.ceil(total / LIMITE));
+
+			if (summaryArea) {
+				summaryArea.outerHTML = renderSummaryCards(resumen);
+			}
 
 			if (title) title.textContent = `Usuarios Registrados (${total})`;
 
