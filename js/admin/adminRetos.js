@@ -516,7 +516,7 @@ async function loadAndRender(state, refs) {
 			${renderSummaryCards(resumen)}
 
 			<div class="admin-retos-toolbar">
-				<input type="search" id="admin-retos-search" class="admin-retos-search" placeholder="Buscar por título o categoría..." value="${escapeHtml(state.query)}">
+				<input type="search" id="admin-retos-search" class="admin-retos-search" placeholder="Buscar por título..." value="${escapeHtml(state.query)}">
 				<select id="admin-retos-status" class="admin-retos-select">
 					<option value="todos" ${state.estado === 'todos' ? 'selected' : ''}>Todos los estados</option>
 					<option value="activo" ${state.estado === 'activo' ? 'selected' : ''}>Activo</option>

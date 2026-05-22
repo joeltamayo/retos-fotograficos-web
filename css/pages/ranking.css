@@ -67,19 +67,42 @@
 
 /* Selector: cambia el criterio o periodo. */
 .rk-select {
-  background: var(--color-neutral-bg);
+  background-color: #ffffff;
   border: 1px solid var(--color-border);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   border-radius: var(--radius-md);
-  padding: 10px 14px;
+  padding: 10px 40px 10px 14px;
   font-size: 15px;
   color: var(--color-text);
   min-width: 220px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 14px;
+}
+
+/* Efecto Hover: Al pasar el ratón */
+.rk-select:hover:not(:disabled) {
+  border-color: var(--color-text-hover); 
+}
+
+/* Efecto Focus: Al hacer clic o navegar con el teclado */
+.rk-select:focus {
+  border-color: var(--color-primary); 
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); 
 }
 
 /* Estado disabled: evita cambios no disponibles. */
 .rk-select:disabled {
-  opacity: 1;
-  cursor: default;
+  opacity: 0.6; 
+  cursor: not-allowed; 
+  background-color: #f3f4f6; 
 }
 
 /* Rango: texto resumen del periodo mostrado. */

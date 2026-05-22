@@ -566,12 +566,11 @@ body.modal-open {
   box-sizing: content-box;
   width: 1em;
   height: 1em;
-  padding: 0.25rem;
+  padding: .7rem;
   border: 0;
   border-radius: var(--radius-sm);
-  background: transparent;
-  color: #6B7280;
-  opacity: 0.72;
+  background: var(--color-text);
+  color: var(--color-bg);
   display: inline-flex;
   align-items: center;
   justify-content: center;

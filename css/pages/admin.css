@@ -396,6 +396,29 @@
     color: var(--color-text);
 }
 
+/* Selector: cambia el criterio o periodo. */
+.admin-usuarios-select, .admin-usuarios-role {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
+    outline: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 14px;
+}
+
+/* Efecto Hover: Al pasar el ratón */
+.admin-usuarios-select:hover, .admin-usuarios-search:hover, .admin-usuarios-role:hover {
+    border-color: var(--color-text-hover);
+}
+
+/* Efecto Focus: Al hacer clic o navegar con el teclado */
+.admin-usuarios-select:focus, .admin-usuarios-search:focus, .admin-usuarios-role:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
 .admin-usuarios-search::placeholder {
     color: var(--color-text-muted);
 }
@@ -675,6 +698,30 @@
     padding: 11px 14px;
     font-size: 14px;
     color: var(--color-text);
+}
+
+/* Selector: cambia el criterio o periodo. */
+.admin-retos-select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
+    outline: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 14px;
+}
+
+/* Efecto Hover: Al pasar el ratón */
+.admin-retos-select:hover:not(:disabled), .admin-retos-search:hover {
+    border-color: var(--color-text-hover);
+}
+
+/* Efecto Focus: Al hacer clic o navegar con el teclado */
+.admin-retos-select:focus, .admin-retos-search:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
 
 .admin-retos-search::placeholder {
@@ -992,6 +1039,30 @@
     padding: 11px 14px;
     font-size: 14px;
     color: var(--color-text);
+}
+
+/* Selector: cambia el criterio o periodo. */
+.admin-fotos-select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
+    outline: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 14px;
+}
+
+/* Efecto Hover: Al pasar el ratón */
+.admin-fotos-select:hover:not(:disabled), .admin-fotos-search:hover {
+    border-color: var(--color-text-hover);
+}
+
+/* Efecto Focus: Al hacer clic o navegar con el teclado */
+.admin-fotos-select:focus, .admin-fotos-search:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
 
 .admin-fotos-search::placeholder {

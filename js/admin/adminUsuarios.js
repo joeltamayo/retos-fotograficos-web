@@ -377,9 +377,7 @@ async function loadAndRender(state, refs) {
 		const totalPages = Math.max(1, Math.ceil(total / LIMITE));
 
 		refs.content.innerHTML = `
-			<div id="admin-usuarios-summary-area">
-				${renderSummaryCards(resumen)}
-			</div>
+			${renderSummaryCards(resumen)}
 
 			<div class="admin-usuarios-filter">
 				<input type="search" id="admin-usuarios-search" class="admin-usuarios-search" placeholder="Buscar por nombre, usuario o email..." value="${escapeHtml(state.query)}">
@@ -406,7 +404,6 @@ async function loadAndRender(state, refs) {
 		const statusFilter = refs.content.querySelector('#admin-usuarios-status-filter');
 		const tableArea = refs.content.querySelector('#admin-usuarios-table-area');
 		const pagination = refs.content.querySelector('#admin-usuarios-pagination');
-		const summaryArea = refs.content.querySelector('#admin-usuarios-summary-area');
 
 		let searchTimer = null;
 		if (searchInput) {
@@ -561,14 +558,9 @@ async function loadAndRender(state, refs) {
 			};
 
 			const response = await api.get('/admin/usuarios', params);
-			const resumen = response?.resumen || {};
 			const usuarios = Array.isArray(response?.usuarios) ? response.usuarios : [];
 			const total = toInt(response?.total, usuarios.length);
 			const totalPages = Math.max(1, Math.ceil(total / LIMITE));
-
-			if (summaryArea) {
-				summaryArea.innerHTML = renderSummaryCards(resumen);
-			}
 
 			if (title) title.textContent = `Usuarios Registrados (${total})`;
 
