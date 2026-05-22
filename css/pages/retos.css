@@ -22,8 +22,8 @@
 /* Título principal de la página */
 .rt-title {
 	margin: 0;
-	font-size: 36px;
-	font-weight: 700;
+	font-size: 20px;
+	font-weight: 600;
 	color: var(--color-text);
 }
 
@@ -63,8 +63,8 @@
 /* Título de cada sección (Activos, Finalizados) */
 .rt-section-title {
 	margin: 0 0 14px;
-	font-size: 30px;
-	font-weight: 600;
+	font-size: 18px;
+	font-weight: 500;
 	color: var(--color-text);
 }
 
