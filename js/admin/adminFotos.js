@@ -242,8 +242,8 @@ function renderTable(contenedor, fotos, handlers) {
 								<td>${renderUserCell(foto)}</td>
 								<td>${renderEstadoBadge(foto.estado)}</td>
 								<td>${escapeHtml(formatDateTime(foto.created_at))}</td>
-								<td><span class="admin-fotos-score">⭐ ${toInt(foto.total_calificaciones)}</span></td>
-								<td><span class="admin-fotos-score">💬 ${toInt(foto.total_comentarios)}</span></td>
+								<td><span class="admin-fotos-score"><i class="bi bi-star-fill"></i> ${toInt(foto.total_calificaciones)}</span></td>
+								<td><span class="admin-fotos-score"><i class="bi bi-chat-dots-fill"></i> ${toInt(foto.total_comentarios)}</span></td>
 								<td><span class="admin-fotos-score">${escapeHtml(puntuacion)}</span></td>
 								<td>
 									<div class="admin-fotos-actions">

@@ -1270,11 +1270,20 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: 6px;
     padding: 4px 10px;
     border-radius: var(--radius-full);
     background: var(--color-neutral-bg);
     font-weight: 600;
     color: var(--color-text);
+}
+
+.admin-fotos-score .bi-star-fill {
+    color: #F59E0B;
+}
+
+.admin-fotos-score .bi-chat-dots-fill {
+    color: #6B7280;
 }
 
 .admin-fotos-empty,
