@@ -29,8 +29,12 @@ const KEY_RUTA_DESTINO = 'rutaDestino';
 let navigationToken = 0;
 let revalidationInProgress = false;
 let revalidationTimer = null;
+let lastHiddenAt = null;
+let lastRevalidationAt = 0;
 
-const REVALIDATION_DELAY_MS = 400;
+const REVALIDATION_DELAY_MS = 1200;
+const MIN_AWAY_BEFORE_REVALIDATE_MS = 60_000;
+const MIN_REVALIDATION_INTERVAL_MS = 15_000;
 
 function closeOpenModals() {
 	if (!window.bootstrap?.Modal) {
@@ -283,9 +287,30 @@ async function revalidarSesionYRender() {
 	}
 }
 
-function scheduleRevalidation() {
+function scheduleRevalidation(options = {}) {
+	const { force = false } = options;
+
 	if (hasOpenModal()) {
 		return;
+	}
+
+	if (document.hidden) {
+		return;
+	}
+
+	const now = Date.now();
+
+	if (!force) {
+		const awayMs = lastHiddenAt ? now - lastHiddenAt : 0;
+		const sinceLastRevalidation = now - lastRevalidationAt;
+
+		if (awayMs < MIN_AWAY_BEFORE_REVALIDATE_MS) {
+			return;
+		}
+
+		if (sinceLastRevalidation < MIN_REVALIDATION_INTERVAL_MS) {
+			return;
+		}
 	}
 
 	if (revalidationTimer) {
@@ -295,6 +320,7 @@ function scheduleRevalidation() {
 	revalidationTimer = setTimeout(() => {
 		revalidationTimer = null;
 		if (navigator.onLine) {
+			lastRevalidationAt = Date.now();
 			void revalidarSesionYRender();
 			return;
 		}
@@ -319,15 +345,22 @@ async function bootstrapApp() {
 
 window.addEventListener('hashchange', renderCurrentRoute);
 window.addEventListener('DOMContentLoaded', bootstrapApp);
-window.addEventListener('focus', scheduleRevalidation);
+window.addEventListener('focus', () => {
+	scheduleRevalidation();
+});
 window.addEventListener('visibilitychange', () => {
+	if (document.hidden) {
+		lastHiddenAt = Date.now();
+		return;
+	}
+
 	if (!document.hidden) {
 		scheduleRevalidation();
 	}
 });
 window.addEventListener('online', () => {
 	mostrarToast('Conexión restaurada.', 'success');
-	scheduleRevalidation();
+	scheduleRevalidation({ force: true });
 });
 window.addEventListener('offline', () => {
 	mostrarToast('Sin conexión a internet.', 'warning');
