@@ -57,6 +57,9 @@ async function refreshRetosTable(state, refs) {
 
 		if (tableArea) tableArea.classList.add('pc-update-prep');
 		renderTable(tableArea, retos, {
+			onView: (id, estado) => {
+				abrirDetalleRetoSegunEstado(id, estado);
+			},
 			onEdit: async (id) => {
 				try {
 					const reto = await api.get(`/admin/retos/${encodeURIComponent(id)}`);
@@ -290,6 +293,25 @@ function renderEstadoBadge(estado) {
 	return `<span class="admin-retos-badge ${meta.badgeClass}">${escapeHtml(meta.label)}</span>`;
 }
 
+function abrirDetalleReto(id) {
+	if (!id) {
+		return;
+	}
+
+	window.location.hash = `#/retos/${encodeURIComponent(String(id))}`;
+}
+
+function abrirDetalleRetoSegunEstado(id, estado) {
+	const estadoNormalizado = String(estado || '').trim().toLowerCase();
+
+	if (estadoNormalizado === 'programado') {
+		mostrarToast('No hay detalle porque todavia no empieza.', 'warning');
+		return;
+	}
+
+	abrirDetalleReto(id);
+}
+
 function renderTable(contenedor, retos, handlers) {
 	if (!Array.isArray(retos) || retos.length === 0) {
 		contenedor.innerHTML = '<p class="admin-retos-empty">No se encontraron retos con los filtros actuales.</p>';
@@ -316,7 +338,7 @@ function renderTable(contenedor, retos, handlers) {
 					${retos.map((reto) => {
 		const isRevision = String(reto.estado || '').toLowerCase() === 'revision';
 		return `
-							<tr>
+							<tr class="admin-retos-row" data-reto-id="${escapeHtml(reto.id)}" data-estado="${escapeHtml(reto.estado || '')}" role="button" tabindex="0" aria-label="Abrir detalle del reto ${escapeHtml(reto.titulo || 'sin título')}">
 								<td>
 									${reto.imagen_url
 					? `<img class="admin-retos-thumb" src="${reto.imagen_public_id ? cloudinaryUrl(reto.imagen_public_id, { width: 100, height: 100, crop: 'fill' }) : escapeHtml(reto.imagen_url)}" alt="${escapeHtml(reto.titulo || 'Reto')}" loading="lazy" decoding="async" width="100" height="100">`
@@ -334,6 +356,9 @@ function renderTable(contenedor, retos, handlers) {
 								<td>${toInt(reto.total_fotografias)}</td>
 								<td>
 									<div class="admin-retos-actions">
+										<button type="button" class="admin-retos-action-btn" data-action="view" data-id="${escapeHtml(reto.id)}" data-estado="${escapeHtml(reto.estado || '')}" aria-label="Visualizar reto">
+											<i class="bi bi-eye"></i>
+										</button>
 										<button type="button" class="admin-retos-action-btn" data-action="edit" data-id="${escapeHtml(reto.id)}" aria-label="Editar reto">
 											<i class="bi bi-pencil-square"></i>
 										</button>
@@ -362,6 +387,10 @@ function renderTable(contenedor, retos, handlers) {
 		button.addEventListener('click', () => handlers.onEdit(button.dataset.id || ''));
 	});
 
+	contenedor.querySelectorAll('[data-action="view"]').forEach((button) => {
+		button.addEventListener('click', () => handlers.onView(button.dataset.id || '', button.dataset.estado || ''));
+	});
+
 	contenedor.querySelectorAll('[data-action="approve"]').forEach((button) => {
 		button.addEventListener('click', () => handlers.onModerate(button.dataset.id || '', 'activo'));
 	});
@@ -372,6 +401,23 @@ function renderTable(contenedor, retos, handlers) {
 
 	contenedor.querySelectorAll('[data-action="delete"]').forEach((button) => {
 		button.addEventListener('click', () => handlers.onDelete(button.dataset.id || ''));
+	});
+
+	contenedor.querySelectorAll('.admin-retos-row').forEach((row) => {
+		row.addEventListener('click', (event) => {
+			if (event.target.closest('[data-action]')) {
+				return;
+			}
+
+			abrirDetalleRetoSegunEstado(row.dataset.retoId || '', row.dataset.estado || '');
+		});
+
+		row.addEventListener('keydown', (event) => {
+			if (event.key === 'Enter' || event.key === ' ') {
+				event.preventDefault();
+				abrirDetalleReto(row.dataset.retoId || '');
+			}
+		});
 	});
 }
 
@@ -521,7 +567,10 @@ async function loadAndRender(state, refs) {
 			});
 		}
 
-		renderTable(tableArea, retos, {
+			renderTable(tableArea, retos, {
+				onView: (id, estado) => {
+					abrirDetalleRetoSegunEstado(id, estado);
+			},
 			onEdit: async (id) => {
 				try {
 					const reto = await api.get(`/admin/retos/${encodeURIComponent(id)}`);

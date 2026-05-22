@@ -818,6 +818,30 @@
     flex-wrap: wrap;
 }
 
+.admin-retos-row {
+    cursor: pointer;
+    transition: background-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.admin-retos-row:hover,
+.admin-retos-row:focus-visible {
+    background: rgba(15, 23, 42, 0.03);
+}
+
+.admin-retos-row:hover td,
+.admin-retos-row:focus-visible td {
+    background: rgba(15, 23, 42, 0.03);
+}
+
+.admin-retos-row:focus-visible {
+    outline: 2px solid var(--color-primary, #2563EB);
+    outline-offset: -2px;
+}
+
+.admin-retos-row:hover .admin-retos-title {
+    color: var(--color-primary, #2563EB);
+}
+
 .admin-retos-action-btn {
     width: 32px;
     height: 32px;
