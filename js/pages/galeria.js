@@ -85,13 +85,11 @@ function getCurrentWeekRange() {
  * Renderiza la estructura base y devuelve referencias de secciones dinámicas.
  */
 function renderLayout(contenedor, ordenActual) {
-	const { inicio, fin } = getCurrentWeekRange();
 
 	contenedor.innerHTML = `
 		<section class="gl-page page-enter">
 			<header class="gl-header">
-				<h1 class="gl-title"><i class="bi bi-stars"></i>Galería de la Semana</h1>
-				<p class="gl-subtitle">Semana del ${escapeHtml(inicio)} al ${escapeHtml(fin)}</p>
+				<h1 class="gl-title"><i class="bi bi-stars"></i>Galería</h1>
 			</header>
 
 			<div class="gl-order-row">
