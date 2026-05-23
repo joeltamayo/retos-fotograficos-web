@@ -80,10 +80,20 @@ const MILISEGUNDOS_DIA = 1000 * 60 * 60 * 24;
  */
 function parsearFecha(iso) {
 	if (!iso) return null;
-	const dateStr = String(iso).slice(0, 10);
-	const [year, month, day] = dateStr.split('-');
-	if (!year || !month || !day) return null;
-	const fecha = new Date(Number(year), Number(month) - 1, Number(day));
+
+	const valor = String(iso).trim();
+	if (!valor) return null;
+
+	// Si es fecha sola (YYYY-MM-DD), la interpretamos en horario local para
+	// evitar cambios de dia por conversion UTC.
+	if (/^\d{4}-\d{2}-\d{2}$/.test(valor)) {
+		const [year, month, day] = valor.split('-');
+		const fechaLocal = new Date(Number(year), Number(month) - 1, Number(day));
+		return Number.isNaN(fechaLocal.getTime()) ? null : fechaLocal;
+	}
+
+	// Si ya trae hora o timezone, se respeta el instante real.
+	const fecha = new Date(valor);
 	return Number.isNaN(fecha.getTime()) ? null : fecha;
 }
 
