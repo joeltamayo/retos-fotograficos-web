@@ -54,6 +54,10 @@ function hasOpenModal() {
 	return Boolean(document.querySelector('.modal.show'));
 }
 
+function isAuthRoute() {
+	return getCurrentPath() === '/login';
+}
+
 /**
  * Normaliza el hash actual a una ruta usable por el matcher.
  */
@@ -138,6 +142,17 @@ function resolveRoute(path) {
 	}
 
 	return null;
+}
+
+function getAuthSnapshot() {
+	return {
+		autenticado: auth.estaAutenticado(),
+		esAdmin: auth.esAdmin(),
+	};
+}
+
+function areAuthSnapshotsEqual(before, after) {
+	return before.autenticado === after.autenticado && before.esAdmin === after.esAdmin;
 }
 
 /**
@@ -276,12 +291,37 @@ async function revalidarSesionYRender() {
 		return;
 	}
 
+	// En login/registro no tiene sentido revalidar sesion ni re-renderizar,
+	// porque interrumpe la captura de datos en el formulario.
+	if (isAuthRoute()) {
+		return;
+	}
+
 	revalidationInProgress = true;
+	const pathAntes = getCurrentPath();
+	const authAntes = getAuthSnapshot();
 
 	try {
 		await auth.verificarSesion();
+
+		if (getCurrentPath() !== pathAntes) {
+			return;
+		}
+
+		const authDespues = getAuthSnapshot();
+		const authCambio = !areAuthSnapshotsEqual(authAntes, authDespues);
+		const resolved = resolveRoute(pathAntes);
+		const routeProtegida = Boolean(resolved?.route.requiresAuth || resolved?.route.requiresAdmin);
+
+		if (!authCambio && !routeProtegida) {
+			return;
+		}
+
 		await renderNavbar();
-		await renderCurrentRoute();
+
+		if (routeProtegida || authCambio) {
+			await renderCurrentRoute();
+		}
 	} finally {
 		revalidationInProgress = false;
 	}
@@ -289,6 +329,10 @@ async function revalidarSesionYRender() {
 
 function scheduleRevalidation(options = {}) {
 	const { force = false } = options;
+
+	if (isAuthRoute()) {
+		return;
+	}
 
 	if (hasOpenModal()) {
 		return;
@@ -333,7 +377,9 @@ function scheduleRevalidation(options = {}) {
  * Inicializa sesion, navbar y primera ruta del SPA.
  */
 async function bootstrapApp() {
-	await auth.verificarSesion();
+	if (!isAuthRoute()) {
+		await auth.verificarSesion();
+	}
 	await renderNavbar();
 	await renderCurrentRoute();
 
@@ -355,6 +401,8 @@ window.addEventListener('visibilitychange', () => {
 	}
 
 	if (!document.hidden) {
+		// Evita usar un timestamp viejo en revalidaciones posteriores.
+		lastHiddenAt = null;
 		scheduleRevalidation();
 	}
 });
