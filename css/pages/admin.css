@@ -828,8 +828,51 @@
 
 .admin-retos-table {
     width: max-content;
-    min-width: 1120px;
+    min-width: 1040px;
     border-collapse: collapse;
+}
+
+.admin-retos-table th:nth-child(1),
+.admin-retos-table td:nth-child(1) {
+    width: 72px;
+}
+
+.admin-retos-table th:nth-child(2),
+.admin-retos-table td:nth-child(2) {
+    width: 230px;
+    max-width: 220px;
+}
+
+.admin-retos-table th:nth-child(3),
+.admin-retos-table td:nth-child(3) {
+    width: 160px;
+}
+
+.admin-retos-table th:nth-child(4),
+.admin-retos-table td:nth-child(4) {
+    width: 110px;
+}
+
+.admin-retos-table th:nth-child(5),
+.admin-retos-table td:nth-child(5) {
+    width: 105px;
+}
+
+.admin-retos-table th:nth-child(6),
+.admin-retos-table td:nth-child(6) {
+    width: 150px;
+}
+
+.admin-retos-table th:nth-child(7),
+.admin-retos-table td:nth-child(7),
+.admin-retos-table th:nth-child(8),
+.admin-retos-table td:nth-child(8) {
+    width: 100px;
+}
+
+.admin-retos-table th:nth-child(9),
+.admin-retos-table td:nth-child(9) {
+    width: 140px;
 }
 
 .admin-retos-table th {
@@ -848,6 +891,20 @@
     vertical-align: top;
     font-size: 14px;
     color: var(--color-text);
+}
+
+.admin-retos-table th:nth-child(4),
+.admin-retos-table td:nth-child(4),
+.admin-retos-table th:nth-child(7),
+.admin-retos-table td:nth-child(7),
+.admin-retos-table th:nth-child(8),
+.admin-retos-table td:nth-child(8) {
+    text-align: center;
+}
+
+.admin-retos-table td:nth-child(7),
+.admin-retos-table td:nth-child(8) {
+    white-space: nowrap;
 }
 
 .admin-retos-thumb,
@@ -875,6 +932,9 @@
     font-size: 15px;
     font-weight: 600;
     color: var(--color-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .admin-retos-desc {
@@ -1182,8 +1242,48 @@
 
 .admin-fotos-table {
     width: max-content;
-    min-width: 1180px;
+    min-width: 1080px;
     border-collapse: collapse;
+}
+
+.admin-fotos-table th:nth-child(2),
+.admin-fotos-table td:nth-child(2) {
+    width: 210px;
+    max-width: 210px;
+}
+
+.admin-fotos-table th:nth-child(1),
+.admin-fotos-table td:nth-child(1) {
+    width: 72px;
+}
+
+.admin-fotos-table th:nth-child(3),
+.admin-fotos-table td:nth-child(3) {
+    width: 170px;
+}
+
+.admin-fotos-table th:nth-child(4),
+.admin-fotos-table td:nth-child(4) {
+    width: 110px;
+}
+
+.admin-fotos-table th:nth-child(5),
+.admin-fotos-table td:nth-child(5) {
+    width: 140px;
+}
+
+.admin-fotos-table th:nth-child(6),
+.admin-fotos-table td:nth-child(6),
+.admin-fotos-table th:nth-child(7),
+.admin-fotos-table td:nth-child(7),
+.admin-fotos-table th:nth-child(8),
+.admin-fotos-table td:nth-child(8) {
+    width: 92px;
+}
+
+.admin-fotos-table th:nth-child(9),
+.admin-fotos-table td:nth-child(9) {
+    width: 140px;
 }
 
 .admin-fotos-table th {
@@ -1202,6 +1302,23 @@
     vertical-align: middle;
     font-size: 14px;
     color: var(--color-text);
+}
+
+.admin-fotos-table th:nth-child(4),
+.admin-fotos-table td:nth-child(4),
+.admin-fotos-table th:nth-child(6),
+.admin-fotos-table td:nth-child(6),
+.admin-fotos-table th:nth-child(7),
+.admin-fotos-table td:nth-child(7),
+.admin-fotos-table th:nth-child(8),
+.admin-fotos-table td:nth-child(8) {
+    text-align: center;
+}
+
+.admin-fotos-table td:nth-child(6),
+.admin-fotos-table td:nth-child(7),
+.admin-fotos-table td:nth-child(8) {
+    white-space: nowrap;
 }
 
 .admin-fotos-thumb {
@@ -1228,6 +1345,9 @@
     font-size: 15px;
     font-weight: 600;
     color: var(--color-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .admin-fotos-desc {
