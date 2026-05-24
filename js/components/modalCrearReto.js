@@ -257,6 +257,20 @@ function calculateDurationFromDates(fechaInicio, fechaFin) {
     return '1 Semana';
 }
 
+function calculateEstadoFromDates(fechaInicio, fechaFin) {
+    const today = getTodayDateString();
+
+    if (fechaFin && fechaFin < today) {
+        return { label: 'Finalizado', className: 'mcr-state-badge--finalizado' };
+    }
+
+    if (fechaInicio && fechaInicio > today) {
+        return { label: 'Programado', className: 'mcr-state-badge--programado' };
+    }
+
+    return { label: 'Activo', className: 'mcr-state-badge--activo' };
+}
+
 function renderModalContent(state) {
     state.modalElement.querySelector('.modal-content').innerHTML = `
         <div class="modal-header mcr-header">
@@ -306,7 +320,7 @@ function renderModalContent(state) {
                     </select>
                     <p class="mcr-error" data-error="duracion"></p>
                 </div>
-                <div class="mcr-row">
+                <div class="mcr-row ${state.isEditing ? 'mcr-row--dates' : ''}">
                     <div class="mcr-col">
                         <label class="mcr-label" for="mcr-inicio">Fecha de Inicio *</label>
                         <input id="mcr-inicio" name="fecha_inicio" class="mcr-input" type="date">
@@ -317,6 +331,12 @@ function renderModalContent(state) {
                         <input id="mcr-fin" name="fecha_fin" class="mcr-input" type="date">
                         <p class="mcr-error" data-error="fecha_fin"></p>
                     </div>
+                    ${state.isEditing ? `
+                    <div class="mcr-col mcr-state-col">
+                        <div class="mcr-label">Estado del Reto</div>
+                        <span id="mcr-estado-preview" class="mcr-state-badge mcr-state-badge--programado">Programado</span>
+                    </div>
+                    ` : ''}
                 </div>
                 <div class="mcr-section">
                     <div class="mcr-label">Imagen de Portada ${state.isEditing ? '' : '*'}</div>
@@ -373,6 +393,7 @@ async function abrirModalCrearReto(onSaved = null, reto = null) {
     const durationSelect = form.querySelector('#mcr-duracion');
     const fileInput = form.querySelector('#mcr-imagen-file');
     const uploadZone = form.querySelector('#mcr-upload-zone');
+    const estadoPreview = form.querySelector('#mcr-estado-preview');
     const categoriaPicker = form.querySelector('.mcr-category-picker');
     const categoriaDropdown = form.querySelector('#mcr-categoria-dropdown');
     const categoriaSearch = form.querySelector('#mcr-categoria-search');
@@ -402,6 +423,11 @@ async function abrirModalCrearReto(onSaved = null, reto = null) {
             if (!state.isEditing) {
                 dateEnd.min = dateStart.value || today;
             }
+            if (estadoPreview) {
+                const estado = calculateEstadoFromDates(dateStart.value, dateEnd.value);
+                estadoPreview.textContent = estado.label;
+                estadoPreview.className = `mcr-state-badge ${estado.className}`;
+            }
             return;
         }
 
@@ -417,6 +443,12 @@ async function abrirModalCrearReto(onSaved = null, reto = null) {
         dateEnd.readOnly = true;
         if (!state.isEditing) {
             dateEnd.min = dateStart.value;
+        }
+
+        if (estadoPreview) {
+            const estado = calculateEstadoFromDates(dateStart.value, dateEnd.value);
+            estadoPreview.textContent = estado.label;
+            estadoPreview.className = `mcr-state-badge ${estado.className}`;
         }
     };
 
@@ -678,9 +710,20 @@ async function abrirModalCrearReto(onSaved = null, reto = null) {
         if (!state.isEditing && dateStart?.value) {
             dateEnd.min = dateStart.value;
         }
+
+        if (estadoPreview) {
+            const estado = calculateEstadoFromDates(dateStart?.value || '', dateEnd?.value || '');
+            estadoPreview.textContent = estado.label;
+            estadoPreview.className = `mcr-state-badge ${estado.className}`;
+        }
     });
 
     updateRangeFromDuration();
+    if (estadoPreview) {
+        const estado = calculateEstadoFromDates(dateStart?.value || '', dateEnd?.value || '');
+        estadoPreview.textContent = estado.label;
+        estadoPreview.className = `mcr-state-badge ${estado.className}`;
+    }
     renderUploadZone();
 
     form.onsubmit = async (event) => {
