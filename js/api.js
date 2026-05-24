@@ -1,7 +1,7 @@
 /**
  * URL base del backend Express para todos los endpoints del SPA.
  */
-const BASE_URL = 'http://localhost:3000/api';
+const BASE_URL = 'https://retos-fotograficos-api.onrender.com';
 
 /**
  * Hash de ruta usado para enviar al usuario al login cuando su sesión expira.
